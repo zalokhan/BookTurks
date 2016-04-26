@@ -9,6 +9,7 @@ python:
 before_install:
 - export DJANGO_SETTINGS_MODULE=mysite.settings
 
+# Keep changing periodically
 env:
   global:
     # SECRET_KEY
