@@ -57,11 +57,12 @@ def get_env_variable(var_name, default=False):
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = get_env_variable('SECRET_KEY')
-SOCIAL_AUTH_FACEBOOK_KEY = get_env_variable('SOCIAL_AUTH_FACEBOOK_KEY')
-SOCIAL_AUTH_FACEBOOK_SECRET = get_env_variable('SOCIAL_AUTH_FACEBOOK_SECRET')
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+# SECRET_KEY = get_env_variable('SECRET_KEY')
+SECRET_KEY = 'wme%u@d*vp4brgr=#n=y4j(q7r#l&i@dz!&j408$c9%sz(p=i&'
+# SOCIAL_AUTH_FACEBOOK_KEY = get_env_variable('SOCIAL_AUTH_FACEBOOK_KEY')
+# SOCIAL_AUTH_FACEBOOK_SECRET = get_env_variable('SOCIAL_AUTH_FACEBOOK_SECRET')
+# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
