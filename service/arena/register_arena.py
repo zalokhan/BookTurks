@@ -63,7 +63,10 @@ def register_check_arena(request):
         request.session['alert_type'] = alert_type
         return HttpResponseRedirect(reverse('service:register'))
 
-    User.objects.create_user(username, password)
+    auth_user = User.objects.create_user(username, username, password)
+    auth_user.first_name = user_first_name
+    auth_user.last_name = user_last_name
+
     user = UserModel(username=username,
                      user_first_name=user_first_name,
                      user_last_name=user_last_name,

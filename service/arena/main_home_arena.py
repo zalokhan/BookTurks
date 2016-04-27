@@ -38,11 +38,12 @@ Gives failure alert if unsuccessful
 def login_check_arena(request):
     username = request.POST['username']
     password = request.POST['password']
+
     user = authenticate(username=username, password=password)
     if user is not None:
         if user.is_active:
             auth_login(request, user)
-            return HttpResponseRedirect(reverse('service:my_home'))
+            return HttpResponseRedirect(reverse('service:user_home'))
         else:
             message = "This account has been disabled. Contact the admin."
             alert_type = "danger"
