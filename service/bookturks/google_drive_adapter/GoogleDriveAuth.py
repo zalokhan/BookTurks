@@ -61,10 +61,10 @@ def get_credentials(client_secrets_path, doc="", argv=None, name='storage', vers
     storage = file.Storage(name + '.json')
     credentials = storage.get()
     if credentials is None or credentials.invalid:
-        flow = client.flow_from_clientsecrets(client_secrets, scope)
+        flow = client.flow_from_clientsecrets(client_secrets, scope, redirect_uri="http://bookturks.herokuapp.com")
         credentials = tools.run_flow(flow, storage, flags) \
             if flags else tools.run_flow(flow, storage, tools.argparser.parse_args([]))
-    http = credentials.authorize(http=httplib2.Http('www.bookturks.heroku.com/'))
+    http = credentials.authorize(http=httplib2.Http())
 
     if discovery_filename is None:
         # Construct a service object via the discovery service.
