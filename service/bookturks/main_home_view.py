@@ -1,11 +1,14 @@
-from django.http import HttpResponseRedirect
-
-from django.shortcuts import render
-from django.core.urlresolvers import reverse
-
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout
+
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.conf import settings
+
+from google_drive_adapter import GoogleDriveAuth
+from google_drive_adapter.GoogleDriveClient import GoogleDriveClient
 
 """
 Main home page
@@ -25,6 +28,10 @@ def main_home_arena(request):
         'alert_message': alert_message,
         'alert_type': alert_type
     }
+
+    gauth = GoogleDriveAuth.get_credentials(client_secrets_path=settings.CLIENT_SECRET_FILE_PATH, scope_param='drive')
+    client = GoogleDriveClient(gauth)
+    file_list = client.list_all()
 
     return render(request, 'service/main_home_page.html', context)
 

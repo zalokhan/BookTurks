@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import sys
 import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -62,6 +63,7 @@ SOCIAL_AUTH_FACEBOOK_KEY = get_env_variable('SOCIAL_AUTH_FACEBOOK_KEY')
 SOCIAL_AUTH_FACEBOOK_SECRET = get_env_variable('SOCIAL_AUTH_FACEBOOK_SECRET')
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_DRIVE = get_env_variable('SOCIAL_AUTH_GOOGLE_DRIVE')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -214,3 +216,20 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 STATICFILES_DIRS = [
     # Static absolute path
 ]
+
+#
+# Create client_secrets.json
+#
+CLIENT_SECRET_FILE = 'client_secrets.json'
+CLIENT_SECRET_FILE_PATH = os.path.join(PROJECT_ROOT, CLIENT_SECRET_FILE)
+
+
+def create_client_secret():
+    if not os.path.exists(CLIENT_SECRET_FILE_PATH):
+        key_file = open(CLIENT_SECRET_FILE_PATH, 'w')
+        key_string = str(SOCIAL_AUTH_GOOGLE_DRIVE)
+        key_file.write(key_string)
+        key_file.close()
+
+
+create_client_secret()
