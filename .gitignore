@@ -1,2 +1,4 @@
 mysite/.env
 mysite/client_secrets.json
+storage.json
+service/bookturks/client_secrets.json

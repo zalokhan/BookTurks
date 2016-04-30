@@ -10,6 +10,7 @@ from django.conf import settings
 from google_drive_adapter import GoogleDriveAuth
 from google_drive_adapter.GoogleDriveClient import GoogleDriveClient
 
+
 """
 Main home page
 Sends alerts if registration successful or login failure
