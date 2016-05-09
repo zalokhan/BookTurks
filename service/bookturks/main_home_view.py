@@ -39,6 +39,9 @@ def main_home_arena(request):
         ALERT_TYPE: alert_type
     }
 
+    # dbx = DropboxClient()
+    # dbx.list_quiz_files()
+
     return render(request, 'service/main_home_page.html', context)
 
 
