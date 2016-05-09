@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
-import sys
 import dj_database_url
+import dropbox
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -56,14 +56,16 @@ def get_env_variable(var_name, default=False):
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
+"""
+Environment Variables and keys.
+"""
 # SECURITY WARNING: keep the secret key used in production secret!
-
 SECRET_KEY = get_env_variable('SECRET_KEY')
 SOCIAL_AUTH_FACEBOOK_KEY = get_env_variable('SOCIAL_AUTH_FACEBOOK_KEY')
 SOCIAL_AUTH_FACEBOOK_SECRET = get_env_variable('SOCIAL_AUTH_FACEBOOK_SECRET')
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
-SOCIAL_AUTH_GOOGLE_DRIVE = get_env_variable('SOCIAL_AUTH_GOOGLE_DRIVE')
+DROPBOX_ACCESS_TOKEN = get_env_variable('DROPBOX_ACCESS_TOKEN')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -71,7 +73,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # Application definition
-
 INSTALLED_APPS = [
     'service.apps.ServiceConfig',
     'django.contrib.admin',
@@ -217,19 +218,5 @@ STATICFILES_DIRS = [
     # Static absolute path
 ]
 
-#
-# Create client_secrets.json
-#
-CLIENT_SECRET_FILE = 'client_secrets.json'
-CLIENT_SECRET_FILE_PATH = os.path.join(PROJECT_ROOT, CLIENT_SECRET_FILE)
-
-
-def create_client_secret():
-    if not os.path.exists(CLIENT_SECRET_FILE_PATH):
-        key_file = open(CLIENT_SECRET_FILE_PATH, 'w')
-        key_string = str(SOCIAL_AUTH_GOOGLE_DRIVE)
-        key_file.write(key_string)
-        key_file.close()
-
-
-create_client_secret()
+# Dropbox client
+DROPBOX_CLIENT = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
