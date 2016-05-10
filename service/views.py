@@ -10,57 +10,57 @@ def main_home(request):
     """
     Main Home Page
     Website landing page
-    :param request:
+    :param request: User request
     :return: Renders a page
     """
     return main_home_arena(request)
 
 
-"""
-Login Check
-Validates login values
-"""
-
-
 def login(request):
+    """
+    Login Check
+    Validates login values
+    :param request: User request
+    :return: Renders a page
+    """
     return login_check_arena(request)
 
 
-"""
-Logout
-Logs out the user
-"""
-
-
 def logout(request):
+    """
+    Logout
+    Logs out the user
+    :param request: User request
+    :return: Renders a page
+    """
     return logout_arena(request)
 
 
-"""
-Register Page
-Register new account landing page
-"""
-
-
 def register(request):
+    """
+    Register Page
+    Register new account landing page
+    :param request: User request
+    :return: Renders a page
+    """
     return register_arena(request)
 
 
-"""
-Register Check
-Validates registration values
-"""
-
-
 def register_check(request):
+    """
+    Register Check
+    Validates registration values
+    :param request: User request
+    :return: Renders a page
+    """
     return register_check_arena(request)
 
 
-"""
-User Home page
-User Dashboard and home landing page
-"""
-
-
 def user_home(request):
+    """
+    User Home page
+    User Dashboard and home landing page
+    :param request: User request
+    :return: Renders a page
+    """
     return user_home_main_arena(request)

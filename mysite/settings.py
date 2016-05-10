@@ -23,6 +23,8 @@ def get_env_variable(var_name, default=False):
     """
     Get the environment variable or return exception
     :param var_name: Environment Variable to lookup
+    :param default:
+    :return: returns environment variables
     """
     try:
         return os.environ[var_name]
@@ -67,8 +69,14 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 DROPBOX_ACCESS_TOKEN = get_env_variable('DROPBOX_ACCESS_TOKEN')
 
+database_config = dj_database_url.config()
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if database_config:
+    DEBUG = False
+else:
+    DEBUG = True
+
 
 ALLOWED_HOSTS = ['*']
 
@@ -151,7 +159,6 @@ DATABASES = {
     }
 }
 
-database_config = dj_database_url.config()
 
 if database_config:
     DATABASES = {
