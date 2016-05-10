@@ -72,10 +72,10 @@ DROPBOX_ACCESS_TOKEN = get_env_variable('DROPBOX_ACCESS_TOKEN')
 database_config = dj_database_url.config()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if database_config:
-    DEBUG = False
-else:
+if database_config is None:
     DEBUG = True
+else:
+    DEBUG = False
 
 
 ALLOWED_HOSTS = ['*']
