@@ -1,14 +1,18 @@
+"""
+Views
+"""
 from bookturks.main_home_view import main_home_arena, login_check_arena, logout_arena
 from bookturks.register_view import register_arena, register_check_arena
 from bookturks.user_home_view import user_home_main_arena
 
-"""
-Main Home Page
-Website landing page
-"""
-
 
 def main_home(request):
+    """
+    Main Home Page
+    Website landing page
+    :param request:
+    :return: Renders a page
+    """
     return main_home_arena(request)
 
 
