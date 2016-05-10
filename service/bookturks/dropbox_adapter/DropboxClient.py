@@ -17,22 +17,20 @@ class DropboxClient:
     def upload_file(self, content, filename):
         """
         Uploads content creating a new file
-        Args:
-            content: content of file
-            filename: create a file with this name on dropbox
-        Returns:
-            Metadata related to file
+        :param content: content of file
+        :param filename: create a file with this name on dropbox
+        :return: List of File objects of all quizzes matching the filter
         """
+
         return self.client.files_upload(content, filename)
 
     def list_quiz_files(self, filters=None):
         """
         Lists the quiz files filtering out required quiz results
-        Args:
-            filters: filters to be provided in future
-        Returns:
-            List of File objects of all quizzes matching the filter
+        :param filters: filters to be provided in future
+        :return: List of File objects of all quizzes matching the filter
         """
+
         list_of_files = self.client.files_list_folder(QUIZ_HOME)
         if not filters:
             while True:

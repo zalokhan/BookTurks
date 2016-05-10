@@ -8,17 +8,16 @@ from django.shortcuts import render
 
 from dropbox_adapter.DropboxClient import DropboxClient
 
-from Constants import USERNAME, PASSWORD, ALERT_MESSAGE, ALERT_TYPE, DANGER
+from Constants import USERNAME, PASSWORD, ALERT_MESSAGE, ALERT_TYPE, DANGER, SERVICE_MAIN_HOME, SERVICE_USER_HOME, \
+    MAIN_HOME_PAGE, USER, REQUEST
 
 
 def main_home_arena(request):
     """
     Main home page
     Sends alerts if registration successful or login failure
-    Args:
-        request: user request
-    Returns:
-        renders a page with context
+    :param request: user request
+    :return: renders a page with context
     """
 
     # Checks if alert message is required to be displayed on the top
@@ -27,14 +26,14 @@ def main_home_arena(request):
     alert_type = request.session.get(ALERT_TYPE)
 
     # Remove the alerts from the request to prevent repetition of alerts on reload of the page
-    if 'alert_message' in request.session:
+    if ALERT_MESSAGE in request.session:
         del request.session[ALERT_MESSAGE]
         del request.session[ALERT_TYPE]
 
     # Creating context
     context = {
-        'request': request,
-        'user': request.user,
+        REQUEST: request,
+        USER: request.user,
         ALERT_MESSAGE: alert_message,
         ALERT_TYPE: alert_type
     }
@@ -42,17 +41,16 @@ def main_home_arena(request):
     # dbx = DropboxClient()
     # dbx.list_quiz_files()
 
-    return render(request, 'service/main_home_page.html', context)
+    return render(request, MAIN_HOME_PAGE, context)
 
 
 def login_check_arena(request):
     """
     Checks login authentication result and gives failure alert if unsuccessful
-    Args:
-        request: user request
-    Returns:
-        renders a page with context
+    :param request: user request
+    :return: renders a page with context
     """
+
     username = request.POST[USERNAME]
     password = request.POST[PASSWORD]
 
@@ -63,7 +61,7 @@ def login_check_arena(request):
         if user.is_active:
             # Authentication successful
             auth_login(request, user)
-            return HttpResponseRedirect(reverse('service:user_home'))
+            return HttpResponseRedirect(reverse(SERVICE_USER_HOME))
 
         else:
             # Authentication failure as user was disabled.
@@ -72,7 +70,7 @@ def login_check_arena(request):
             alert_type = DANGER
             request.session[ALERT_MESSAGE] = message
             request.session[ALERT_TYPE] = alert_type
-            return HttpResponseRedirect(reverse('service:main_home'))
+            return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))
 
     else:
         # Authentication failure
@@ -81,16 +79,15 @@ def login_check_arena(request):
         alert_type = DANGER
         request.session[ALERT_MESSAGE] = message
         request.session[ALERT_TYPE] = alert_type
-        return HttpResponseRedirect(reverse('service:main_home', ))
+        return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME, ))
 
 
 def logout_arena(request):
     """
     Logs out user
-    Args:
-        request: user request
-    Returns:
-        renders a page with context
+    :param request: user request
+    :return: renders a page with context
     """
+
     logout(request)
-    return HttpResponseRedirect(reverse('service:main_home', ))
+    return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME, ))
