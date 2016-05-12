@@ -4,15 +4,15 @@ Parses and checks for errors
 Uploads the file to DropBox with relevant naming conventions for faster searches.
 Add functions in future
 """
-import json
+from service.dropbox_adapter.DropboxClient import DropboxClient
 
 
-def create_quiz(content):
+def create_quiz(content, quiz_name):
     """
     Create quiz with dict contents
     :param content: Dictionary containing entire quiz
     :return: Dropbox file metadata
     """
-
-    json_data = json.dumps(content)
-    return json_data
+    dbx = DropboxClient()
+    return_code = dbx.upload_file(content=content, filename="/quiz/"+quiz_name)
+    return return_code

@@ -1,0 +1,93 @@
+{% extends "service/skeleton.html" %}
+{% load static %}
+
+{% block head %}
+<link href="{% static 'service/stylesheets/form-builder.min.css' %}" rel="stylesheet" type="text/css" media="screen">
+<link href="{% static 'service/stylesheets/form-render.min.css' %}" rel="stylesheet" type="text/css" media="screen">
+<style>
+    body {
+        background: lightgrey;
+        font-family: sans-serif;
+    }
+
+    #rendered-form {
+        clear: both;
+        display: none;
+
+    button {
+        float: right;
+    }
+
+    }
+</style>
+{% endblock %}
+
+{% block main_container %}
+
+{{ state }}
+<form id="quiz_form" action="{% url 'service:user_home' %}" method="post" class="form-signin">
+    {% csrf_token %}
+    <input type='hidden' id='hiddenField' name='quiz_data' value=''/>
+</form>
+
+<div id="edit-form" style="padding-top: 40px">
+    <textarea id="fb-template"></textarea>
+</div>
+
+<div id="rendered-form" style="padding-top: 40px">
+    <form action="#"></form>
+    <button class="btn btn-default edit-form">Edit</button>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'service/javascripts/jqueryui/1.11.4/jquery-ui.min.js' %}"></script>
+<script src="{% static 'service/javascripts/form-builder.min.js' %}"></script>
+<script src="{% static 'service/javascripts/form-render.min.js' %}"></script>
+<script>
+    jQuery(document).ready(function ($) {
+        var fbTemplate = document.getElementById('fb-template'),
+                formContainer = document.getElementById('rendered-form'),
+                $fBInstance = $(document.getElementById('edit-form')),
+                formRenderOpts = {
+                    container: $('form', formContainer)
+                };
+        var options = {
+            disableFields: [
+                'autocomplete',
+                'button',
+                'checkbox',
+                'date',
+                'file',
+                'hidden',
+                'paragraph',
+                'text',
+                'textarea']
+        };
+
+        var formBuilder = $(fbTemplate).formBuilder(options);
+
+        $('.form-builder-save').click(function () {
+            $fBInstance.toggle();
+            $(formContainer).toggle();
+            $(fbTemplate).formRender(formRenderOpts);
+        });
+
+        $('.edit-form', formContainer).click(function () {
+            $fBInstance.toggle();
+            $(formContainer).toggle();
+        });
+
+        $(".form-builder-submit").click(function (e) {
+            e.preventDefault();
+            var formData = formBuilder.data('formBuilder').formData;
+            document.getElementById('hiddenField').value = formData;
+            document.getElementById("quiz_form").submit();
+        });
+
+    });
+</script>
+{% endblock %}}
+
+

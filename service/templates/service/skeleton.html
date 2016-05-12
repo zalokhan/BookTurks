@@ -38,6 +38,8 @@
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <!-- jQuery -->
+    <script src="{% static 'service/userpages/bower_components/jquery/dist/jquery.min.js' %}"></script>
 
     {% block head %}{% endblock %}
 
@@ -186,10 +188,23 @@
                         <!-- /input-group -->
                     </li>
                     <li>
-                        <a href="/home/"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                        <a href="{% url 'service:user_home' %}"><i class="fa fa-dashboard fa-fw"></i>  Dashboard</a>
                     </li>
                     <li>
-                        <a href="/quiz/"><i class="fa fa-trophy fa-fw"></i> Quiz</a>
+                        <a href="#"><i class="fa fa-trophy fa-fw"></i>  Quiz<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="{% url 'service:user_quiz' %}">
+                                    <i class="fa fa-wrench fa-fw"></i>  Create a new quiz
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-gamepad fa-fw"></i>  Take a quiz
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- /.nav-second-level -->
                     </li>
                     <!--<li>-->
                     <!--<a href="#"><i class="fa fa-sitemap fa-fw"></i> Multi-Level Dropdown<span-->
@@ -230,13 +245,13 @@
         <!-- /.navbar-static-side -->
     </nav>
 
-    {% block main_container %}{% endblock %}
+    <div id="page-wrapper">
+        {% block main_container %}{% endblock %}
+    </div>
+    <!-- /#page-wrapper -->
 
 </div>
 <!-- /#wrapper -->
-
-<!-- jQuery -->
-<script src="{% static 'service/userpages/bower_components/jquery/dist/jquery.min.js' %}"></script>
 
 <!-- Bootstrap Core JavaScript -->
 <script src="{% static 'service/userpages/bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
@@ -247,7 +262,6 @@
 <!-- Morris Charts JavaScript -->
 <script src="{% static 'service/userpages/bower_components/raphael/raphael-min.js' %}"></script>
 <script src="{% static 'service/userpages/bower_components/morrisjs/morris.min.js' %}"></script>
-<script src="../js/morris-data.js"></script>
 
 <!-- Custom Theme JavaScript -->
 <script src="{% static 'service/userpages/dist/js/sb-admin-2.js' %}"></script>

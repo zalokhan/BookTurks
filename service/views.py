@@ -3,7 +3,7 @@ Views
 """
 from bookturks.main_home_view import main_home_arena, login_check_arena, logout_arena
 from bookturks.register_view import register_arena, register_check_arena
-from bookturks.user_home_view import user_home_main_arena
+from bookturks.user_home_view import user_home_main_arena, user_quiz_arena
 
 
 def main_home(request):
@@ -64,3 +64,12 @@ def user_home(request):
     :return: Renders a page
     """
     return user_home_main_arena(request)
+
+
+def user_quiz(request):
+    """
+    User Quiz Page
+    :param request: User request
+    :return:  Renders a page
+    """
+    return user_quiz_arena(request)
