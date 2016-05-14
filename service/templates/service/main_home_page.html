@@ -157,7 +157,8 @@
                 <div class="service-box">
                     <i class="fa fa-4x fa-book bounceIn text-primary" data-wow-delay=".3s"></i>
                     <h3>Write a story</h3>
-                    <p class="text-muted">Write a story you have always wanted to write or complete one from the list.</p>
+                    <p class="text-muted">Write a story you have always wanted to write or complete one from the
+                        list.</p>
                 </div>
             </div>
         </div>
@@ -273,67 +274,68 @@
 <!-- Signin Section -->
 <section id="signin">
 
-    {% if user and not user.is_anonymous %}
-    <fieldset disabled>
-        {% endif %}
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 text-center signin-h2">
-                    <h2>Sign In</h2>
-                </div>
+
+    <!--Display sign in box only if user has not signed in already -->
+    {% if user and user.is_anonymous %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center signin-h2">
+                <h2>Sign In</h2>
             </div>
-            <div class="row">
-                <div class="col-lg-12" style="text-align:center;">
-                    {{ state }}
-                    <form action="{% url 'service:login' %}" method="post" class="form-signin">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div style="width: 50%; margin: 0 auto;">
-                                <div class="form-group">
-                                    <label for="inputUsername" class="sr-only">Email</label>
-                                    <input type="email" name="username" value="{{ username}}" class="form-control"
-                                           placeholder="Username"
-                                           required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputPassword" class="sr-only">Password</label>
-                                    <input type="password" name="password" value="{{ password}}" class="form-control"
-                                           placeholder="Password"
-                                           required>
-                                </div>
-                                <button class="btn btn-xl" type="submit" style="background-color: lightblue">Sign in
-                                </button>
+        </div>
+        <div class="row">
+            <div class="col-lg-12" style="text-align:center;">
+                {{ state }}
+                <form action="{% url 'service:login' %}" method="post" class="form-signin">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div style="width: 50%; margin: 0 auto;">
+                            <div class="form-group">
+                                <label for="inputUsername" class="sr-only">Email</label>
+                                <input type="email" name="username" value="{{ username}}" class="form-control"
+                                       placeholder="Username"
+                                       required>
                             </div>
+                            <div class="form-group">
+                                <label for="inputPassword" class="sr-only">Password</label>
+                                <input type="password" name="password" value="{{ password}}" class="form-control"
+                                       placeholder="Password"
+                                       required>
+                            </div>
+                            <button class="btn btn-xl" type="submit" style="background-color: lightblue">Sign in
+                            </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        <div class="container" style="padding-top: 30px">
-            <div class="row" style="text-align: center; padding-left: 28%; padding-right: 28%">
-                <div class="col-sm-6 text-center button-div">
-                    <a href="{% url 'social:begin' 'facebook' %}?next={% url 'service:user_home' %}"
-                       class="btn btn-block btn-social btn-facebook" style="border-radius: 4px;"><i
-                            class="fa fa-facebook"></i> Sign in with Facebook
-                    </a>
-                </div>
-                <div class="col-sm-6 text-center button-div">
-                    <a href="{% url 'social:begin' 'google-oauth2' %}?next={% url 'service:user_home' %}"
-                       class="btn btn-block btn-social btn-google-plus" style="border-radius: 4px;">
-                        <i class="fa fa-google-plus"></i> Sign in with Google
-                    </a>
-                </div>
+    <div class="container" style="padding-top: 30px">
+        <div class="row" style="text-align: center; padding-left: 28%; padding-right: 28%">
+            <div class="col-sm-6 text-center button-div">
+                <a href="{% url 'social:begin' 'facebook' %}?next={% url 'service:user_home' %}"
+                   class="btn btn-block btn-social btn-facebook" style="border-radius: 4px;"><i
+                        class="fa fa-facebook"></i> Sign in with Facebook
+                </a>
+            </div>
+            <div class="col-sm-6 text-center button-div">
+                <a href="{% url 'social:begin' 'google-oauth2' %}?next={% url 'service:user_home' %}"
+                   class="btn btn-block btn-social btn-google-plus" style="border-radius: 4px;">
+                    <i class="fa fa-google-plus"></i> Sign in with Google
+                </a>
             </div>
         </div>
-        {% if user and not user.is_anonymous %}
-    </fieldset>
+    </div>
+    {% endif %}
 
+    <!--Sign in as different user shown only if user already signed in-->
+    {% if user and not user.is_anonymous %}
     <div class="container" style="padding-top: 30px">
 
         <div class="row">
-            <div class="col-lg-12" style="text-align:center;">
-                <h3 class="section-subheading text-muted" style="margin: 0 auto;">Sign in as a different user</h3>
+            <div class="col-lg-12 text-center signin-h2">
+                <h2>Sign in as a different user</h2>
             </div>
         </div>
         <div class="row" style="padding-top: 20px">
@@ -346,32 +348,32 @@
                 </form>
             </div>
         </div>
+    </div>
+    {% endif %}
 
-        {% endif %}
-
-        <div class="container" style="padding-top: 30px">
-            <div class="row">
-                <div class="col-lg-12" style="text-align:center;">
-                    <h3 class="section-subheading text-muted" style="margin: 0 auto;">Don't have an account?
-                        Sign up
-                        here!</h3>
-                </div>
-            </div>
-            <div class="row" style="padding-top: 20px">
-                <div class="col-lg-12" style="text-align:center;">
-                    <form action="{% url 'service:register' %}" method="post" class="form-signin">
-                        {% csrf_token %}
-                        <button class="btn btn-xl" type="submit" style="background-color: lightblue">Register
-                        </button>
-                    </form>
-                </div>
+    <div class="container" style="padding-top: 30px">
+        <div class="row">
+            <div class="col-lg-12" style="text-align:center;">
+                <h3 class="section-subheading text-muted" style="margin: 0 auto;">Don't have an account?
+                    Sign up
+                    here!</h3>
             </div>
         </div>
+        <div class="row" style="padding-top: 20px">
+            <div class="col-lg-12" style="text-align:center;">
+                <form action="{% url 'service:register' %}" method="post" class="form-signin">
+                    {% csrf_token %}
+                    <button class="btn btn-xl" type="submit" style="background-color: lightblue">Register
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-        {% if user and not user.is_anonymous %}
-        {{ user.get_full_name|default:user.username }}
-        {% else %}
-        {% endif %}
+    {% if user and not user.is_anonymous %}
+    {{ user.get_full_name|default:user.username }}
+    {% else %}
+    {% endif %}
 </section>
 
 <section id="contact">

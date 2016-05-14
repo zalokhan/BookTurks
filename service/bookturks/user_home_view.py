@@ -17,6 +17,10 @@ def user_home_main_arena(request):
     """
     if not request.user.is_authenticated():
         return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))
+
+    # debug line
+    print request.user
+
     return render(request, USER_HOME_PAGE)
 
 
@@ -26,5 +30,5 @@ def user_quiz_arena(request):
     :param request: User request
     :return: Renders quiz page
     """
-    
+
     return render(request, "service/user_quiz.html")
