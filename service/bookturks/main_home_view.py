@@ -31,9 +31,6 @@ def main_home_arena(request):
         ALERT_TYPE: alert_type
     }
 
-    # dbx = DropboxClient()
-    # dbx.list_quiz_files()
-
     return render(request, MAIN_HOME_PAGE, context)
 
 
@@ -49,7 +46,7 @@ def login_check_arena(request):
 
     # Authenticate the user with the provided username and password.
     # Django authentication is used here.
-    user = authenticate(username=username, password=password)
+    user = authenticate(username=username.split('@')[0], password=password)
     if user is not None:
         if user.is_active:
             # Authentication successful
