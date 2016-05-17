@@ -13,5 +13,5 @@ class MainHomeArenaTest(TestCase):
 
     def test_main_home_arena_view(self):
         client = Client()
-        # response = client.get(reverse('service:main_home'))
+        response = client.get(reverse('service:main_home'))
         self.assertEqual(200, 200)

@@ -15,15 +15,20 @@ def create_filename(owner, id):
 def create_quiz_content(quiz_form, quiz_data, quiz, answer_key):
     """
     Create quiz with dict contents
-    :param content: Dictionary containing entire quiz
-    :return: Dropbox file metadata
+    :param quiz_form: HTML Form data
+    :param quiz_data: Raw data without rendering from form builder
+    :param quiz: quiz model
+    :param answer_key: answer key in dictionary
+    :return:
     """
 
     content = dict()
 
     # Converting from immutable dict to mutable
     answer_key = dict(answer_key)
-    del answer_key['csrfmiddlewaretoken']
+    if 'csrfmiddlewaretoken' in answer_key:
+        # Not required in the answer key so deleting
+        del answer_key['csrfmiddlewaretoken']
 
     content['quiz_form'] = quiz_form
     content['quiz_data'] = quiz_data
