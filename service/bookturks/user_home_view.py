@@ -76,7 +76,13 @@ def user_quiz_maker_arena(request):
     try:
         get_object_or_404(Quiz, quiz_id=quiz_id)
     except Http404:
-        pass
+        # Quiz was not found so creating new quiz object for user
+        quiz = Quiz(
+            quiz_id=quiz_id,
+            quiz_name=quiz_name,
+            quiz_description=quiz_description,
+            quiz_owner=request.user)
+
     else:
         message = "Quiz ID already present"
         alert_type = DANGER
@@ -84,11 +90,6 @@ def user_quiz_maker_arena(request):
         request.session[ALERT_TYPE] = alert_type
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
-    quiz = Quiz(
-        quiz_id=quiz_id,
-        quiz_name=quiz_name,
-        quiz_description=quiz_description,
-        quiz_owner=request.user)
     quiz.save()
 
     message = " ".join([quiz_id, "created successfully"])

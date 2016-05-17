@@ -1,3 +1,6 @@
+"""
+Registration handling
+"""
 from django.http import HttpResponseRedirect
 from django.http import Http404
 
@@ -14,25 +17,25 @@ from service.bookturks.Constants import USERNAME, PASSWORD, REPASSWORD, USER_FIR
 
 from service.models import User as UserModel
 
-"""
-Register
-Returns page when user clicks the register button
-or redirected from invalid registration
-"""
-
 
 def register_arena(request):
+    """
+    Register
+    Returns page when user clicks the register button or redirected from invalid registration
+    :param request: User request
+    :return: Renders page
+    """
     request, alert_type, alert_message = init_alerts(request=request)
     return render(request, REGISTER_PAGE, {ALERT_MESSAGE: alert_message, ALERT_TYPE: alert_type})
 
 
-"""
-Register validation
-Validates the input by the user and checks for duplicates or invalid inputs.
-"""
-
-
 def register_check_arena(request):
+    """
+    Register validation
+    Validates the input by the user and checks for duplicates or invalid inputs.
+    :param request: User request
+    :return: redirects depending on result of authentication.
+    """
     username = request.POST[USERNAME]
     user_first_name = request.POST[USER_FIRST_NAME]
     user_last_name = request.POST[USER_LAST_NAME]
@@ -57,17 +60,16 @@ def register_check_arena(request):
     try:
         get_object_or_404(UserModel, username=username)
     except Http404:
-        pass
+        # Creating user in django authentication
+        auth_user = User.objects.create_user(username=username, email=username, password=password)
+        auth_user.first_name = user_first_name
+        auth_user.last_name = user_last_name
     else:
         message = "User ID already present"
         alert_type = DANGER
         request.session[ALERT_MESSAGE] = message
         request.session[ALERT_TYPE] = alert_type
         return HttpResponseRedirect(reverse(SERVICE_REGISTER))
-
-    auth_user = User.objects.create_user(username=username, email=username, password=password)
-    auth_user.first_name = user_first_name
-    auth_user.last_name = user_last_name
 
     user = UserModel(username=username,
                      user_first_name=user_first_name,

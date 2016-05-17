@@ -8,8 +8,14 @@ import json
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 
 
-def create_filename(owner, id):
-    return "/quiz/" + str(owner) + "_" + str(id) + ".JSON"
+def create_filename(owner, quizid):
+    """
+    Create filename for dropbox upload
+    :param owner:
+    :param quizid:
+    :return:
+    """
+    return "/quiz/" + str(owner) + "_" + str(quizid) + ".JSON"
 
 
 def create_quiz_content(quiz_form, quiz_data, quiz, answer_key):
