@@ -89,7 +89,7 @@ def user_quiz_maker_arena(request):
         quiz_name=quiz_name,
         quiz_description=quiz_description,
         quiz_owner=request.user)
-    # quiz.save()
+    quiz.save()
 
     message = " ".join([quiz_id, "created successfully"])
     alert_type = SUCCESS
