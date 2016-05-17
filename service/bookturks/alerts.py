@@ -2,7 +2,7 @@
 Check and refresh alerts
 """
 
-from Constants import ALERT_TYPE, ALERT_MESSAGE
+from service.bookturks.Constants import ALERT_TYPE, ALERT_MESSAGE
 
 
 def init_alerts(request):

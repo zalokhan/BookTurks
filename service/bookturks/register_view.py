@@ -6,8 +6,9 @@ from django.core.urlresolvers import reverse
 
 from django.contrib.auth.models import User
 
-from alerts import init_alerts
-from Constants import USERNAME, PASSWORD, REPASSWORD, USER_FIRST_NAME, USER_LAST_NAME, USER_PHONE, USER_DOB, \
+from service.bookturks.alerts import init_alerts
+from service.bookturks.Constants import USERNAME, PASSWORD, REPASSWORD, USER_FIRST_NAME, USER_LAST_NAME, USER_PHONE, \
+    USER_DOB, \
     ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS, \
     SERVICE_REGISTER, SERVICE_MAIN_HOME, REGISTER_PAGE
 

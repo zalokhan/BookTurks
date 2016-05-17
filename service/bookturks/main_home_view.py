@@ -6,11 +6,10 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from alerts import init_alerts
-from dropbox_adapter.DropboxClient import DropboxClient
+from service.bookturks.alerts import init_alerts
 
-from Constants import USERNAME, PASSWORD, ALERT_MESSAGE, ALERT_TYPE, DANGER, SERVICE_MAIN_HOME, SERVICE_USER_HOME, \
-    MAIN_HOME_PAGE, USER, REQUEST
+from service.bookturks.Constants import USERNAME, PASSWORD, ALERT_MESSAGE, ALERT_TYPE, DANGER, SERVICE_MAIN_HOME, \
+    SERVICE_USER_HOME, MAIN_HOME_PAGE, USER, REQUEST
 
 
 def main_home_arena(request):

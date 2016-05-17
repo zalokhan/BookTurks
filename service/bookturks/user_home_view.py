@@ -7,12 +7,12 @@ from django.shortcuts import render, get_object_or_404
 
 from service.models import Quiz, User
 
-from alerts import init_alerts
-from Constants import SERVICE_MAIN_HOME, SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, \
+from service.bookturks.alerts import init_alerts
+from service.bookturks.Constants import SERVICE_MAIN_HOME, SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, \
     USER_HOME_PAGE, USER_QUIZ_INIT_PAGE, USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, \
     REQUEST, USER, \
     ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS
-from quiz.QuizMaker import quiz_form_data_parser, create_quiz_content
+from service.bookturks.quiz.QuizMaker import quiz_form_data_parser, create_quiz_content
 
 
 def user_home_main_arena(request):
