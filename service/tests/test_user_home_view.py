@@ -13,7 +13,6 @@ class UserHomeViewTest(TestCase):
         :return:
         """
         client = Client()
-        client.login()
         response = client.get(reverse('service:user_home'))
         # TODO: Fix this.
         self.assertEqual(response.status_code, 302)
