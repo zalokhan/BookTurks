@@ -27,7 +27,7 @@ class GoogleDriveClient:
             try:
                 result = self.credentials.files().create(body=metadata, media_body=filename).execute()
             except errors.HttpError, error:
-                print "Error: GoogleDriveClient.py; upload; %s" % error
+                print ("Error: GoogleDriveClient.py; upload; %s" % error)
                 return
             return result
 
@@ -39,7 +39,7 @@ class GoogleDriveClient:
         try:
             results = self.credentials.files().list(pageSize=100, fields="nextPageToken, files(id, name)").execute()
         except errors.HttpError, error:
-            print "Error: GoogleDriveClient.py; upload; %s" % error
+            print ("Error: GoogleDriveClient.py; upload; %s" % error)
             return
         items = results.get('files', [])
 
@@ -48,7 +48,7 @@ class GoogleDriveClient:
                 results = self.credentials.files().list(pageSize=100, pageToken=results.get('nextPageToken'),
                                                         fields="nextPageToken, files(id, name)").execute()
             except errors.HttpError, error:
-                print "Error: GoogleDriveClient.py; upload; %s" % error
+                print ("Error: GoogleDriveClient.py; upload; %s" % error)
                 return
             items.append(results.get('files', []))
 
@@ -62,6 +62,6 @@ class GoogleDriveClient:
         try:
             file_data = self.credentials.files().get_media(fileId=id).execute()
         except errors.HttpError, error:
-            print "Error: GoogleDriveClient.py; upload; %s" % error
+            print ("Error: GoogleDriveClient.py; upload; %s" % error)
             return
         return file_data

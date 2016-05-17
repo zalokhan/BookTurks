@@ -35,7 +35,7 @@ class DropboxClient:
         if not filters:
             while True:
                 for i in list_of_files.entries:
-                    print i.name
+                    print (i.name)
                 if not list_of_files.has_more:
                     break
                 else:
