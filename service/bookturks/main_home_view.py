@@ -46,7 +46,7 @@ def login_check_arena(request):
 
     # Authenticate the user with the provided username and password.
     # Django authentication is used here.
-    user = authenticate(username=username.split('@')[0], password=password)
+    user = authenticate(username=username, password=password)
     if user is not None:
         if user.is_active:
             # Authentication successful
