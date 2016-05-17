@@ -1,9 +1,9 @@
 """
 Views
 """
-from bookturks.main_home_view import main_home_arena, login_check_arena, logout_arena
-from bookturks.register_view import register_arena, register_check_arena
-from bookturks.user_home_view import user_home_main_arena, user_quiz_init_arena, user_quiz_maker_arena, \
+from service.bookturks.main_home_view import main_home_arena, login_check_arena, logout_arena
+from service.bookturks.register_view import register_arena, register_check_arena
+from service.bookturks.user_home_view import user_home_main_arena, user_quiz_init_arena, user_quiz_maker_arena, \
     user_quiz_verifier_arena, user_quiz_create_arena
 
 
