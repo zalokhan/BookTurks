@@ -77,7 +77,6 @@ if not database_config:
 else:
     DEBUG = False
 
-
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -125,6 +124,9 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# JSON serializer causing issues.
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [
@@ -158,7 +160,6 @@ DATABASES = {
         'PORT': '',
     }
 }
-
 
 if database_config:
     DATABASES = {

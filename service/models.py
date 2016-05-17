@@ -1,3 +1,6 @@
+"""
+Models
+"""
 from __future__ import unicode_literals
 
 from django.db import models
@@ -18,18 +21,17 @@ class Choice(models.Model):
     votes = models.IntegerField(default=0)
 """
 
-"""
-Basic user details:
-userid
-first and last names
-email
-phone
-dob
-account creation date and time
-"""
-
 
 class User(models.Model):
+    """
+    Basic user details:
+    userid
+    first and last names
+    email
+    phone
+    dob
+    account creation date and time
+    """
     username = models.EmailField(max_length=100)
     user_first_name = models.CharField(max_length=50)
     user_last_name = models.CharField(max_length=50)
@@ -48,12 +50,10 @@ class User(models.Model):
         return model_string
 
 
-"""
-Model for storing Notification or messages
-"""
-
-
 class Message(models.Model):
+    """
+    Model for storing Notification or messages
+    """
     receiver = models.ForeignKey('User', on_delete=models.CASCADE, )
     sender = models.CharField(max_length=100)
     message_subject = models.CharField(max_length=200)
@@ -66,4 +66,23 @@ class Message(models.Model):
                        "SUBJECT:" + self.message_subject + ";" + \
                        "MESSAGE:" + self.message_body + ";" + \
                        "MESSAGE_DATETIME" + str(self.message_datetime) + ";"
+        return model_string
+
+
+class Quiz(models.Model):
+    """
+    Quiz Model
+    """
+    quiz_id = models.CharField(max_length=200)
+    quiz_name = models.CharField(max_length=200)
+    quiz_description = models.CharField(max_length=1000)
+    quiz_owner = models.EmailField(max_length=100)
+    quiz_creation_datetime = models.DateTimeField('quiz datetime', default=timezone.now())
+
+    def __str__(self):
+        model_string = "ID:" + self.quiz_id + "; " + \
+                       "NAME:" + self.quiz_name + "; " + \
+                       "DESCRIPTION:" + self.quiz_description + "; " + \
+                       "OWNER:" + self.quiz_owner + "; " + \
+                       "QUIZ_DATETIME:" + str(self.quiz_creation_datetime) + ";"
         return model_string

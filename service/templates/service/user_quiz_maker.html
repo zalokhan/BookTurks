@@ -22,12 +22,14 @@
 </style>
 {% endblock %}
 
+
 {% block main_container %}
 
 {{ state }}
-<form id="quiz_form" action="{% url 'service:user_home' %}" method="post" class="form-signin">
+<form id="quiz_form" action="{% url 'service:user_quiz_verifier' %}" method="post" class="form-signin">
     {% csrf_token %}
-    <input type='hidden' id='hiddenField' name='quiz_data' value=''/>
+    <input type='hidden' id='hiddenFieldData' name='quiz_data' value=''/>
+    <input type='hidden' id='hiddenFieldForm' name='quiz_form' value=''/>
 </form>
 
 <div id="edit-form" style="padding-top: 40px">
@@ -40,6 +42,7 @@
 </div>
 
 {% endblock %}
+
 
 {% block script %}
 <script src="{% static 'service/javascripts/jqueryui/1.11.4/jquery-ui.min.js' %}"></script>
@@ -72,6 +75,7 @@
             $fBInstance.toggle();
             $(formContainer).toggle();
             $(fbTemplate).formRender(formRenderOpts);
+
         });
 
         $('.edit-form', formContainer).click(function () {
@@ -81,8 +85,21 @@
 
         $(".form-builder-submit").click(function (e) {
             e.preventDefault();
+            function nodeToString(node) {
+                var tmpNode = document.createElement("div");
+                tmpNode.appendChild(node.cloneNode(true));
+                var str = tmpNode.innerHTML;
+                tmpNode = node = null; // prevent memory leaks in IE
+                return str;
+            }
+
+            $fBInstance.toggle();
+            $(formContainer).toggle();
+            $(fbTemplate).formRender(formRenderOpts);
+
             var formData = formBuilder.data('formBuilder').formData;
-            document.getElementById('hiddenField').value = formData;
+            document.getElementById('hiddenFieldForm').value = nodeToString(formContainer);
+            document.getElementById('hiddenFieldData').value = formData;
             document.getElementById("quiz_form").submit();
         });
 

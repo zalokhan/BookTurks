@@ -3,7 +3,8 @@ Views
 """
 from bookturks.main_home_view import main_home_arena, login_check_arena, logout_arena
 from bookturks.register_view import register_arena, register_check_arena
-from bookturks.user_home_view import user_home_main_arena, user_quiz_arena
+from bookturks.user_home_view import user_home_main_arena, user_quiz_init_arena, user_quiz_maker_arena, \
+    user_quiz_verifier_arena, user_quiz_create_arena
 
 
 def main_home(request):
@@ -66,10 +67,37 @@ def user_home(request):
     return user_home_main_arena(request)
 
 
-def user_quiz(request):
+def user_quiz_init(request):
     """
-    User Quiz Page
+    User Quiz Name verifier and initialization
+    :param request: User request
+    :return: Renders quiz name form
+    """
+    return user_quiz_init_arena(request)
+
+
+def user_quiz_maker(request):
+    """
+    User Quiz Maker page
     :param request: User request
     :return:  Renders a page
     """
-    return user_quiz_arena(request)
+    return user_quiz_maker_arena(request)
+
+
+def user_quiz_verifier(request):
+    """
+    User Quiz Verifier page and answer key generator
+    :param request: User request
+    :return:  Renders a page
+    """
+    return user_quiz_verifier_arena(request)
+
+
+def user_quiz_create(request):
+    """
+    Creates the quiz and uploads to the storage
+    :param request: User request
+    :return: Redirects to dashboard
+    """
+    return user_quiz_create_arena(request)

@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
+from alerts import init_alerts
 from dropbox_adapter.DropboxClient import DropboxClient
 
 from Constants import USERNAME, PASSWORD, ALERT_MESSAGE, ALERT_TYPE, DANGER, SERVICE_MAIN_HOME, SERVICE_USER_HOME, \
@@ -20,15 +21,7 @@ def main_home_arena(request):
     :return: renders a page with context
     """
 
-    # Checks if alert message is required to be displayed on the top
-    # Alert type is the severity level of the alert box: success(green) or danger(red)
-    alert_message = request.session.get(ALERT_MESSAGE)
-    alert_type = request.session.get(ALERT_TYPE)
-
-    # Remove the alerts from the request to prevent repetition of alerts on reload of the page
-    if ALERT_MESSAGE in request.session:
-        del request.session[ALERT_MESSAGE]
-        del request.session[ALERT_TYPE]
+    request, alert_type, alert_message = init_alerts(request=request)
 
     # Creating context
     context = {

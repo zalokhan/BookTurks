@@ -6,6 +6,11 @@ from django.core.urlresolvers import reverse
 
 from django.contrib.auth.models import User
 
+from alerts import init_alerts
+from Constants import USERNAME, PASSWORD, REPASSWORD, USER_FIRST_NAME, USER_LAST_NAME, USER_PHONE, USER_DOB, \
+    ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS, \
+    SERVICE_REGISTER, SERVICE_MAIN_HOME, REGISTER_PAGE
+
 from service.models import User as UserModel
 
 """
@@ -16,12 +21,8 @@ or redirected from invalid registration
 
 
 def register_arena(request):
-    alert_message = request.session.get('alert_message')
-    alert_type = request.session.get('alert_type')
-    if 'alert_message' in request.session:
-        del request.session['alert_message']
-        del request.session['alert_type']
-    return render(request, 'service/register.html', {'alert_message': alert_message, 'alert_type': alert_type})
+    request, alert_type, alert_message = init_alerts(request=request)
+    return render(request, REGISTER_PAGE, {ALERT_MESSAGE: alert_message, ALERT_TYPE: alert_type})
 
 
 """
@@ -31,13 +32,13 @@ Validates the input by the user and checks for duplicates or invalid inputs.
 
 
 def register_check_arena(request):
-    username = request.POST['username']
-    user_first_name = request.POST['user_first_name']
-    user_last_name = request.POST['user_last_name']
-    user_phone = request.POST['user_phone']
-    user_dob = request.POST['user_dob']
-    password = request.POST['password']
-    repassword = request.POST['repassword']
+    username = request.POST[USERNAME]
+    user_first_name = request.POST[USER_FIRST_NAME]
+    user_last_name = request.POST[USER_LAST_NAME]
+    user_phone = request.POST[USER_PHONE]
+    user_dob = request.POST[USER_DOB]
+    password = request.POST[PASSWORD]
+    repassword = request.POST[REPASSWORD]
 
     if username is None or \
                     user_first_name is None or \
@@ -47,10 +48,10 @@ def register_check_arena(request):
                     password is None or \
                     password != repassword:
         message = "The password should be same in both the fields"
-        alert_type = "danger"
-        request.session['alert_message'] = message
-        request.session['alert_type'] = alert_type
-        return HttpResponseRedirect(reverse('service:register'))
+        alert_type = DANGER
+        request.session[ALERT_MESSAGE] = message
+        request.session[ALERT_TYPE] = alert_type
+        return HttpResponseRedirect(reverse(SERVICE_REGISTER))
 
     try:
         get_object_or_404(UserModel, username=username)
@@ -58,10 +59,10 @@ def register_check_arena(request):
         pass
     else:
         message = "User ID already present"
-        alert_type = "danger"
-        request.session['alert_message'] = message
-        request.session['alert_type'] = alert_type
-        return HttpResponseRedirect(reverse('service:register'))
+        alert_type = DANGER
+        request.session[ALERT_MESSAGE] = message
+        request.session[ALERT_TYPE] = alert_type
+        return HttpResponseRedirect(reverse(SERVICE_REGISTER))
 
     auth_user = User.objects.create_user(username, username, password)
     auth_user.first_name = user_first_name
@@ -74,7 +75,7 @@ def register_check_arena(request):
                      user_dob=user_dob)
     user.save()
     message = " ".join([user_first_name, user_last_name, "registered successfully"])
-    alert_type = "success"
-    request.session['alert_message'] = message
-    request.session['alert_type'] = alert_type
-    return HttpResponseRedirect(reverse('service:main_home'))
+    alert_type = SUCCESS
+    request.session[ALERT_MESSAGE] = message
+    request.session[ALERT_TYPE] = alert_type
+    return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))

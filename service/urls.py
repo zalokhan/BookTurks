@@ -16,6 +16,13 @@ urlpatterns = [
     url(r'^register/check/$', views.register_check, name='register_check'),
     # User Home page
     url(r'^home/$', views.user_home, name='user_home'),
-    # User Quiz page
-    url(r'^quiz/$', views.user_quiz, name='user_quiz'),
+    # User Quiz pages
+    # Quiz Name Verifier
+    url(r'^quiz_init/$', views.user_quiz_init, name='user_quiz_init'),
+    # Quiz Maker
+    url(r'^quiz_maker/$', views.user_quiz_maker, name='user_quiz_maker'),
+    # Quiz Answer
+    url(r'^quiz_verifier/$', views.user_quiz_verifier, name='user_quiz_verifier'),
+    # Quiz Create
+    url(r'^quiz_create/$', views.user_quiz_create, name='user_quiz_create'),
 ]
