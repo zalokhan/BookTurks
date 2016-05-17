@@ -51,20 +51,18 @@ def quiz_form_data_parser(form_data):
     form_tags = form_data.split('<')
 
     if len(form_tags) < 10:
-        print "Empty forms not allowed"
+        print ("Empty forms not allowed")
         # Do something here
 
     if "rendered-form" in form_tags[1] and "form action=" in form_tags[2]:
         pass
     else:
-        print "Something is wrong with data"
+        print ("Something is wrong with data")
         # Do something
 
     # Removing redundant lines
     # <div rendered-form></div>
     # <form></form>
     form_tags = form_tags[3:-4]
-
     final_form = "<" + "<".join(form_tags)
-    print
     return final_form
