@@ -69,8 +69,8 @@ def quiz_form_data_parser(form_data):
     if "rendered-form" in form_tags[1] and "form action=" in form_tags[2]:
         pass
     else:
-        print ("Something is wrong with data")
-        # Do something
+        raise ValueError(
+            "QuizMaker:quiz_form_data_parser:Quiz form is not properly generated. Something wrong with data")
 
     # Removing redundant lines
     # <div rendered-form></div>

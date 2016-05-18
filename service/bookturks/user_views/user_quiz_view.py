@@ -133,6 +133,8 @@ def user_quiz_create_view(request):
     quiz = request.session.get('quiz')
 
     try:
+        if not quiz_form or not quiz_data or not quiz or not answer_key:
+            raise ValueError("quiz_data or quiz_form or quiz is None")
         return_code = create_quiz_content(quiz_form=quiz_form, quiz_data=quiz_data, quiz=quiz, answer_key=answer_key)
     except:
         # Remove the quiz objects
