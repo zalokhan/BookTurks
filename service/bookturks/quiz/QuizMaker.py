@@ -6,6 +6,7 @@ Add functions in future
 """
 import json
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
+from django.conf import settings
 
 
 def create_filename(owner, quizid):
@@ -47,7 +48,7 @@ def create_quiz_content(quiz_form, quiz_data, quiz, answer_key):
     filename = create_filename(quiz.quiz_owner, quiz.quiz_id)
 
     try:
-        dbx = DropboxClient()
+        dbx = DropboxClient(settings.DROPBOX_CLIENT)
         return_code = dbx.upload_file(content=content, filename=filename)
     except:
         return None
