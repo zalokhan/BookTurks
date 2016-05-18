@@ -18,11 +18,11 @@ urlpatterns = [
     url(r'^home/$', views.user_home, name='user_home'),
     # User Quiz pages
     # Quiz Name Verifier
-    url(r'^quiz_init/$', views.user_quiz_init, name='user_quiz_init'),
+    url(r'^quiz/init/$', views.user_quiz_init, name='user_quiz_init'),
     # Quiz Maker
-    url(r'^quiz_maker/$', views.user_quiz_maker, name='user_quiz_maker'),
+    url(r'^quiz/maker/$', views.user_quiz_maker, name='user_quiz_maker'),
     # Quiz Answer
-    url(r'^quiz_verifier/$', views.user_quiz_verifier, name='user_quiz_verifier'),
+    url(r'^quiz/verifier/$', views.user_quiz_verifier, name='user_quiz_verifier'),
     # Quiz Create
-    url(r'^quiz_create/$', views.user_quiz_create, name='user_quiz_create'),
+    url(r'^quiz/create/$', views.user_quiz_create, name='user_quiz_create'),
 ]

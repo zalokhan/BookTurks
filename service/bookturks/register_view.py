@@ -18,7 +18,7 @@ from service.bookturks.Constants import USERNAME, PASSWORD, REPASSWORD, USER_FIR
 from service.models import User as UserModel
 
 
-def register_arena(request):
+def register_view(request):
     """
     Register
     Returns page when user clicks the register button or redirected from invalid registration
@@ -29,28 +29,35 @@ def register_arena(request):
     return render(request, REGISTER_PAGE, {ALERT_MESSAGE: alert_message, ALERT_TYPE: alert_type})
 
 
-def register_check_arena(request):
+def register_check_view(request):
     """
     Register validation
     Validates the input by the user and checks for duplicates or invalid inputs.
     :param request: User request
     :return: redirects depending on result of authentication.
     """
-    username = request.POST[USERNAME]
-    user_first_name = request.POST[USER_FIRST_NAME]
-    user_last_name = request.POST[USER_LAST_NAME]
-    user_phone = request.POST[USER_PHONE]
-    user_dob = request.POST[USER_DOB]
-    password = request.POST[PASSWORD]
-    repassword = request.POST[REPASSWORD]
+    username = request.POST.get(USERNAME)
+    user_first_name = request.POST.get(USER_FIRST_NAME)
+    user_last_name = request.POST.get(USER_LAST_NAME)
+    user_phone = request.POST.get(USER_PHONE)
+    user_dob = request.POST.get(USER_DOB)
+    password = request.POST.get(PASSWORD)
+    repassword = request.POST.get(REPASSWORD)
 
-    if username is None or \
-                    user_first_name is None or \
-                    user_last_name is None or \
-                    user_phone is None or \
-                    user_dob is None or \
-                    password is None or \
-                    password != repassword:
+    if not username or \
+            not user_first_name or \
+            not user_last_name or \
+            not user_phone or \
+            not user_dob or \
+            not password or \
+            not repassword:
+        message = "Please fill in all the values"
+        alert_type = DANGER
+        request.session[ALERT_MESSAGE] = message
+        request.session[ALERT_TYPE] = alert_type
+        return HttpResponseRedirect(reverse(SERVICE_REGISTER))
+
+    if password != repassword:
         message = "The password should be same in both the fields"
         alert_type = DANGER
         request.session[ALERT_MESSAGE] = message

@@ -36,6 +36,9 @@ def create_quiz_content(quiz_form, quiz_data, quiz, answer_key):
         # Not required in the answer key so deleting
         del answer_key['csrfmiddlewaretoken']
 
+    if not quiz_form or not quiz_data or not quiz or not answer_key:
+        raise ValueError("QuizMaker:create_quiz_content:Parameter missing quiz, quiz_data, quiz_form or answer_key")
+
     content['quiz_form'] = quiz_form
     content['quiz_data'] = quiz_data
     content['answer_key'] = json.dumps(answer_key, ensure_ascii=False)
@@ -43,8 +46,11 @@ def create_quiz_content(quiz_form, quiz_data, quiz, answer_key):
 
     filename = create_filename(quiz.quiz_owner, quiz.quiz_id)
 
-    dbx = DropboxClient()
-    return_code = dbx.upload_file(content=content, filename=filename)
+    try:
+        dbx = DropboxClient()
+        return_code = dbx.upload_file(content=content, filename=filename)
+    except:
+        return None
     return return_code
 
 
@@ -57,8 +63,8 @@ def quiz_form_data_parser(form_data):
     form_tags = form_data.split('<')
 
     if len(form_tags) < 10:
-        print ("Empty forms not allowed")
-        # Do something here
+        raise ValueError(
+            "QuizMaker:quiz_form_data_parser:Empty quizzes cannot be submitted. Form_data cannot be empty.")
 
     if "rendered-form" in form_tags[1] and "form action=" in form_tags[2]:
         pass

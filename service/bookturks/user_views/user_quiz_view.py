@@ -1,35 +1,21 @@
 """
-User account pages
+User Quiz Views
 """
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
 
-from service.models import Quiz, User
+from service.models import Quiz
 
 from service.bookturks.alerts import init_alerts
-from service.bookturks.Constants import SERVICE_MAIN_HOME, SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, \
-    USER_HOME_PAGE, USER_QUIZ_INIT_PAGE, USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, \
+from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
+    USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, \
     REQUEST, USER, \
     ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS
 from service.bookturks.quiz.QuizMaker import quiz_form_data_parser, create_quiz_content
 
 
-def user_home_main_arena(request):
-    """
-    User Home page. Lands on the dashboard page
-    If not authenticated redirects back to main page
-    :param request:
-    :return: Renders user_home page (dashboard)
-    """
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))
-    request, alert_type, alert_message = init_alerts(request=request)
-
-    return render(request, USER_HOME_PAGE)
-
-
-def user_quiz_init_arena(request):
+def user_quiz_init_view(request):
     """
     Landing quiz page and verifier and name checker
     :param request: User request
@@ -47,7 +33,7 @@ def user_quiz_init_arena(request):
     return render(request, USER_QUIZ_INIT_PAGE, context)
 
 
-def user_quiz_maker_arena(request):
+def user_quiz_maker_view(request):
     """
     Quiz creation page for user
     :param request: User request
@@ -66,7 +52,7 @@ def user_quiz_maker_arena(request):
         ALERT_TYPE: alert_type
     }
 
-    if not quiz_id.rstrip():
+    if not quiz_id or not quiz_id.rstrip():
         message = "The quiz id cannot be empty."
         alert_type = DANGER
         request.session[ALERT_MESSAGE] = message
@@ -90,8 +76,6 @@ def user_quiz_maker_arena(request):
         request.session[ALERT_TYPE] = alert_type
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
-    quiz.save()
-
     message = " ".join([quiz_id, "created successfully"])
     alert_type = SUCCESS
     request.session[ALERT_MESSAGE] = message
@@ -101,7 +85,7 @@ def user_quiz_maker_arena(request):
     return render(request, USER_QUIZ_MAKER_PAGE, context)
 
 
-def user_quiz_verifier_arena(request):
+def user_quiz_verifier_view(request):
     """
     Verifies the form for errors
     Asks the user to prepare the answer key
@@ -111,9 +95,21 @@ def user_quiz_verifier_arena(request):
     request, alert_type, alert_message = init_alerts(request=request)
     quiz_form = request.POST.get('quiz_form')
     quiz_data = request.POST.get('quiz_data')
+    if not quiz_data or not quiz_form:
+        message = "Quiz data was not provided"
+        alert_type = DANGER
+        request.session[ALERT_MESSAGE] = message
+        request.session[ALERT_TYPE] = alert_type
+        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
-    # TODO: Put try catch and handle exceptions
-    quiz_form = quiz_form_data_parser(form_data=quiz_form)
+    try:
+        quiz_form = quiz_form_data_parser(form_data=quiz_form)
+    except ValueError:
+        message = "Empty quizzes cannot be submitted"
+        alert_type = DANGER
+        request.session[ALERT_MESSAGE] = message
+        request.session[ALERT_TYPE] = alert_type
+        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
     context = {
         'quiz_form': quiz_form,
@@ -124,7 +120,7 @@ def user_quiz_verifier_arena(request):
     return render(request, USER_QUIZ_VERIFIER_PAGE, context)
 
 
-def user_quiz_create_arena(request):
+def user_quiz_create_view(request):
     """
     Creates the quiz and uploads to storage.
     :param request: User request
@@ -135,14 +131,31 @@ def user_quiz_create_arena(request):
     quiz_form = request.session.get('quiz_form')
     quiz_data = request.session.get('quiz_data')
     quiz = request.session.get('quiz')
-    return_code = create_quiz_content(quiz_form=quiz_form, quiz_data=quiz_data, quiz=quiz, answer_key=answer_key)
 
-    # TODO Check return code
+    try:
+        return_code = create_quiz_content(quiz_form=quiz_form, quiz_data=quiz_data, quiz=quiz, answer_key=answer_key)
+    except:
+        # Remove the quiz objects
+        if 'quiz' in request.session and 'quiz_data' in request.session and 'quiz_form' in request.session:
+            del request.session['quiz']
+            del request.session['quiz_data']
+            del request.session['quiz_form']
+        message = "An error occurred creating the quiz."
+        alert_type = DANGER
+        request.session[ALERT_MESSAGE] = message
+        request.session[ALERT_TYPE] = alert_type
+        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
+    if return_code:
+        quiz.save()
     # Remove the quiz objects
     if 'quiz' in request.session and 'quiz_data' in request.session and 'quiz_form' in request.session:
         del request.session['quiz']
         del request.session['quiz_data']
         del request.session['quiz_form']
 
+    message = "The quiz has been successfully created"
+    alert_type = SUCCESS
+    request.session[ALERT_MESSAGE] = message
+    request.session[ALERT_TYPE] = alert_type
     return HttpResponseRedirect(reverse(SERVICE_USER_HOME))

@@ -4,6 +4,8 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 
+from create_user import context
+
 from service.models import User
 
 
@@ -27,15 +29,6 @@ class RegisterViewTest(TestCase):
         :return:
         """
         client = Client()
-        context = {
-            'username': 'test@email.com',
-            'user_first_name': 'testfirstname',
-            'user_last_name': 'testlastname',
-            'user_phone': '1234567890',
-            'user_dob': '01/01/1990',
-            'password': 'test',
-            'repassword': 'test'
-        }
         response = client.post(reverse('service:register_check'), context)
         self.assertEqual(response.status_code, 302)
 

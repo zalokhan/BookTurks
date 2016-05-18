@@ -12,7 +12,7 @@ from service.bookturks.Constants import USERNAME, PASSWORD, ALERT_MESSAGE, ALERT
     SERVICE_USER_HOME, MAIN_HOME_PAGE, USER, REQUEST
 
 
-def main_home_arena(request):
+def main_home_view(request):
     """
     Main home page
     Sends alerts if registration successful or login failure
@@ -33,7 +33,7 @@ def main_home_arena(request):
     return render(request, MAIN_HOME_PAGE, context)
 
 
-def login_check_arena(request):
+def login_check_view(request):
     """
     Checks login authentication result and gives failure alert if unsuccessful
     :param request: user request
@@ -71,7 +71,7 @@ def login_check_arena(request):
         return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME, ))
 
 
-def logout_arena(request):
+def logout_view(request):
     """
     Logs out user
     :param request: user request

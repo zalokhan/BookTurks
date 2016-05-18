@@ -1,10 +1,11 @@
 """
 Views
 """
-from service.bookturks.main_home_view import main_home_arena, login_check_arena, logout_arena
-from service.bookturks.register_view import register_arena, register_check_arena
-from service.bookturks.user_home_view import user_home_main_arena, user_quiz_init_arena, user_quiz_maker_arena, \
-    user_quiz_verifier_arena, user_quiz_create_arena
+from service.bookturks.main_home_view import main_home_view, login_check_view, logout_view
+from service.bookturks.register_view import register_view, register_check_view
+from service.bookturks.user_views.user_home_view import user_home_main_view
+from service.bookturks.user_views.user_quiz_view import user_quiz_init_view, user_quiz_maker_view, \
+    user_quiz_verifier_view, user_quiz_create_view
 
 
 def main_home(request):
@@ -14,7 +15,7 @@ def main_home(request):
     :param request: User request
     :return: Renders a page
     """
-    return main_home_arena(request)
+    return main_home_view(request)
 
 
 def login(request):
@@ -24,7 +25,7 @@ def login(request):
     :param request: User request
     :return: Renders a page
     """
-    return login_check_arena(request)
+    return login_check_view(request)
 
 
 def logout(request):
@@ -34,7 +35,7 @@ def logout(request):
     :param request: User request
     :return: Renders a page
     """
-    return logout_arena(request)
+    return logout_view(request)
 
 
 def register(request):
@@ -44,7 +45,7 @@ def register(request):
     :param request: User request
     :return: Renders a page
     """
-    return register_arena(request)
+    return register_view(request)
 
 
 def register_check(request):
@@ -54,7 +55,7 @@ def register_check(request):
     :param request: User request
     :return: Renders a page
     """
-    return register_check_arena(request)
+    return register_check_view(request)
 
 
 def user_home(request):
@@ -64,7 +65,7 @@ def user_home(request):
     :param request: User request
     :return: Renders a page
     """
-    return user_home_main_arena(request)
+    return user_home_main_view(request)
 
 
 def user_quiz_init(request):
@@ -73,7 +74,7 @@ def user_quiz_init(request):
     :param request: User request
     :return: Renders quiz name form
     """
-    return user_quiz_init_arena(request)
+    return user_quiz_init_view(request)
 
 
 def user_quiz_maker(request):
@@ -82,7 +83,7 @@ def user_quiz_maker(request):
     :param request: User request
     :return:  Renders a page
     """
-    return user_quiz_maker_arena(request)
+    return user_quiz_maker_view(request)
 
 
 def user_quiz_verifier(request):
@@ -91,7 +92,7 @@ def user_quiz_verifier(request):
     :param request: User request
     :return:  Renders a page
     """
-    return user_quiz_verifier_arena(request)
+    return user_quiz_verifier_view(request)
 
 
 def user_quiz_create(request):
@@ -100,4 +101,4 @@ def user_quiz_create(request):
     :param request: User request
     :return: Redirects to dashboard
     """
-    return user_quiz_create_arena(request)
+    return user_quiz_create_view(request)
