@@ -62,7 +62,7 @@ class UserQuizViewTest(TestCase):
         redirect_chain.append(("/quiz/init/", 302))
         self.assertEqual(response.redirect_chain, redirect_chain)
 
-    def test_user_quiz_maker_view_with_duplicate_id(self):
+    def test_user_quiz_maker_view_with_empty_id(self):
         """
         Testing the user maker quiz view
         :return:
@@ -71,15 +71,9 @@ class UserQuizViewTest(TestCase):
         user = create_user()
         quiz_parameters = dict(context)
 
-        quiz_parameters['quiz_id'] = 'test_quiz_id'
+        quiz_parameters['quiz_id'] = ''
         quiz_parameters['quiz_name'] = 'test_quiz_name'
         quiz_parameters['quiz_description'] = 'test_quiz_description'
-        quiz = Quiz(
-            quiz_id='test_quiz_id',
-            quiz_name='test',
-            quiz_description='test description',
-            quiz_owner='test@email.com')
-        quiz.save()
 
         self.assertEqual(user.is_active, True)
         client.login(username=context.get('username'), password=context.get('password'))
@@ -90,8 +84,6 @@ class UserQuizViewTest(TestCase):
         redirect_chain = list()
         redirect_chain.append(("/quiz/init/", 302))
         self.assertEqual(response.redirect_chain, redirect_chain)
-        # deleting to provide clean slate to other tests
-        quiz.delete()
 
     def test_user_quiz_verifier_view_with_null_inputs(self):
         """

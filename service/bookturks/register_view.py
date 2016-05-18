@@ -64,19 +64,27 @@ def register_check_view(request):
         request.session[ALERT_TYPE] = alert_type
         return HttpResponseRedirect(reverse(SERVICE_REGISTER))
 
+    if '@' not in username:
+        message = "The username should be your email address"
+        alert_type = DANGER
+        request.session[ALERT_MESSAGE] = message
+        request.session[ALERT_TYPE] = alert_type
+        return HttpResponseRedirect(reverse(SERVICE_REGISTER))
+
     try:
         get_object_or_404(UserModel, username=username)
     except Http404:
         # Creating user in django authentication
         auth_user = User.objects.create_user(username=username, email=username, password=password)
-        auth_user.first_name = user_first_name
-        auth_user.last_name = user_last_name
     else:
         message = "User ID already present"
         alert_type = DANGER
         request.session[ALERT_MESSAGE] = message
         request.session[ALERT_TYPE] = alert_type
         return HttpResponseRedirect(reverse(SERVICE_REGISTER))
+
+    auth_user.first_name = user_first_name
+    auth_user.last_name = user_last_name
 
     user = UserModel(username=username,
                      user_first_name=user_first_name,
