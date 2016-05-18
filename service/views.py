@@ -1,7 +1,8 @@
 """
 Views
 """
-from service.bookturks.main_home_view import main_home_view, login_check_view, logout_view
+from service.bookturks.main_home_view import main_home_view
+from service.bookturks.auth.authentication import login_check_view, logout_view
 from service.bookturks.register_view import register_view, register_check_view
 from service.bookturks.user_views.user_home_view import user_home_main_view
 from service.bookturks.user_views.user_quiz_view import user_quiz_init_view, user_quiz_maker_view, \
