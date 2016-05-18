@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
-from create_user import create_user, context
+from service.tests.create_user import create_user, context
 
 
 class UserHomeViewTest(TestCase):
