@@ -303,3 +303,71 @@ class UserQuizViewTest(TestCase):
         redirect_chain = list()
         redirect_chain.append(("/quiz/init/", 302))
         self.assertEqual(response.redirect_chain, redirect_chain)
+
+    def test_user_quiz_create_view_with_invalid_error_inputs(self):
+        """
+        Testing create view
+        Handling exception
+        :return:
+        """
+        settings.DROPBOX_CLIENT = self.dbx
+        client = Client()
+        user = create_user()
+        self.assertEqual(user.is_active, True)
+        client.login(username=context.get('username'), password=context.get('password'))
+
+        # Preparing the context
+        quiz_parameters = dict(context)
+        quiz_parameters['answer_key'] = {'answer_key': 'test', 'csrfmiddlewaretoken': 'test'}
+
+        # Preparing session
+        quiz = Quiz(
+            quiz_id="test_id",
+            quiz_name="mock_name",
+            quiz_description="mock_description",
+            quiz_owner="test@mock.com"
+        )
+        session = client.session
+        session['quiz_data'] = "mock_quiz_data"
+        session['quiz'] = quiz
+        session.save()
+        # Testing response status code
+        response = client.post(reverse('service:user_quiz_create'), quiz_parameters, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # Testing redirection
+        redirect_chain = list()
+        redirect_chain.append(("/quiz/init/", 302))
+        self.assertEqual(response.redirect_chain, redirect_chain)
+
+        # Preparing session
+        quiz = Quiz(
+            quiz_name="mock_name",
+            quiz_description="mock_description",
+            quiz_owner="test@mock.com"
+        )
+        session['quiz_form'] = "mock_quiz_form"
+        session['quiz'] = quiz
+        session.save()
+        # Testing response status code
+        response = client.post(reverse('service:user_quiz_create'), quiz_parameters, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # Testing redirection
+        redirect_chain = list()
+        redirect_chain.append(("/quiz/init/", 302))
+        self.assertEqual(response.redirect_chain, redirect_chain)
+
+        # Preparing session
+        quiz = Quiz(
+            quiz_id="test_id",
+            quiz_description="mock_description",
+            quiz_owner="test@mock.com"
+        )
+        session['quiz'] = quiz
+        session.save()
+        # Testing response status code
+        response = client.post(reverse('service:user_quiz_create'), quiz_parameters, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # Testing redirection
+        redirect_chain = list()
+        redirect_chain.append(("/quiz/init/", 302))
+        self.assertEqual(response.redirect_chain, redirect_chain)
