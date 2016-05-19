@@ -39,6 +39,8 @@ def create_quiz_content(quiz_form, quiz_data, quiz, answer_key):
 
     if not quiz_form or not quiz_data or not quiz or not answer_key:
         raise ValueError("QuizMaker:create_quiz_content:Parameter missing quiz, quiz_data, quiz_form or answer_key")
+    if not quiz.quiz_id or not quiz.quiz_name:
+        raise ValueError("QuizMaker:create_quiz_content:Invalid Quiz model passed")
 
     content['quiz_form'] = quiz_form
     content['quiz_data'] = quiz_data

@@ -3,17 +3,7 @@ from django.test import TestCase
 import mock
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from service.bookturks.Constants import QUIZ_HOME
-
-
-class MockFileList:
-    entries = ["mock_file_1", "mock_file_2", "mock_file_3"]
-    has_more = False
-
-    def __init__(self):
-        return
-
-    def __call__(self, *args, **kwargs):
-        return self
+from service.tests.dropbox_tools import MockFileList
 
 
 class DropboxClientTest(TestCase):

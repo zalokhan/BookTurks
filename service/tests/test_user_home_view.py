@@ -8,7 +8,7 @@ class UserHomeViewTest(TestCase):
     Test case for the User Home Page
     """
 
-    def test_user_home_view(self):
+    def test_user_valid(self):
         """
         Testing the dashboard view
         :return:
@@ -19,3 +19,17 @@ class UserHomeViewTest(TestCase):
         client.login(username=context.get('username'), password=context.get('password'))
         response = client.post(reverse('service:user_home'), context)
         self.assertEqual(response.status_code, 200)
+
+    def test_user_not_authenticated(self):
+        """
+        Testing the dashboard view
+        :return:
+        """
+        client = Client()
+        client.login(username=context.get('username'), password=context.get('password'))
+        response = client.post(reverse('service:user_home'), context, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # Testing redirection
+        redirect_chain = list()
+        redirect_chain.append(("/", 302))
+        self.assertEqual(response.redirect_chain, redirect_chain)
