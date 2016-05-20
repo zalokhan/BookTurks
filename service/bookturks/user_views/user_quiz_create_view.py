@@ -65,8 +65,6 @@ def user_quiz_maker_view(request):
     except Http404:
         # Quiz was not found so creating new quiz object for user
         user = get_user_instance_from_request(request)
-        print (user)
-        print request.user.pk
 
         quiz = Quiz(
             quiz_id=quiz_id,

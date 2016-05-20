@@ -8,7 +8,7 @@ from service.models import Quiz, User
 from service.tests.dropbox_tools import MockFileList
 
 
-class UserQuizViewTest(TestCase):
+class UserQuizCreateViewTest(TestCase):
     """
     Test case for the Quiz pages
     """
