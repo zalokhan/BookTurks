@@ -1,0 +1,42 @@
+{% extends "service/skeleton.html" %}
+{% load static %}
+
+{% block head %}
+<link href="{% static 'service/stylesheets/user_myquiz_home.css' %}" rel="stylesheet">
+{% endblock %}
+
+
+{% block main_container %}
+
+<div style="padding-top: 50px">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h2>Quiz List</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="list-type2">
+                <ol>
+                    {% for quiz in quiz_list%}
+                    <li>
+                        <a href="id/{{quiz.quiz_id}}">
+                            <div>
+                                {{ quiz.quiz_name }}
+                            </div>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block script %}
+{% endblock %}}
+
+

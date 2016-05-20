@@ -4,7 +4,7 @@ from django.conf import settings
 import mock
 
 from service.tests.create_user import create_user, context
-from service.models import Quiz
+from service.models import Quiz, User
 from service.tests.dropbox_tools import MockFileList
 
 
@@ -24,6 +24,16 @@ class UserQuizViewTest(TestCase):
         self.mock_file_list = MockFileList()
         dbx.files_list_folder.return_value = self.mock_file_list
         self.dbx = dbx
+        # Creating test user in database
+        new_user = User(
+            username='test@email.com',
+            user_first_name='testfirstname',
+            user_last_name='testlastname',
+            user_phone='1234567890',
+            user_dob='01/01/1990',
+        )
+        new_user.save()
+        self.mock_user = new_user
 
     def test_user_quiz_init_view(self):
         """
@@ -95,7 +105,7 @@ class UserQuizViewTest(TestCase):
             quiz_id="test_id",
             quiz_name="mock_name",
             quiz_description="mock_description",
-            quiz_owner="test@mock.com"
+            quiz_owner=self.mock_user
         )
         quiz.save()
 
@@ -268,7 +278,7 @@ class UserQuizViewTest(TestCase):
             quiz_id="test_id",
             quiz_name="mock_name",
             quiz_description="mock_description",
-            quiz_owner="test@mock.com"
+            quiz_owner=self.mock_user
         )
         session = client.session
         session['quiz_form'] = "mock_quiz_form"
@@ -318,14 +328,15 @@ class UserQuizViewTest(TestCase):
 
         # Preparing the context
         quiz_parameters = dict(context)
-        quiz_parameters['answer_key'] = {'answer_key': 'test', 'csrfmiddlewaretoken': 'test'}
+        quiz_parameters['answer_key'] = 'answer_key'
+        quiz_parameters['csrfmiddlewaretoken'] = 'test'
 
         # Preparing session
         quiz = Quiz(
             quiz_id="test_id",
             quiz_name="mock_name",
             quiz_description="mock_description",
-            quiz_owner="test@mock.com"
+            quiz_owner=self.mock_user
         )
         session = client.session
         session['quiz_data'] = "mock_quiz_data"
@@ -343,7 +354,7 @@ class UserQuizViewTest(TestCase):
         quiz = Quiz(
             quiz_name="mock_name",
             quiz_description="mock_description",
-            quiz_owner="test@mock.com"
+            quiz_owner=self.mock_user
         )
         session['quiz_form'] = "mock_quiz_form"
         session['quiz'] = quiz
@@ -360,7 +371,7 @@ class UserQuizViewTest(TestCase):
         quiz = Quiz(
             quiz_id="test_id",
             quiz_description="mock_description",
-            quiz_owner="test@mock.com"
+            quiz_owner=self.mock_user
         )
         session['quiz'] = quiz
         session.save()

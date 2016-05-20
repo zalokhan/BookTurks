@@ -47,7 +47,7 @@ def create_quiz_content(quiz_form, quiz_data, quiz, answer_key):
     content['answer_key'] = json.dumps(answer_key, ensure_ascii=False)
     content = json.dumps(content, ensure_ascii=False)
 
-    filename = create_filename(quiz.quiz_owner, quiz.quiz_id)
+    filename = create_filename(quiz.quiz_owner.username, quiz.quiz_id)
 
     try:
         dbx = DropboxClient(settings.DROPBOX_CLIENT)

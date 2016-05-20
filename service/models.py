@@ -76,13 +76,13 @@ class Quiz(models.Model):
     quiz_id = models.CharField(max_length=200)
     quiz_name = models.CharField(max_length=200)
     quiz_description = models.CharField(max_length=1000)
-    quiz_owner = models.EmailField(max_length=100)
+    quiz_owner = models.ForeignKey('User')
     quiz_creation_datetime = models.DateTimeField('quiz datetime', default=timezone.now())
 
     def __str__(self):
         model_string = "ID:" + self.quiz_id + "; " + \
                        "NAME:" + self.quiz_name + "; " + \
                        "DESCRIPTION:" + self.quiz_description + "; " + \
-                       "OWNER:" + self.quiz_owner + "; " + \
+                       "OWNER:" + str(self.quiz_owner) + "; " + \
                        "QUIZ_DATETIME:" + str(self.quiz_creation_datetime) + ";"
         return model_string

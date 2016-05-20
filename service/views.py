@@ -1,12 +1,16 @@
 """
 Views
 """
+from django.contrib.auth.decorators import login_required
+from service.bookturks.Constants import SERVICE_MAIN_HOME
 from service.bookturks.main_home_view import main_home_view
 from service.bookturks.auth.authentication import login_check_view, logout_view
 from service.bookturks.register_view import register_view, register_check_view
+
 from service.bookturks.user_views.user_home_view import user_home_main_view
-from service.bookturks.user_views.user_quiz_view import user_quiz_init_view, user_quiz_maker_view, \
+from service.bookturks.user_views.user_quiz_create_view import user_quiz_init_view, user_quiz_maker_view, \
     user_quiz_verifier_view, user_quiz_create_view
+from service.bookturks.user_views.user_myquiz_view import user_myquiz_home_view
 
 
 def main_home(request):
@@ -59,6 +63,7 @@ def register_check(request):
     return register_check_view(request)
 
 
+@login_required(login_url=SERVICE_MAIN_HOME)
 def user_home(request):
     """
     User Home page
@@ -69,6 +74,7 @@ def user_home(request):
     return user_home_main_view(request)
 
 
+@login_required(login_url=SERVICE_MAIN_HOME)
 def user_quiz_init(request):
     """
     User Quiz Name verifier and initialization
@@ -78,6 +84,7 @@ def user_quiz_init(request):
     return user_quiz_init_view(request)
 
 
+@login_required(login_url=SERVICE_MAIN_HOME)
 def user_quiz_maker(request):
     """
     User Quiz Maker page
@@ -87,6 +94,7 @@ def user_quiz_maker(request):
     return user_quiz_maker_view(request)
 
 
+@login_required(login_url=SERVICE_MAIN_HOME)
 def user_quiz_verifier(request):
     """
     User Quiz Verifier page and answer key generator
@@ -96,6 +104,7 @@ def user_quiz_verifier(request):
     return user_quiz_verifier_view(request)
 
 
+@login_required(login_url=SERVICE_MAIN_HOME)
 def user_quiz_create(request):
     """
     Creates the quiz and uploads to the storage
@@ -103,3 +112,13 @@ def user_quiz_create(request):
     :return: Redirects to dashboard
     """
     return user_quiz_create_view(request)
+
+
+@login_required(login_url=SERVICE_MAIN_HOME)
+def user_myquiz_home(request):
+    """
+    Landing page for user's quizzes
+    :param request: User request
+    :return: Redirects to quiz home
+    """
+    return user_myquiz_home_view(request)

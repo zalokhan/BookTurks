@@ -85,6 +85,7 @@ def register_check_view(request):
 
     auth_user.first_name = user_first_name
     auth_user.last_name = user_last_name
+    auth_user.save()
 
     user = UserModel(username=username,
                      user_first_name=user_first_name,

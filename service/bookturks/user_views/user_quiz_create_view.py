@@ -5,7 +5,8 @@ from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
 
-from service.models import Quiz
+from service.models import Quiz, User
+from service.bookturks.adapters.user_adapter import get_user_instance_from_request
 
 from service.bookturks.alerts import init_alerts
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
@@ -63,11 +64,15 @@ def user_quiz_maker_view(request):
         get_object_or_404(Quiz, quiz_id=quiz_id)
     except Http404:
         # Quiz was not found so creating new quiz object for user
+        user = get_user_instance_from_request(request)
+        print (user)
+        print request.user.pk
+
         quiz = Quiz(
             quiz_id=quiz_id,
             quiz_name=quiz_name,
             quiz_description=quiz_description,
-            quiz_owner=request.user)
+            quiz_owner=user)
 
     else:
         message = "Quiz ID already present"

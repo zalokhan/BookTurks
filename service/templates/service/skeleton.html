@@ -197,6 +197,11 @@
                         <a href="#"><i class="fa fa-trophy fa-fw"></i> Quiz<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <li>
+                                <a href="{% url 'service:user_myquiz_home' %}">
+                                    <i class="fa fa-star fa-fw"></i> My Quizzes
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{% url 'service:user_quiz_init' %}">
                                     <i class="fa fa-wrench fa-fw"></i> Create a new quiz
                                 </a>
