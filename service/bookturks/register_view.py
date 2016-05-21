@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 
 from django.contrib.auth.models import User
 
-from service.bookturks.alerts import init_alerts
+from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import USERNAME, PASSWORD, REPASSWORD, USER_FIRST_NAME, USER_LAST_NAME, USER_PHONE, \
     USER_DOB, \
     ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS, \
@@ -51,24 +51,17 @@ def register_check_view(request):
             not user_dob or \
             not password or \
             not repassword:
-        message = "Please fill in all the values"
-        alert_type = DANGER
-        request.session[ALERT_MESSAGE] = message
-        request.session[ALERT_TYPE] = alert_type
+        set_alert_session(session=request.session, message="Please fill in all the values", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_REGISTER))
 
     if password != repassword:
-        message = "The password should be same in both the fields"
-        alert_type = DANGER
-        request.session[ALERT_MESSAGE] = message
-        request.session[ALERT_TYPE] = alert_type
+        set_alert_session(session=request.session, message="The password should be same in both the fields",
+                          alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_REGISTER))
 
     if '@' not in username:
-        message = "The username should be your email address"
-        alert_type = DANGER
-        request.session[ALERT_MESSAGE] = message
-        request.session[ALERT_TYPE] = alert_type
+        set_alert_session(session=request.session, message="The username should be your email address",
+                          alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_REGISTER))
 
     try:
@@ -77,10 +70,7 @@ def register_check_view(request):
         # Creating user in django authentication
         auth_user = User.objects.create_user(username=username, email=username, password=password)
     else:
-        message = "User ID already present"
-        alert_type = DANGER
-        request.session[ALERT_MESSAGE] = message
-        request.session[ALERT_TYPE] = alert_type
+        set_alert_session(session=request.session, message="User ID already present", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_REGISTER))
 
     auth_user.first_name = user_first_name
@@ -93,8 +83,7 @@ def register_check_view(request):
                      user_phone=user_phone,
                      user_dob=user_dob)
     user.save()
-    message = " ".join([user_first_name, user_last_name, "registered successfully"])
-    alert_type = SUCCESS
-    request.session[ALERT_MESSAGE] = message
-    request.session[ALERT_TYPE] = alert_type
+    set_alert_session(session=request.session,
+                      message=" ".join([user_first_name, user_last_name, "registered successfully"]),
+                      alert_type=SUCCESS)
     return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))
