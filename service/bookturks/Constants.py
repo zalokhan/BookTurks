@@ -46,6 +46,7 @@ USER_QUIZ_MAKER_PAGE = "service/user_quiz_maker.html"
 USER_QUIZ_VERIFIER_PAGE = "service/user_quiz_verifier.html"
 # My quiz pages
 USER_MYQUIZ_HOME_PAGE = "service/user_myquiz_home.html"
+USER_MYQUIZ_INFO_PAGE = "service/user_myquiz_info.html"
 """
 Quiz
 """

@@ -11,3 +11,4 @@ class ServiceConfig(AppConfig):
     Add app config here.
     """
     name = 'service'
+    verbose_name = "Book Turks Service"

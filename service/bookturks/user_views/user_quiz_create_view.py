@@ -1,19 +1,19 @@
 """
 User Quiz Views
 """
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 
-from service.models import Quiz, User
-from service.bookturks.adapters.user_adapter import get_user_instance_from_request
+from service.bookturks.adapters.UserAdapter import UserAdapter
+from service.bookturks.adapters.QuizAdapter import QuizAdapter
+from service.bookturks.quiz.QuizMaker import quiz_form_data_parser, create_quiz_content, QuizMaker
 
-from service.bookturks.alerts import init_alerts
+from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
     USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, \
     REQUEST, USER, \
     ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS
-from service.bookturks.quiz.QuizMaker import quiz_form_data_parser, create_quiz_content
 
 
 def user_quiz_init_view(request):
@@ -45,6 +45,8 @@ def user_quiz_maker_view(request):
     quiz_description = request.POST.get('quiz_description')
 
     request, alert_type, alert_message = init_alerts(request=request)
+    user_adapter = UserAdapter()
+    quiz_adapter = QuizAdapter()
 
     context = {
         REQUEST: request,
@@ -54,35 +56,26 @@ def user_quiz_maker_view(request):
     }
 
     if not quiz_id or not quiz_id.rstrip():
-        message = "The quiz id cannot be empty."
-        alert_type = DANGER
-        request.session[ALERT_MESSAGE] = message
-        request.session[ALERT_TYPE] = alert_type
+        set_alert_session(session=request.session, message="The quiz id cannot be empty.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
-    try:
-        get_object_or_404(Quiz, quiz_id=quiz_id)
-    except Http404:
-        # Quiz was not found so creating new quiz object for user
-        user = get_user_instance_from_request(request)
+    if not quiz_adapter.exists(quiz_id):
+        user = user_adapter.get_user_instance_from_request(request)
 
-        quiz = Quiz(
-            quiz_id=quiz_id,
-            quiz_name=quiz_name,
-            quiz_description=quiz_description,
-            quiz_owner=user)
+        if not user:
+            set_alert_session(session=request.session, message="User not recognizes", alert_type=DANGER)
+            return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
+        quiz = quiz_adapter.create_model(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description,
+                                         quiz_owner=user)
+        if not quiz:
+            set_alert_session(session=request.session, message="Quiz ID already present", alert_type=DANGER)
+            return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
     else:
-        message = "Quiz ID already present"
-        alert_type = DANGER
-        request.session[ALERT_MESSAGE] = message
-        request.session[ALERT_TYPE] = alert_type
+        set_alert_session(session=request.session, message="Quiz ID already present", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
-    message = " ".join([quiz_id, "created successfully"])
-    alert_type = SUCCESS
-    request.session[ALERT_MESSAGE] = message
-    request.session[ALERT_TYPE] = alert_type
+    set_alert_session(session=request.session, message=" ".join([quiz_id, "created successfully"]), alert_type=SUCCESS)
     request.session['quiz'] = quiz
 
     return render(request, USER_QUIZ_MAKER_PAGE, context)
@@ -99,19 +92,13 @@ def user_quiz_verifier_view(request):
     quiz_form = request.POST.get('quiz_form')
     quiz_data = request.POST.get('quiz_data')
     if not quiz_data or not quiz_form:
-        message = "Quiz data was not provided"
-        alert_type = DANGER
-        request.session[ALERT_MESSAGE] = message
-        request.session[ALERT_TYPE] = alert_type
+        set_alert_session(session=request.session, message="Quiz data was not provided", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
     try:
         quiz_form = quiz_form_data_parser(form_data=quiz_form)
     except ValueError:
-        message = "Empty quizzes cannot be submitted"
-        alert_type = DANGER
-        request.session[ALERT_MESSAGE] = message
-        request.session[ALERT_TYPE] = alert_type
+        set_alert_session(session=request.session, message="Empty quizzes cannot be submitted", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
     context = {
@@ -145,10 +132,7 @@ def user_quiz_create_view(request):
             del request.session['quiz']
             del request.session['quiz_data']
             del request.session['quiz_form']
-        message = "An error occurred creating the quiz."
-        alert_type = DANGER
-        request.session[ALERT_MESSAGE] = message
-        request.session[ALERT_TYPE] = alert_type
+        set_alert_session(session=request.session, message="An error occurred creating the quiz.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
     if return_code:
@@ -159,8 +143,5 @@ def user_quiz_create_view(request):
         del request.session['quiz_data']
         del request.session['quiz_form']
 
-    message = "The quiz has been successfully created"
-    alert_type = SUCCESS
-    request.session[ALERT_MESSAGE] = message
-    request.session[ALERT_TYPE] = alert_type
+    set_alert_session(session=request.session, message="The quiz has been successfully created", alert_type=SUCCESS)
     return HttpResponseRedirect(reverse(SERVICE_USER_HOME))

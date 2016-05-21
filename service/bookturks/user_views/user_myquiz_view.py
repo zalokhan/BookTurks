@@ -3,12 +3,11 @@ My quizzes page
 """
 from django.shortcuts import render
 
-from service.bookturks.adapters.user_adapter import get_user_instance_from_request
-from service.bookturks.adapters.quiz_adapter import quiz_exists
+from service.bookturks.adapters.UserAdapter import UserAdapter
 
 from service.bookturks.alerts import init_alerts
 from service.bookturks.Constants import REQUEST, USER, ALERT_MESSAGE, ALERT_TYPE, \
-    USER_MYQUIZ_HOME_PAGE
+    USER_MYQUIZ_HOME_PAGE, USER_MYQUIZ_INFO_PAGE
 from service.models import Quiz
 
 
@@ -19,8 +18,9 @@ def user_myquiz_home_view(request):
     :return: Renders page
     """
     request, alert_type, alert_message = init_alerts(request=request)
+    user_adapter = UserAdapter()
 
-    user = get_user_instance_from_request(request)
+    user = user_adapter.get_user_instance_from_request(request)
 
     quiz_list = Quiz.objects.filter(quiz_owner=user)
     context = {
@@ -32,3 +32,12 @@ def user_myquiz_home_view(request):
     }
 
     return render(request, USER_MYQUIZ_HOME_PAGE, context)
+
+
+def user_myquiz_info_view(request, quiz_id):
+    """
+    Quiz related tasks
+    :param request:
+    :return:
+    """
+    return render(request, USER_MYQUIZ_INFO_PAGE, {'quiz_id': quiz_id})

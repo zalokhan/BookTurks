@@ -22,3 +22,16 @@ def init_alerts(request):
         del request.session[ALERT_TYPE]
 
     return request, alert_type, alert_message
+
+
+def set_alert_session(session, message, alert_type):
+    """
+    set alert session
+    :param session:
+    :param message:
+    :param alert_type:
+    :return:
+    """
+    session[ALERT_MESSAGE] = message
+    session[ALERT_TYPE] = alert_type
+    session.save()
