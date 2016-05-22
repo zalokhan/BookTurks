@@ -13,7 +13,7 @@ def main_home_view(request):
     :param request: user request
     :return: renders a page with context
     """
-
+    # Clearing and displaying any alerts passed
     request, alert_type, alert_message = init_alerts(request=request)
 
     # Creating context

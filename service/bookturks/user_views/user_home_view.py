@@ -33,8 +33,9 @@ def user_home_main_view(request):
 
     # User does not exist but has email field in social authentication
     elif request.user.email and str(request.user.email).strip():
-        # Already created user from email address
+        # Creating username from email address
         username = "".join([str(request.user.pk), request.user.email])
+        # username exists
         if user_adapter.exists(username):
             return render(request, USER_HOME_PAGE, context)
         # Create user
@@ -42,6 +43,7 @@ def user_home_main_view(request):
             if user_adapter.create_and_save_model(username=username, first_name=request.user.first_name,
                                                   last_name=request.user.last_name, phone="", dob=""):
                 return render(request, USER_HOME_PAGE, context)
+            # This condition should never be encountered
             else:
                 set_alert_session(session=request.session, message="Trouble signing in. Contact the support for help !",
                                   alert_type=DANGER)
@@ -49,6 +51,7 @@ def user_home_main_view(request):
 
     # User not present and no email field (facebook) so creating username from username and pk
     else:
+        # Creating username from pk and username in auth
         username = "".join([str(request.user.pk), request.user.username, "@bookturks.com"])
         if user_adapter.exists(request.user.email):
             return render(request, USER_HOME_PAGE, context)

@@ -7,7 +7,7 @@ from django.shortcuts import render
 
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
-from service.bookturks.quiz.QuizMaker import quiz_form_data_parser, create_quiz_content, QuizMaker
+from service.bookturks.quiz.QuizMaker import QuizMaker
 
 from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
@@ -40,13 +40,16 @@ def user_quiz_maker_view(request):
     :param request: User request
     :return: Renders quiz page
     """
-    quiz_id = request.POST.get('quiz_id')
+    # Get the post variables from the quiz init view.
     quiz_name = request.POST.get('quiz_name')
     quiz_description = request.POST.get('quiz_description')
 
     request, alert_type, alert_message = init_alerts(request=request)
+
+    # Initialize the adapters.
     user_adapter = UserAdapter()
     quiz_adapter = QuizAdapter()
+    quiz_maker = QuizMaker()
 
     context = {
         REQUEST: request,
@@ -54,23 +57,31 @@ def user_quiz_maker_view(request):
         ALERT_MESSAGE: alert_message,
         ALERT_TYPE: alert_type
     }
+    # Get the user model from the request.
+    user = user_adapter.get_user_instance_from_request(request)
 
+    quiz_id = quiz_maker.get_quiz_id(username=user.username, quiz_name=quiz_name)
+
+    # Check if quiz_id is not set. (This will mostly be true as we already have this check in the javascript)
     if not quiz_id or not quiz_id.rstrip():
-        set_alert_session(session=request.session, message="The quiz id cannot be empty.", alert_type=DANGER)
+        set_alert_session(session=request.session, message="The quiz Name cannot be empty.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
+    # Check if the quiz_id is already used before.
     if not quiz_adapter.exists(quiz_id):
-        user = user_adapter.get_user_instance_from_request(request)
-
+        # If quiz id is original, check if user is not None
         if not user:
             set_alert_session(session=request.session, message="User not recognizes", alert_type=DANGER)
             return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
+        # Create the quiz model
         quiz = quiz_adapter.create_model(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description,
                                          quiz_owner=user)
+        # This qould be None if there were errors in creating the model
         if not quiz:
             set_alert_session(session=request.session, message="Quiz ID already present", alert_type=DANGER)
             return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
+    # Quiz ID is duplicate
     else:
         set_alert_session(session=request.session, message="Quiz ID already present", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
@@ -89,21 +100,30 @@ def user_quiz_verifier_view(request):
     :return: Message depending on success or failure of quiz creation.
     """
     request, alert_type, alert_message = init_alerts(request=request)
+    quiz_maker = QuizMaker()
+
+    # Quiz form is the HTML form which can be displayed and submitted by a user
     quiz_form = request.POST.get('quiz_form')
+    # Quiz data is the template created by the form builder. This can be editted
     quiz_data = request.POST.get('quiz_data')
+    # Do not allow empty forms to be submitted
     if not quiz_data or not quiz_form:
         set_alert_session(session=request.session, message="Quiz data was not provided", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
     try:
-        quiz_form = quiz_form_data_parser(form_data=quiz_form)
+        # Parse the form to remove irrelevant data.
+        # It will be better and cleaner to change the javascript so this will not be required
+        quiz_form = quiz_maker.parse_form(quiz_form=quiz_form)
     except ValueError:
         set_alert_session(session=request.session, message="Empty quizzes cannot be submitted", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
+    # Add this form so that it can be displayed in the next page
     context = {
         'quiz_form': quiz_form,
     }
+    # Save to session to pass to the next view
     request.session['quiz_form'] = quiz_form
     request.session['quiz_data'] = quiz_data
 
@@ -118,16 +138,26 @@ def user_quiz_create_view(request):
     """
     answer_key = request.POST
 
+    # Quiz Form is the HTML form which can be displayed as quiz and submitted
     quiz_form = request.session.get('quiz_form')
+    # Quiz Data is the editable form which needs to be rendered to obtain the HTML form
     quiz_data = request.session.get('quiz_data')
     quiz = request.session.get('quiz')
+
+    quiz_maker = QuizMaker()
 
     try:
         if not quiz_form or not quiz_data or not quiz or not answer_key:
             raise ValueError("quiz_data or quiz_form or quiz is None")
-        return_code = create_quiz_content(quiz_form=quiz_form, quiz_data=quiz_data, quiz=quiz, answer_key=answer_key)
+        # Create a JSON content to be uploaded to storage
+        content = quiz_maker.create_content(quiz_form=quiz_form, quiz_data=quiz_data, quiz_model=quiz,
+                                            answer_key=answer_key)
+        # Create filename for file in storage
+        filename = quiz_maker.create_filename(quiz=quiz)
+        # Upload file to storage and get the return code (file id)
+        return_code = quiz_maker.upload_quiz(content=content, filename=filename)
     except:
-        # Remove the quiz objects
+        # Remove the quiz objects so that new form can be generated without mixing up old data
         if 'quiz' in request.session and 'quiz_data' in request.session and 'quiz_form' in request.session:
             del request.session['quiz']
             del request.session['quiz_data']
@@ -135,6 +165,7 @@ def user_quiz_create_view(request):
         set_alert_session(session=request.session, message="An error occurred creating the quiz.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
+    # If return code was not None, save quiz in database
     if return_code:
         quiz.save()
     # Remove the quiz objects

@@ -1,4 +1,4 @@
-# Django-ServiceWebApp
+# Book Turks
 
 [![Build Status](https://travis-ci.org/zalokhan/BookTurks.svg?branch=master)](https://travis-ci.org/zalokhan/BookTurks)
 [![Coverage Status](https://coveralls.io/repos/github/zalokhan/BookTurks/badge.svg?branch=master)](https://coveralls.io/github/zalokhan/BookTurks?branch=master)

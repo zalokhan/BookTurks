@@ -8,51 +8,40 @@
 {% block main_container %}
 
 <div style="padding-top: 50px">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <h2>Quiz</h2>
-            </div>
+    <div class="row">
+        <div class="col-lg-12 text-center">
+            <h2>Quiz</h2>
         </div>
-        <div class="row">
-            <div class="col-lg-12" style="text-align:center;">
-                {{ state }}
-                <form action="{% url 'service:user_quiz_maker' %}" method="post" class="form-horizontal">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div style="width: 75%; margin: 0 auto;">
-
-                            <div class="form-group">
-                                <label for="quizID" class="col-sm-2 control-label">Quiz ID :</label>
-                                <div class="col-sm-10">
-                                    <input type="text" name="quiz_id" value="{{ quiz_id}}" class="form-control"
-                                           placeholder="Quiz ID" required
-                                           autofocus>
-                                </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12" style="text-align:center;">
+            {{ state }}
+            <form action="{% url 'service:user_quiz_maker' %}" method="post" class="form-horizontal">
+                {% csrf_token %}
+                <div class="row">
+                    <div style="width: 75%; margin: 0 auto;">
+                        <div class="form-group">
+                            <label for="quizName" class="col-sm-2 control-label">Quiz Name :</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="quiz_name" value="{{ quiz_name}}" class="form-control"
+                                       placeholder="Quiz Name" required
+                                       autofocus>
                             </div>
-                            <div class="form-group">
-                                <label for="quizName" class="col-sm-2 control-label">Quiz Name :</label>
-                                <div class="col-sm-10">
-                                    <input type="text" name="quiz_name" value="{{ quiz_name}}" class="form-control"
-                                           placeholder="Quiz Name" required
-                                           autofocus>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="quizDescription" class="col-sm-2 control-label">Quiz Description :</label>
-                                <div class="col-sm-10">
-                                    <input type="text" name="quiz_description" value="{{ quiz_description}}"
-                                           class="form-control"
-                                           placeholder="Quiz Description" required
-                                           autofocus>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-
                         </div>
+                        <div class="form-group">
+                            <label for="quizDescription" class="col-sm-2 control-label">Quiz Description :</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="quiz_description" value="{{ quiz_description}}"
+                                       class="form-control"
+                                       placeholder="Quiz Description" required
+                                       autofocus>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

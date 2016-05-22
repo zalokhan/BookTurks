@@ -26,7 +26,7 @@ def init_alerts(request):
 
 def set_alert_session(session, message, alert_type):
     """
-    set alert session
+    set alert session and message and save.
     :param session:
     :param message:
     :param alert_type:

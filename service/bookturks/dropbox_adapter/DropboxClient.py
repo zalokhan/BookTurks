@@ -20,10 +20,25 @@ class DropboxClient:
         :param filename: create a file with this name on dropbox
         :return: file id from dropbox
         """
-
         return self.client.files_upload(content, filename)
 
-    def list_quiz_files(self, filters=None):
+    def delete_file(self, filename):
+        """
+        Permanantly deletes the file from dropbox
+        :param filename: Absolute filename with path
+        :return:
+        """
+        return self.client.files_delete(filename)
+
+    def get_file(self, filename):
+        """
+        Downloads file from storage and saves in the base root folder
+        :param filename:
+        :return:
+        """
+        return self.client.files_download_to_file(download_path=filename, path=filename)
+
+    def list_all_quiz_files(self, filters=None):
         """
         Lists the quiz files filtering out required quiz results
         :param filters: filters to be provided in future
@@ -39,4 +54,22 @@ class DropboxClient:
                     break
                 else:
                     list_of_files = self.client.files_list_folder_continue(list_of_files.cursor)
+        return result_list
+
+    def list_quiz_files_for_user(self, username):
+        """
+        For the input user, list all the quiz files owned
+        :param username:
+        :return:
+        """
+        result_list = list()
+        list_of_files = self.client.files_search(path=QUIZ_HOME, query=username, start=0, )
+        while True:
+            for match in list_of_files.matches:
+                result_list.append(match)
+            if not list_of_files.more:
+                break
+            else:
+                # Check if more than 100 files are available and search in batchse of 100.
+                list_of_files = self.client.files_search(path=QUIZ_HOME, query=username, start=list_of_files.start)
         return result_list
