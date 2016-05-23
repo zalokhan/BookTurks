@@ -154,6 +154,7 @@ def user_quizarena_solve(request, quiz_id):
     :param quiz_id:
     :return:
     """
+    print ("HERE")
     return user_quizarena_solve_view(request, quiz_id)
 
 
