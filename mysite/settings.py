@@ -76,6 +76,7 @@ database_config = dj_database_url.config()
 #     DEBUG = True
 # else:
 #     DEBUG = False
+
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
