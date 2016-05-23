@@ -68,3 +68,18 @@ class QuizAdapter(AbstractAdapter):
             return quiz
         except Http404:
             return None
+
+    def get_models_for_owner(self, user_model):
+        """
+        Returns a list of all quizzes owned by the user passed in the argument
+        :param user_model:
+        :return:
+        """
+        return Quiz.objects.filter(quiz_owner=user_model)
+
+    def get_all_models(self):
+        """
+        Returns list of all quizzes
+        :return:
+        """
+        return Quiz.objects.all()

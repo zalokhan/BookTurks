@@ -11,6 +11,7 @@ from service.bookturks.user_views.user_home_view import user_home_main_view
 from service.bookturks.user_views.user_quiz_create_view import user_quiz_init_view, user_quiz_maker_view, \
     user_quiz_verifier_view, user_quiz_create_view
 from service.bookturks.user_views.user_myquiz_view import user_myquiz_home_view, user_myquiz_info_view
+from service.bookturks.user_views.user_quizarena_view import user_quizarena_home_view
 
 
 def main_home(request):
@@ -132,3 +133,13 @@ def user_myquiz_info(request, quiz_id):
     :return:
     """
     return user_myquiz_info_view(request, quiz_id)
+
+
+@login_required(login_url=SERVICE_MAIN_HOME)
+def user_quizarena_home(request):
+    """
+    Attempt quizzes here. Displays a list of quizzes which you can attempt
+    :param request:
+    :return:
+    """
+    return user_quizarena_home_view(request)

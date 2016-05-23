@@ -2,15 +2,16 @@
 My quizzes page
 """
 from django.shortcuts import render
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.quiz.QuizTools import QuizTools
 
-from service.bookturks.alerts import init_alerts
-from service.bookturks.Constants import REQUEST, USER, ALERT_MESSAGE, ALERT_TYPE, \
-    USER_MYQUIZ_HOME_PAGE, USER_MYQUIZ_INFO_PAGE
-from service.models import Quiz
+from service.bookturks.alerts import init_alerts, set_alert_session
+from service.bookturks.Constants import REQUEST, USER, ALERT_MESSAGE, ALERT_TYPE, DANGER, \
+    USER_MYQUIZ_HOME_PAGE, USER_MYQUIZ_INFO_PAGE, SERVICE_USER_HOME
 
 
 def user_myquiz_home_view(request):
@@ -21,10 +22,11 @@ def user_myquiz_home_view(request):
     """
     request, alert_type, alert_message = init_alerts(request=request)
     user_adapter = UserAdapter()
+    quiz_adapter = QuizAdapter()
 
     user = user_adapter.get_user_instance_from_request(request)
 
-    quiz_list = Quiz.objects.filter(quiz_owner=user)
+    quiz_list = quiz_adapter.get_models_for_owner(user_model=user)
     context = {
         REQUEST: request,
         USER: request.user,
@@ -43,11 +45,19 @@ def user_myquiz_info_view(request, quiz_id):
     :param quiz_id:
     :return:
     """
+    user_adapter = UserAdapter()
     quiz_adapter = QuizAdapter()
     quiz_tools = QuizTools()
 
+    user = user_adapter.get_user_instance_from_request(request)
     quiz = quiz_adapter.exists(quiz_id)
     # TODO: DO something if quiz does not exist
+
+    # Check if this user is the owner of this quiz
+    if user != quiz.quiz_owner:
+        set_alert_session(session=request.session, message="You do not own this quiz. You are not allowed to edit this",
+                          alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_HOME))
 
     content = quiz_tools.download_quiz_content(quiz_model=quiz)
 

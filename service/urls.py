@@ -33,4 +33,7 @@ urlpatterns = [
     # Quiz editting page
     url(r'^myquiz/home/id/(?P<quiz_id>\w+)/$', views.user_myquiz_info, name='user_myquiz_info'),
 
+    # Quiz Arena home page
+    url(r'^quizarena/home/$', views.user_quizarena_home, name='user_quizarena_home'),
+
 ]

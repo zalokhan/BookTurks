@@ -32,11 +32,6 @@
         <!--panel heading-->
         <div class="panel-body">
             {{ state }}
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <h2>Quiz Editor</h2>
-                </div>
-            </div>
             <form id="quiz_form" action="{% url 'service:user_quiz_verifier' %}" method="post" class="form-signin">
                 {% csrf_token %}
                 <input type='hidden' id='hiddenFieldData' name='quiz_data' value=''/>
@@ -44,9 +39,9 @@
             </form>
 
             <div id="edit-form" style="padding-top: 40px">
-            <textarea id="fb-template">
-            {% autoescape off %}{{ quiz_data }}{% endautoescape %}
-            </textarea>
+                <textarea id="fb-template">
+                    {% autoescape off %}{{ quiz_data }}{% endautoescape %}
+                </textarea>
             </div>
 
             <div id="rendered-form" style="padding-top: 40px">
@@ -56,8 +51,6 @@
         </div>
     </div>
 </div>
-
-
 {% endblock %}
 
 

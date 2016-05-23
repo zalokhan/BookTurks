@@ -34,6 +34,9 @@ SERVICE_USER_QUIZ_VERIFIER = "service:user_quiz_verifier"
 SERVICE_USER_QUIZ_CREATE = "service:user_quiz_create"
 # My quiz pages
 SERVICE_USER_MYQUIZ_HOME = "service:user_myquiz_home"
+SERVICE_USER_MYQUIZ_INFO = "service:user_myquiz_info"
+# Quiz Arena pages
+SERVICE_USER_QUIZARENA_HOME = "service:user_quizarena_home"
 
 # HTML pages
 # Main pages
@@ -47,6 +50,8 @@ USER_QUIZ_VERIFIER_PAGE = "service/user_quiz_verifier.html"
 # My quiz pages
 USER_MYQUIZ_HOME_PAGE = "service/user_myquiz_home.html"
 USER_MYQUIZ_INFO_PAGE = "service/user_myquiz_info.html"
+# Quiz Arena pages
+USER_QUIZARENA_HOME_PAGE = "service/user_quizarena_home.html"
 """
 Quiz
 """

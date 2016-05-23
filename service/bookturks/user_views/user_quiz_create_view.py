@@ -74,7 +74,7 @@ def user_quiz_maker_view(request):
     if not quiz_adapter.exists(quiz_id):
         # If quiz id is original, check if user is not None
         if not user:
-            set_alert_session(session=request.session, message="User not recognizes", alert_type=DANGER)
+            set_alert_session(session=request.session, message="User not recognized", alert_type=DANGER)
             return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
         # Create the quiz model
