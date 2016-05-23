@@ -53,7 +53,7 @@ def user_home_main_view(request):
     else:
         # Creating username from pk and username in auth
         username = "".join([str(request.user.pk), request.user.username, "@bookturks.com"])
-        if user_adapter.exists(request.user.email):
+        if user_adapter.exists(username):
             return render(request, USER_HOME_PAGE, context)
         else:
             if user_adapter.create_and_save_model(username=username, first_name=request.user.first_name,
