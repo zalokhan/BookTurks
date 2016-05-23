@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block head %}
-<link href="{% static 'service/stylesheets/user_myquiz_home.css' %}" rel="stylesheet">
+<link href="{% static 'service/stylesheets/user_quiz_list.css' %}" rel="stylesheet">
 {% endblock %}
 
 
@@ -19,9 +19,13 @@
             <ol>
                 {% for quiz in quiz_list%}
                 <li>
-                    <a href="{% url 'service:user_myquiz_home' %}id/{{quiz.quiz_id}}">
+                    <a href="solve/{{quiz.quiz_id}}">
                         <div>
-                            {{ quiz.quiz_name }}
+                            <p style="float: left; margin: auto">{{ quiz.quiz_name }}</p>
+                            <p style="float: right; margin: auto; font-size: small">
+                                By {{ quiz.quiz_owner.user_first_name }} {{ quiz.quiz_owner.user_last_name }}
+                            </p>
+                            <div style="clear: both;"></div>
                         </div>
                     </a>
                 </li>

@@ -4,6 +4,9 @@ from django.conf import settings
 import mock
 
 from service.tests.create_user import create_user, context
+from service.bookturks.adapters.QuizAdapter import QuizAdapter
+from service.bookturks.adapters.UserAdapter import UserAdapter
+from service.bookturks.quiz.QuizTools import QuizTools
 from service.models import Quiz, User
 from service.tests.dropbox_tools import MockFileList
 
@@ -19,20 +22,23 @@ class UserQuizCreateViewTest(TestCase):
         Initialization for all tests
         :return:
         """
+        self.user_adapter = UserAdapter()
+        self.quiz_adapter = QuizAdapter()
+        self.quiz_tools = QuizTools()
+
         dbx = mock_dbx.return_value
         dbx.files_upload.return_value = "mock_id"
         self.mock_file_list = MockFileList()
         dbx.files_list_folder.return_value = self.mock_file_list
         self.dbx = dbx
         # Creating test user in database
-        new_user = User(
+        new_user = self.user_adapter.create_and_save_model(
             username='test@email.com',
-            user_first_name='testfirstname',
-            user_last_name='testlastname',
-            user_phone='1234567890',
-            user_dob='01/01/1990',
+            first_name='testfirstname',
+            last_name='testlastname',
+            phone='1234567890',
+            dob='01/01/1990',
         )
-        new_user.save()
         self.mock_user = new_user
 
     def test_user_quiz_init_view(self):
@@ -66,7 +72,7 @@ class UserQuizCreateViewTest(TestCase):
         response = client.post(reverse('service:user_quiz_maker'), quiz_parameters, follow=True)
         self.assertEqual(response.status_code, 200)
 
-    def test_user_quiz_maker_view_with_empty_id(self):
+    def test_user_quiz_maker_view_with_empty_name(self):
         """
         Testing the user maker quiz view
         :return:
@@ -75,8 +81,7 @@ class UserQuizCreateViewTest(TestCase):
         user = create_user()
         quiz_parameters = dict(context)
 
-        quiz_parameters['quiz_id'] = ''
-        quiz_parameters['quiz_name'] = 'test_quiz_name'
+        quiz_parameters['quiz_name'] = ' '
         quiz_parameters['quiz_description'] = 'test_quiz_description'
 
         self.assertEqual(user.is_active, True)
@@ -89,7 +94,7 @@ class UserQuizCreateViewTest(TestCase):
         redirect_chain.append(("/quiz/init/", 302))
         self.assertEqual(response.redirect_chain, redirect_chain)
 
-    def test_user_quiz_maker_view_with_duplicate_id(self):
+    def test_user_quiz_maker_view_with_duplicate_name(self):
         """
         Testing the user maker quiz view
         :return:
@@ -98,17 +103,13 @@ class UserQuizCreateViewTest(TestCase):
         user = create_user()
         quiz_parameters = dict(context)
 
-        quiz_parameters['quiz_id'] = 'test_id'
         quiz_parameters['quiz_name'] = 'test_quiz_name'
         quiz_parameters['quiz_description'] = 'test_quiz_description'
-        quiz = Quiz(
-            quiz_id="test_id",
+        quiz = self.quiz_adapter.create_and_save_model(
+            quiz_id=self.quiz_tools.get_quiz_id(user.username, quiz_parameters['quiz_name']),
             quiz_name="mock_name",
             quiz_description="mock_description",
-            quiz_owner=self.mock_user
-        )
-        quiz.save()
-
+            quiz_owner=self.mock_user)
         self.assertEqual(user.is_active, True)
         client.login(username=context.get('username'), password=context.get('password'))
         response = client.post(reverse('service:user_quiz_maker'), quiz_parameters, follow=True)

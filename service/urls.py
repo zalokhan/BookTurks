@@ -35,5 +35,9 @@ urlpatterns = [
 
     # Quiz Arena home page
     url(r'^quizarena/home/$', views.user_quizarena_home, name='user_quizarena_home'),
+    # Quiz attempt page
+    url(r'^quizarena/home/solve/(?P<quiz_id>\w+)/$', views.user_quizarena_solve, name='user_quizarena_solve'),
+    # Quiz result
+    url(r'^quizarena/home/result$', views.user_quizarena_result, name='user_quizarena_result'),
 
 ]

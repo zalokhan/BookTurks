@@ -37,7 +37,7 @@ class UserAdapter(AbstractAdapter):
                         user_phone=phone,
                         user_dob=dob)
             user.save()
-        return True
+        return user
 
     def create_model(self, username, first_name="", last_name="", phone="", dob=""):
         """

@@ -37,6 +37,8 @@ SERVICE_USER_MYQUIZ_HOME = "service:user_myquiz_home"
 SERVICE_USER_MYQUIZ_INFO = "service:user_myquiz_info"
 # Quiz Arena pages
 SERVICE_USER_QUIZARENA_HOME = "service:user_quizarena_home"
+SERVICE_USER_QUIZARENA_SOLVE = "service:user_quizarena_solve"
+SERVICE_USER_QUIZARENA_RESULT = "service:user_quizarena_result"
 
 # HTML pages
 # Main pages
@@ -52,6 +54,8 @@ USER_MYQUIZ_HOME_PAGE = "service/user_myquiz_home.html"
 USER_MYQUIZ_INFO_PAGE = "service/user_myquiz_info.html"
 # Quiz Arena pages
 USER_QUIZARENA_HOME_PAGE = "service/user_quizarena_home.html"
+USER_QUIZARENA_SOLVE_PAGE = "service/user_quizarena_solve.html"
+USER_QUIZARENA_RESULT_PAGE = "service/user_quizarena_result.html"
 """
 Quiz
 """

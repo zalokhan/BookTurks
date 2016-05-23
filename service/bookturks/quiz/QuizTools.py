@@ -75,7 +75,7 @@ class QuizTools:
         try:
             content = json.dumps(content, ensure_ascii=False)
         except Exception, err:
-            print (err)
+            # print (err)
             raise
         return content
 
@@ -90,7 +90,7 @@ class QuizTools:
         # Checking if less html tags then something is wrong or empty form has been submitted
         if len(form_tags) < 10:
             raise ValueError(
-                "QuizMaker:quiz_form_data_parser:Empty quizzes cannot be submitted. Form_data cannot be empty.")
+                "QuizTools:quiz_form_data_parser:Empty quizzes cannot be submitted. Form_data cannot be empty.")
 
         # One more check to make sure that the form submitted has relevant tags.
         # Need to avoid script attacks
@@ -98,7 +98,7 @@ class QuizTools:
             pass
         else:
             raise ValueError(
-                "QuizMaker:quiz_form_data_parser:Quiz form is not properly generated. Something wrong with data")
+                "QuizTools:quiz_form_data_parser:Quiz form is not properly generated. Something wrong with data")
 
         # Removing redundant lines
         # <div rendered-form></div>
@@ -118,7 +118,7 @@ class QuizTools:
             return_code = self.dbx.upload_file(content=content, filename=filename)
         except Exception, err:
             # TODO: Handle this properly
-            print (err)
+            # print (err)
             return None
         return return_code
 

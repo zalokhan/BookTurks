@@ -151,19 +151,15 @@ def user_quiz_create_view(request):
     try:
         if not quiz_form or not quiz_data or not quiz or not answer_key:
             raise ValueError("quiz_data or quiz_form or quiz is None")
-        print "test-2"
         # Create a JSON content to be uploaded to storage
         content = quiz_tools.create_content(quiz_form=quiz_form, quiz_data=quiz_data, quiz_model=quiz,
                                             answer_key=answer_key)
-        print "test-1"
         # Create filename for file in storage
         filename = quiz_tools.create_filename(quiz=quiz)
         # Upload file to storage and get the return code (file id)
-        print "test1"
         return_code = quiz_tools.upload_quiz(content=content, filename=filename)
-        print "test2"
     except Exception, err:
-        print (err)
+        # print (err)
         # Remove the quiz objects so that new form can be generated without mixing up old data
         if 'quiz' in request.session and 'quiz_data' in request.session and 'quiz_form' in request.session:
             del request.session['quiz']
