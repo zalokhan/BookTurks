@@ -1,3 +1,5 @@
+import dropbox
+from django.conf import settings
 from service.bookturks.Constants import QUIZ_HOME
 
 
@@ -20,7 +22,8 @@ class DropboxClient:
         :param filename: create a file with this name on dropbox
         :return: file id from dropbox
         """
-        return self.client.files_upload(content, filename)
+        # TODO: Upload file in chunks to avoid big upload
+        return self.client.files_upload(content, filename, mode=dropbox.files.WriteMode.overwrite)
 
     def delete_file(self, filename):
         """
@@ -36,7 +39,8 @@ class DropboxClient:
         :param filename:
         :return:
         """
-        return self.client.files_download_to_file(download_path=filename, path=filename)
+        download_path = "".join([settings.BASE_DIR, "/service/tmp", filename])
+        return download_path, self.client.files_download_to_file(download_path=download_path, path=filename)
 
     def list_all_quiz_files(self, filters=None):
         """

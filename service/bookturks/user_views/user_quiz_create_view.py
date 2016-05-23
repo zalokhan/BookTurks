@@ -7,7 +7,7 @@ from django.shortcuts import render
 
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
-from service.bookturks.quiz.QuizMaker import QuizMaker
+from service.bookturks.quiz.QuizTools import QuizTools
 
 from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
@@ -49,7 +49,7 @@ def user_quiz_maker_view(request):
     # Initialize the adapters.
     user_adapter = UserAdapter()
     quiz_adapter = QuizAdapter()
-    quiz_maker = QuizMaker()
+    quiz_tools = QuizTools()
 
     context = {
         REQUEST: request,
@@ -60,11 +60,14 @@ def user_quiz_maker_view(request):
     # Get the user model from the request.
     user = user_adapter.get_user_instance_from_request(request)
 
-    quiz_id = quiz_maker.get_quiz_id(username=user.username, quiz_name=quiz_name)
+    quiz_id = quiz_tools.get_quiz_id(username=user.username, quiz_name=quiz_name)
 
     # Check if quiz_id is not set. (This will mostly be true as we already have this check in the javascript)
     if not quiz_id or not quiz_id.rstrip():
-        set_alert_session(session=request.session, message="The quiz Name cannot be empty.", alert_type=DANGER)
+        set_alert_session(session=request.session,
+                          message="The quiz Name can contain ony alphanumeric characters, spaces, "
+                                  "'-', '?' and '_'",
+                          alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
     # Check if the quiz_id is already used before.
@@ -77,7 +80,7 @@ def user_quiz_maker_view(request):
         # Create the quiz model
         quiz = quiz_adapter.create_model(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description,
                                          quiz_owner=user)
-        # This qould be None if there were errors in creating the model
+        # This could be None if there were errors in creating the model
         if not quiz:
             set_alert_session(session=request.session, message="Quiz ID already present", alert_type=DANGER)
             return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
@@ -100,7 +103,7 @@ def user_quiz_verifier_view(request):
     :return: Message depending on success or failure of quiz creation.
     """
     request, alert_type, alert_message = init_alerts(request=request)
-    quiz_maker = QuizMaker()
+    quiz_tools = QuizTools()
 
     # Quiz form is the HTML form which can be displayed and submitted by a user
     quiz_form = request.POST.get('quiz_form')
@@ -114,7 +117,7 @@ def user_quiz_verifier_view(request):
     try:
         # Parse the form to remove irrelevant data.
         # It will be better and cleaner to change the javascript so this will not be required
-        quiz_form = quiz_maker.parse_form(quiz_form=quiz_form)
+        quiz_form = quiz_tools.parse_form(quiz_form=quiz_form)
     except ValueError:
         set_alert_session(session=request.session, message="Empty quizzes cannot be submitted", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
@@ -144,19 +147,23 @@ def user_quiz_create_view(request):
     quiz_data = request.session.get('quiz_data')
     quiz = request.session.get('quiz')
 
-    quiz_maker = QuizMaker()
-
+    quiz_tools = QuizTools()
     try:
         if not quiz_form or not quiz_data or not quiz or not answer_key:
             raise ValueError("quiz_data or quiz_form or quiz is None")
+        print "test-2"
         # Create a JSON content to be uploaded to storage
-        content = quiz_maker.create_content(quiz_form=quiz_form, quiz_data=quiz_data, quiz_model=quiz,
+        content = quiz_tools.create_content(quiz_form=quiz_form, quiz_data=quiz_data, quiz_model=quiz,
                                             answer_key=answer_key)
+        print "test-1"
         # Create filename for file in storage
-        filename = quiz_maker.create_filename(quiz=quiz)
+        filename = quiz_tools.create_filename(quiz=quiz)
         # Upload file to storage and get the return code (file id)
-        return_code = quiz_maker.upload_quiz(content=content, filename=filename)
-    except:
+        print "test1"
+        return_code = quiz_tools.upload_quiz(content=content, filename=filename)
+        print "test2"
+    except Exception, err:
+        print (err)
         # Remove the quiz objects so that new form can be generated without mixing up old data
         if 'quiz' in request.session and 'quiz_data' in request.session and 'quiz_form' in request.session:
             del request.session['quiz']
@@ -174,5 +181,5 @@ def user_quiz_create_view(request):
         del request.session['quiz_data']
         del request.session['quiz_form']
 
-    set_alert_session(session=request.session, message="The quiz has been successfully created", alert_type=SUCCESS)
+    set_alert_session(session=request.session, message="The quiz has been successfully saved", alert_type=SUCCESS)
     return HttpResponseRedirect(reverse(SERVICE_USER_HOME))

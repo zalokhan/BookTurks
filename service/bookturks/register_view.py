@@ -2,9 +2,8 @@
 Registration handling
 """
 from django.http import HttpResponseRedirect
-from django.http import Http404
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
 
 from django.contrib.auth.models import User
@@ -16,7 +15,6 @@ from service.bookturks.Constants import USERNAME, PASSWORD, REPASSWORD, USER_FIR
     SERVICE_REGISTER, SERVICE_MAIN_HOME, REGISTER_PAGE
 
 from service.bookturks.adapters.UserAdapter import UserAdapter
-from service.models import User as UserModel
 
 
 def register_view(request):

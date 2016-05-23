@@ -1,10 +1,12 @@
+import os
 import json
+import re
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from dropbox.exceptions import ApiError
 from django.conf import settings
 
 
-class QuizMaker:
+class QuizTools:
     """
     Creates quizzes
     Parses and checks for errors
@@ -12,6 +14,7 @@ class QuizMaker:
     """
 
     def __init__(self):
+        self.dbx = DropboxClient(settings.DROPBOX_CLIENT)
         pass
 
     def get_quiz_id(self, username, quiz_name):
@@ -21,19 +24,23 @@ class QuizMaker:
         :param quiz_name:
         :return:
         """
-        return "_".join([username, quiz_name])
+        quiz_id = "_".join([username, quiz_name])
+        if re.match("^[A-Za-z0-9_ -]*$", quiz_name):
+            quiz_id = ''.join(character for character in quiz_id if character.isalnum())
+            return quiz_id
+        else:
+            return None
 
     def create_filename(self, quiz):
         """
         Create filename for dropbox upload
-        :param owner:
-        :param quizid:
+        :param quiz:
         :return:
         """
         if not quiz or not quiz.quiz_owner or not str(quiz.quiz_owner).strip() or \
                 not quiz.quiz_id or not str(quiz.quiz_id).strip():
             raise ValueError("QuizMaker:create_filename:Invalid Quiz model passed")
-        return "/quiz/" + str(quiz.quiz_owner.username) + "_" + str(quiz.quiz_id) + ".JSON"
+        return "".join(["/quiz/", str(quiz.quiz_id), ".JSON"])
 
     def create_content(self, quiz_form, quiz_data, quiz_model, answer_key):
         """
@@ -64,7 +71,7 @@ class QuizMaker:
         content['quiz_owner'] = quiz_model.quiz_owner.username
         content['quiz_form'] = quiz_form
         content['quiz_data'] = quiz_data
-        content['answer_key'] = json.dumps(answer_key, ensure_ascii=False)
+        content['answer_key'] = answer_key
         try:
             content = json.dumps(content, ensure_ascii=False)
         except Exception, err:
@@ -108,9 +115,29 @@ class QuizMaker:
         :return:
         """
         try:
-            dbx = DropboxClient(settings.DROPBOX_CLIENT)
-            return_code = dbx.upload_file(content=content, filename=filename)
-        except ApiError:
+            return_code = self.dbx.upload_file(content=content, filename=filename)
+        except Exception, err:
             # TODO: Handle this properly
+            print (err)
             return None
         return return_code
+
+    def download_quiz_content(self, quiz_model):
+        """
+        Downloads the quiz and returns the content as JSON
+        :param quiz_model:
+        :return:
+        """
+        if not quiz_model or not quiz_model.quiz_id or not quiz_model.quiz_owner:
+            raise ValueError("Invalid model is passed. Quiz not recognized.")
+        path, metadata = self.dbx.get_file(filename=self.create_filename(quiz_model))
+        quiz_file = open(path, 'r')
+        content = ""
+        while True:
+            temp_data = quiz_file.read(100)
+            if not temp_data:
+                break
+            content += temp_data
+        quiz_file.close()
+        os.remove(path)
+        return json.loads(content)
