@@ -158,7 +158,7 @@ def user_quiz_create_view(request):
         filename = quiz_tools.create_filename(quiz=quiz)
         # Upload file to storage and get the return code (file id)
         return_code = quiz_tools.upload_quiz(content=content, filename=filename)
-    except Exception, err:
+    except Exception as err:
         # print (err)
         # Remove the quiz objects so that new form can be generated without mixing up old data
         if 'quiz' in request.session and 'quiz_data' in request.session and 'quiz_form' in request.session:

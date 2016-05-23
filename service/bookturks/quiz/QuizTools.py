@@ -2,7 +2,6 @@ import os
 import json
 import re
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
-from dropbox.exceptions import ApiError
 from django.conf import settings
 
 
@@ -74,7 +73,7 @@ class QuizTools:
         content['answer_key'] = answer_key
         try:
             content = json.dumps(content, ensure_ascii=False)
-        except Exception, err:
+        except Exception as err:
             # print (err)
             raise
         return content
@@ -116,7 +115,7 @@ class QuizTools:
         """
         try:
             return_code = self.dbx.upload_file(content=content, filename=filename)
-        except Exception, err:
+        except Exception as err:
             # TODO: Handle this properly
             # print (err)
             return None
