@@ -87,8 +87,6 @@ def user_quizarena_result_view(request):
     right = 0
     wrong = 0
     for key in answer_key.keys():
-        print user_answer_key.get(key)
-        print answer_key.get(key)
         if not user_answer_key.get(key) and not answer_key.get(key):
             continue
         if user_answer_key.get(key) == answer_key.get(key):
