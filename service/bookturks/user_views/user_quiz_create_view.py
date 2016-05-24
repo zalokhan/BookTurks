@@ -89,7 +89,6 @@ def user_quiz_maker_view(request):
         set_alert_session(session=request.session, message="Quiz ID already present", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
-    set_alert_session(session=request.session, message=" ".join([quiz_id, "created successfully"]), alert_type=SUCCESS)
     request.session['quiz'] = quiz
 
     return render(request, USER_QUIZ_MAKER_PAGE, context)

@@ -21,7 +21,9 @@ deploy:
   provider: heroku
   api_key:
     secure: mpNvO7V11HI4a2UOCrav9YfK0sn68owkIghR9+UDdAagsUmGvwJ1TIueITKNJxwwPXSwmaaHbbTZaaST/2TuZV/b8zSs6ffGOYoMiUlObYhfrMUcsdsqMlOSMOph77x20w1LJ+HnUqvj4dxRHIr/eXWlh3uPlzVeoPnj/63YKwoUKIWVHaLMltNHu5aK0XG9/qx+3EAwtTV5g5lYhbQRdmPi8rHu5Ye9xAwwewGPjVm/FK1uPm2Zf//0jRlcCwezvgCT/3r4Unq+pE4tXtJknxB4zJZlKAQAzp78NrWwfE0vks6QuoaSPQJsGNde+GnGE4ZcpFfDAvFmyaq82rloZcEsIvJ3ITzeUe320PWGE6IVu5zuP2PT732PpkmQ1/wVK2YvPICSf5BOWRduGrJEycDrli/y4jPLBzP2xU9ya99se9F+nRcM/nerma3E6QBWkCeQ2tqyYfATTEg70NHyl3Iz0IKlT0ds1CW59lEMelpnnhn44v1CV1Bca5o0sTje8o/7Vgt7y8zHBxFtk5T8YZe/1U9hAh/lCx5GhrtQpRhPvz8Es2obSyP99STh9xbDfpEDt6kmU2ON+GsdNR2fL1t1TLahyWo4qd/NRZNnpaMMwubHLUtCCZGmu3dz452FTkZMabi/EQ9lsWYK0RLFnvOXq+/Yri//IYo+tm5qjVY=
-  app: bookturks
+  app:
+    master: bookturks
+    dev: devbookturks
   on:
     repo: zalokhan/BookTurks
 env:

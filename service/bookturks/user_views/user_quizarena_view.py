@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
+from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.quiz.QuizTools import QuizTools
 
@@ -73,34 +74,27 @@ def user_quizarena_result_view(request):
     request, alert_type, alert_message = init_alerts(request=request)
     quiz = request.session.get('quiz')
 
+    user_adapter = UserAdapter()
+    quiz_tools = QuizTools()
+    # Get the user model from the request.
+    user = user_adapter.get_user_instance_from_request(request)
+
     if not quiz:
         set_alert_session(session=request.session, message="Invalid quiz attempt. No such quiz.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
 
-    quiz_tools = QuizTools()
     content = quiz_tools.download_quiz_content(quiz_model=quiz)
     answer_key = content.get('answer_key')
     user_answer_key = dict(request.POST)
-    if 'csrfmiddlewaretoken' in user_answer_key:
-        del user_answer_key['csrfmiddlewaretoken']
 
-    right = 0
-    wrong = 0
-    for key in answer_key.keys():
-        if not user_answer_key.get(key) and not answer_key.get(key):
-            continue
-        if user_answer_key.get(key) == answer_key.get(key):
-            right += 1
-        else:
-            wrong += 1
-
+    result = quiz_tools.get_quiz_result(user_model=user, quiz_model=quiz, answer_key=answer_key,
+                                        user_answer_key=user_answer_key)
     context = {
         REQUEST: request,
         USER: request.user,
         ALERT_MESSAGE: alert_message,
         ALERT_TYPE: alert_type,
-        'right': right,
-        'wrong': wrong
+        'result': result
     }
 
     del request.session['quiz']

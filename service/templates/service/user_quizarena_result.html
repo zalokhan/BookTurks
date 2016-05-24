@@ -8,16 +8,90 @@
 {% block main_container %}
 
 <div style="padding-top: 50px">
-    <div class="row">
+    <div class="row" style="margin: 0 0 50px 0">
         <div class="col-lg-12 text-center">
             <h2>Quiz Results</h2>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-12">
-            Right = {{right}}
-            <br/>
-            Wrong = {{wrong}}
+
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="row">
+
+            <!--Right Answers-->
+            <div class="col-lg-6 col-md-6">
+                <div class="panel panel-green">
+                    <!--Panel Header-->
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
+                       aria-expanded="false" aria-controls="collapseOne" class="collapsed">
+                        <div class="panel-heading" role="tab" id="headingOne">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-check fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">{{result.correct_score}}</div>
+                                    <div>Correct Answers</div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <!--Panel Header-->
+
+                    <!--Panel Body-->
+                    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="headingOne" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                            <ul class="fa-ul">
+                                {% for entry in result.correct_answers%}
+                                <li style="color: #3c763d"><i class="fa-li fa fa-check-circle"></i>
+                                    <div>{{ entry }}</div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <!--Panel Body -->
+                </div>
+            </div>
+
+
+            <!--Wrong Answers-->
+            <div class="col-lg-6 col-md-6">
+                <div class="panel panel-red">
+                    <!--Panel Header-->
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"
+                       aria-expanded="false" aria-controls="collapseTwo" class="collapsed">
+                        <div class="panel-heading" role="tab" id="headingTwo">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-times fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">{{result.wrong_score}}</div>
+                                    <div>Wrong Answers</div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <!--Panel Header-->
+
+                    <!--Panel Body-->
+                    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="headingTwo" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                            <ul class="fa-ul">
+                                {% for entry in result.wrong_answers%}
+                                <li style="color: #a94442"><i class="fa-li fa fa-times-circle"></i>
+                                    <div>{{ entry }}</div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <!--Panel Body -->
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

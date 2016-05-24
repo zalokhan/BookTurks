@@ -1,8 +1,11 @@
 import os
 import json
 import re
-from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from django.conf import settings
+from dropbox.exceptions import ApiError
+
+from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
+from service.bookturks.models.QuizResultModel import QuizResultModel
 
 
 class QuizTools:
@@ -14,7 +17,6 @@ class QuizTools:
 
     def __init__(self):
         self.dbx = DropboxClient(settings.DROPBOX_CLIENT)
-        pass
 
     def get_quiz_id(self, username, quiz_name):
         """
@@ -129,14 +131,64 @@ class QuizTools:
         """
         if not quiz_model or not quiz_model.quiz_id or not quiz_model.quiz_owner:
             raise ValueError("Invalid model is passed. Quiz not recognized.")
-        path, metadata = self.dbx.get_file(filename=self.create_filename(quiz_model))
+        try:
+            path, metadata = self.dbx.get_file(filename=self.create_filename(quiz_model))
+        except ApiError as err:
+            # TODO: Something went wrong here. Handle this properly
+            # print err
+            return None
         quiz_file = open(path, 'r')
         content = ""
+        # Read in chunks to avoid memory over utilization
         while True:
-            temp_data = quiz_file.read(100)
+            temp_data = quiz_file.read(1000)
             if not temp_data:
                 break
             content += temp_data
         quiz_file.close()
         os.remove(path)
         return json.loads(content)
+
+    def compare_quiz_dict(self, answer_key, user_answer_key):
+        """
+        Compares the 2 dictionaries. Only works with quiz dicts
+        :param answer_key:
+        :param d2:
+        :return: right answers, wrong answers
+        """
+        correct_answers = list()
+        wrong_answers = list()
+        for key in answer_key.keys():
+            l_ak = answer_key.get(key)
+            l_uak = user_answer_key.get(key)
+            if not l_uak:
+                wrong_answers.append(key)
+            elif l_ak != l_uak:
+                wrong_answers.append(key)
+            else:
+                correct_answers.append(key)
+        return correct_answers, wrong_answers
+
+    def get_quiz_result(self, user_model, quiz_model, answer_key, user_answer_key):
+        """
+        Checks and returns the result of the quiz
+        :param answer_key:
+        :param user_answer_key:
+        :return:
+        """
+        if 'csrfmiddlewaretoken' in user_answer_key:
+            del user_answer_key['csrfmiddlewaretoken']
+        if 'csrfmiddlewaretoken' in answer_key:
+            del answer_key['csrfmiddlewaretoken']
+        max_score = len(answer_key.keys())
+        correct_answers, wrong_answers = self.compare_quiz_dict(answer_key, user_answer_key)
+        result = QuizResultModel(user_model=user_model,
+                                 quiz_model=quiz_model,
+                                 answer_key=answer_key,
+                                 user_answer_key=user_answer_key,
+                                 correct_answers=correct_answers,
+                                 wrong_answers=wrong_answers,
+                                 correct_score=len(correct_answers),
+                                 wrong_score=max_score - len(correct_answers),
+                                 max_score=max_score)
+        return result

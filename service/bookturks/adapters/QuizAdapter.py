@@ -56,7 +56,6 @@ class QuizAdapter(AbstractAdapter):
             return None
         except Http404:
             quiz = Quiz(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description, quiz_owner=quiz_owner)
-            quiz.save()
         return quiz
 
     def exists(self, quiz_id):
