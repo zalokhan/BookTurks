@@ -70,6 +70,16 @@ class QuizAdapter(AbstractAdapter):
         except Http404:
             return None
 
+    def delete_model(self, quiz):
+        """
+        Deletes model from database
+        :param quiz:
+        :return:
+        """
+        if quiz and quiz.quiz_id:
+            if self.exists(quiz.quiz_id):
+                quiz.delete()
+
     def get_models_for_owner(self, user_model):
         """
         Returns a list of all quizzes owned by the user passed in the argument

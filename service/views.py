@@ -9,7 +9,7 @@ from service.bookturks.register_view import register_view, register_check_view
 
 from service.bookturks.user_views.user_home_view import user_home_main_view
 from service.bookturks.user_views.user_quiz_create_view import user_quiz_init_view, user_quiz_maker_view, \
-    user_quiz_verifier_view, user_quiz_create_view
+    user_quiz_verifier_view, user_quiz_create_view, user_quiz_delete_view
 from service.bookturks.user_views.user_myquiz_view import user_myquiz_home_view, user_myquiz_info_view
 from service.bookturks.user_views.user_quizarena_view import user_quizarena_home_view, user_quizarena_solve_view, \
     user_quizarena_result_view
@@ -114,6 +114,16 @@ def user_quiz_create(request):
     :return: Redirects to dashboard
     """
     return user_quiz_create_view(request)
+
+
+@login_required(login_url=SERVICE_MAIN_HOME)
+def user_quiz_delete(request):
+    """
+    Deletes quiz from storage and database
+    :param request: User request
+    :return: Redirects to User quizzes
+    """
+    return user_quiz_delete_view(request)
 
 
 @login_required(login_url=SERVICE_MAIN_HOME)

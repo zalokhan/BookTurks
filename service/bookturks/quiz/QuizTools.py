@@ -192,3 +192,16 @@ class QuizTools:
                                  wrong_score=max_score - len(correct_answers),
                                  max_score=max_score)
         return result
+
+    def delete_quiz_from_storage(self, quiz):
+        """
+        Completely deletes quiz from storage only
+        :param quiz:
+        :return:
+        """
+
+        if not quiz or not quiz.quiz_id or not quiz.quiz_owner:
+            raise ValueError("Quiz model invalid")
+
+        filename = self.create_filename(quiz)
+        self.dbx.delete_file(filename)

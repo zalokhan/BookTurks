@@ -27,6 +27,8 @@ urlpatterns = [
     url(r'^quiz/verifier/$', views.user_quiz_verifier, name='user_quiz_verifier'),
     # Quiz Create
     url(r'^quiz/create/$', views.user_quiz_create, name='user_quiz_create'),
+    # Quiz Delete
+    url(r'^quiz/delete/$', views.user_quiz_delete, name='user_quiz_delete'),
 
     # My quizzes
     url(r'^myquiz/home/$', views.user_myquiz_home, name='user_myquiz_home'),

@@ -11,7 +11,7 @@ from service.bookturks.quiz.QuizTools import QuizTools
 
 from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
-    USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, \
+    USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, SERVICE_USER_MYQUIZ_HOME, \
     REQUEST, USER, \
     ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS
 
@@ -178,3 +178,34 @@ def user_quiz_create_view(request):
 
     set_alert_session(session=request.session, message="The quiz has been successfully saved", alert_type=SUCCESS)
     return HttpResponseRedirect(reverse(SERVICE_USER_HOME))
+
+
+def user_quiz_delete_view(request):
+    """
+    Deletes
+    :param request:
+    :return:
+    """
+    quiz_tools = QuizTools()
+    user_adapter = UserAdapter()
+    quiz_adapter = QuizAdapter()
+    quiz_id = request.POST.get('quiz_id')
+    quiz = quiz_adapter.exists(quiz_id)
+
+    # Check whether user deleting this quiz is admin or owner or any other staff person
+    if not request.user.is_staff and not (user_adapter.get_user_instance_from_request(request) == quiz.quiz_owner):
+        set_alert_session(session=request.session,
+                          message="You do not have the permission to delete this quiz. This action will be reported",
+                          alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_MYQUIZ_HOME))
+    if not quiz:
+        set_alert_session(session=request.session, message="No such quiz.", alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_MYQUIZ_HOME))
+
+    # Deletes from storage
+    quiz_tools.delete_quiz_from_storage(quiz)
+    # Deletes from database
+    quiz_adapter.delete_model(quiz)
+
+    set_alert_session(session=request.session, message="The quiz has been successfully deleted", alert_type=SUCCESS)
+    return HttpResponseRedirect(reverse(SERVICE_USER_MYQUIZ_HOME))

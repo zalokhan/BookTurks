@@ -26,7 +26,7 @@
     background: cornflowerblue;
     font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
     font-weight: 300;
-    line-height: 1.1;
+    line-height: 1.5;
     color: ghostwhite;
     text-decoration: none;
     transition: all .2s ease-in-out;
@@ -35,20 +35,20 @@
 .list-type2 a:hover {
     background: #d6d4d4;
     text-decoration: none;
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 .list-type2 a:before {
     content: counter(li);
     counter-increment: li;
     position: absolute;
-    left: -1.3em;
+    left: -2.3em;
     top: 50%;
-    margin-top: -1.3em;
+    margin-top: -1.5em;
     background: cornflowerblue;
-    height: 2em;
-    width: 2em;
-    line-height: 2em;
+    height: 2.4em;
+    width: 2.4em;
+    line-height: 2.4em;
     border: .3em solid #fff;
     text-align: center;
     font-weight: bold;

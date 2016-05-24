@@ -32,6 +32,7 @@ SERVICE_USER_QUIZ_INIT = "service:user_quiz_init"
 SERVICE_USER_QUIZ_MAKER = "service:user_quiz_maker"
 SERVICE_USER_QUIZ_VERIFIER = "service:user_quiz_verifier"
 SERVICE_USER_QUIZ_CREATE = "service:user_quiz_create"
+SERVICE_USER_QUIZ_DELETE = "service:user_quiz_delete"
 # My quiz pages
 SERVICE_USER_MYQUIZ_HOME = "service:user_myquiz_home"
 SERVICE_USER_MYQUIZ_INFO = "service:user_myquiz_info"
