@@ -76,9 +76,8 @@ class QuizAdapter(AbstractAdapter):
         :param quiz:
         :return:
         """
-        if quiz and quiz.quiz_id:
-            if self.exists(quiz.quiz_id):
-                quiz.delete()
+        if quiz and quiz.quiz_id and self.exists(quiz.quiz_id):
+            quiz.delete()
 
     def get_models_for_owner(self, user_model):
         """

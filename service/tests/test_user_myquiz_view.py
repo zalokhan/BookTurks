@@ -117,9 +117,10 @@ class UserMyquizViewTest(TestCase):
                                                        quiz_description="mock_description",
                                                        quiz_owner=self.mock_user)
         # Preparing mock file for test
-        mock_file = open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]), 'w')
-        mock_file.write(json.dumps(MOCK_FILE_CONTENT))
-        mock_file.close()
+        with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
+                  'w') as mock_file:
+            mock_file.write(json.dumps(MOCK_FILE_CONTENT))
+            mock_file.close()
 
         response = client.post(reverse('service:user_myquiz_info', kwargs={'quiz_id': 'test_id'}), context, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -154,9 +155,10 @@ class UserMyquizViewTest(TestCase):
                                                        quiz_description="mock_description",
                                                        quiz_owner=self.mock_user)
         # Preparing mock file for test
-        mock_file = open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]), 'w')
-        mock_file.write(json.dumps(MOCK_FILE_CONTENT))
-        mock_file.close()
+        with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
+                  'w') as mock_file:
+            mock_file.write(json.dumps(MOCK_FILE_CONTENT))
+            mock_file.close()
 
         # User not allowed to modify this
         response = client.post(reverse('service:user_myquiz_info', kwargs={'quiz_id': 'test_id'}), context, follow=True)

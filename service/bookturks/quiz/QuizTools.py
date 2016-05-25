@@ -137,15 +137,16 @@ class QuizTools:
             # TODO: Something went wrong here. Handle this properly
             # print err
             return None
-        quiz_file = open(path, 'r')
-        content = ""
-        # Read in chunks to avoid memory over utilization
-        while True:
-            temp_data = quiz_file.read(1000)
-            if not temp_data:
-                break
-            content += temp_data
-        quiz_file.close()
+        # Open files with the keyword 'with' only
+        with open(path, 'r') as quiz_file:
+            content = ""
+            # Read in chunks to avoid memory over utilization
+            while True:
+                temp_data = quiz_file.read(1000)
+                if not temp_data:
+                    break
+                content += temp_data
+            quiz_file.close()
         os.remove(path)
         return json.loads(content)
 
