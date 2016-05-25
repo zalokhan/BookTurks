@@ -42,6 +42,10 @@ class DropboxClient:
         download_path = "".join([settings.BASE_DIR, "/service/tmp", filename])
         return download_path, self.client.files_download_to_file(download_path=download_path, path=filename)
 
+    """
+    Quiz Specific functions for dropbox
+    """
+
     def list_all_quiz_files(self, filters=None):
         """
         Lists the quiz files filtering out required quiz results

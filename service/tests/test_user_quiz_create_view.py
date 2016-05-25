@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 import mock
 
+from django.contrib.auth.models import User as AuthUser
 from service.tests.create_user import create_user, context
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.adapters.UserAdapter import UserAdapter
@@ -30,6 +31,7 @@ class UserQuizCreateViewTest(TestCase):
         dbx.files_upload.return_value = "mock_id"
         self.mock_file_list = MockFileList()
         dbx.files_list_folder.return_value = self.mock_file_list
+        dbx.files_delete.return_value = None
         self.dbx = dbx
         # Creating test user in database
         new_user = self.user_adapter.create_and_save_model(
@@ -40,6 +42,7 @@ class UserQuizCreateViewTest(TestCase):
             dob='01/01/1990',
         )
         self.mock_user = new_user
+        settings.DROPBOX_CLIENT = self.dbx
 
     def test_user_quiz_init_view(self):
         """
@@ -265,7 +268,6 @@ class UserQuizCreateViewTest(TestCase):
         Testing create view
         :return:
         """
-        settings.DROPBOX_CLIENT = self.dbx
         client = Client()
         user = create_user()
         self.assertEqual(user.is_active, True)
@@ -321,7 +323,6 @@ class UserQuizCreateViewTest(TestCase):
         Handling exception
         :return:
         """
-        settings.DROPBOX_CLIENT = self.dbx
         client = Client()
         user = create_user()
         self.assertEqual(user.is_active, True)
@@ -383,3 +384,70 @@ class UserQuizCreateViewTest(TestCase):
         redirect_chain = list()
         redirect_chain.append(("/quiz/init/", 302))
         self.assertEqual(response.redirect_chain, redirect_chain)
+
+    def test_user_quiz_delete_with_all_valid_inputs(self):
+        """
+        Testing quiz delete view
+        :return:
+        """
+        client = Client()
+        user = create_user()
+        self.assertEqual(user.is_active, True)
+        client.login(username=context.get('username'), password=context.get('password'))
+
+        # Preparing quiz model to be deleted
+        quiz = self.quiz_adapter.create_and_save_model(quiz_id="test_id",
+                                                       quiz_name="mock_name",
+                                                       quiz_description="mock_description",
+                                                       quiz_owner=self.mock_user)
+        quiz_parameters = dict(context)
+        quiz_parameters['quiz_id'] = quiz.quiz_id
+
+        # Assert quiz present
+        self.assertEqual(self.quiz_adapter.exists(quiz.quiz_id), quiz)
+
+        # Testing response status code
+        response = client.post(reverse('service:user_quiz_delete'), quiz_parameters, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # Testing redirection
+        redirect_chain = list()
+        redirect_chain.append(("/myquiz/home/", 302))
+        self.assertEqual(response.redirect_chain, redirect_chain)
+
+        # Assert quiz deleted
+        self.assertEqual(self.quiz_adapter.exists(quiz.quiz_id), None)
+
+    def test_user_quiz_delete_with_invalid_user(self):
+        """
+        Testing quiz delete view
+        :return:
+        """
+        client = Client()
+        create_user()
+
+        # Creating attacker account which tries to delete other persons quizzes
+        AuthUser.objects.create_user(username="mock2@mock.com", email=context.get('mock2@mock.com'),
+                                     password=context.get('password'))
+        client.login(username="mock2@mock.com", password=context.get('password'))
+
+        # Preparing quiz model to be deleted
+        quiz = self.quiz_adapter.create_and_save_model(quiz_id="test_id",
+                                                       quiz_name="mock_name",
+                                                       quiz_description="mock_description",
+                                                       quiz_owner=self.mock_user)
+        quiz_parameters = dict(context)
+        quiz_parameters['quiz_id'] = quiz.quiz_id
+
+        # Assert quiz present
+        self.assertEqual(self.quiz_adapter.exists(quiz.quiz_id), quiz)
+
+        # Testing response status code
+        response = client.post(reverse('service:user_quiz_delete'), quiz_parameters, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # Testing redirection
+        redirect_chain = list()
+        redirect_chain.append(("/myquiz/home/", 302))
+        self.assertEqual(response.redirect_chain, redirect_chain)
+
+        # Assert quiz present
+        self.assertEqual(self.quiz_adapter.exists(quiz.quiz_id), quiz)

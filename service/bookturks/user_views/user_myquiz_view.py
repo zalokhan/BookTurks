@@ -51,7 +51,11 @@ def user_myquiz_info_view(request, quiz_id):
 
     user = user_adapter.get_user_instance_from_request(request)
     quiz = quiz_adapter.exists(quiz_id)
-    # TODO: DO something if quiz does not exist
+    if not quiz or not user:
+        set_alert_session(session=request.session,
+                          message="No such quiz exists",
+                          alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_HOME))
 
     # Check if this user is the owner of this quiz
     if user != quiz.quiz_owner:
