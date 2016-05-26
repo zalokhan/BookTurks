@@ -168,8 +168,12 @@ def user_quiz_create_view(request):
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
     # If return code was not None, save quiz in database
-    if return_code:
-        quiz.save()
+    if not return_code:
+        set_alert_session(session=request.session, message="An error occurred creating the quiz.", alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
+
+    quiz.save()
+
     # Remove the quiz objects
     if 'quiz' in request.session and 'quiz_data' in request.session and 'quiz_form' in request.session:
         del request.session['quiz']

@@ -1,7 +1,6 @@
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.contrib.auth.models import User as AuthUser
 import mock
 import json
 
