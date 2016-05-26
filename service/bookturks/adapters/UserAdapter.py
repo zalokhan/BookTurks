@@ -15,7 +15,8 @@ class UserAdapter(AbstractAdapter):
         """
         pass
 
-    def create_and_save_model(self, username, first_name="", last_name="", phone="", dob=""):
+    @staticmethod
+    def create_and_save_model(username, first_name="", last_name="", phone="", dob=""):
         """
         Creates and saves new user for the database
         :param username:
@@ -39,7 +40,8 @@ class UserAdapter(AbstractAdapter):
             user.save()
         return user
 
-    def create_model(self, username, first_name="", last_name="", phone="", dob=""):
+    @staticmethod
+    def create_model(username, first_name="", last_name="", phone="", dob=""):
         """
         Creates new user for the database
         :param username:
@@ -62,10 +64,11 @@ class UserAdapter(AbstractAdapter):
                         user_dob=dob)
         return user
 
-    def exists(self, username):
+    @staticmethod
+    def exists(username):
         """
         Checks if user present
-        :param quiz_id:
+        :param username:
         :return:
         """
         try:
@@ -74,26 +77,27 @@ class UserAdapter(AbstractAdapter):
         except Http404:
             return None
 
-    def get_user_instance_from_request(self, request):
+    @staticmethod
+    def get_user_instance_from_request(request):
         """
         Fetches User model
         :param request:
         :return:
         """
         # User Exists and nothing else required
-        if self.exists(request.user):
-            return self.exists(request.user)
+        if UserAdapter.exists(request.user):
+            return UserAdapter.exists(request.user)
 
         # User does not exist but has email field in social authentication
         elif request.user.email and str(request.user.email).strip():
             username = "".join([str(request.user.pk), request.user.email])
-            if self.exists(username):
-                return self.exists(username)
+            if UserAdapter.exists(username):
+                return UserAdapter.exists(username)
 
         # User not present and no email field (facebook) so creating username from username and pk
         else:
             username = "".join([str(request.user.pk), request.user.username, "@bookturks.com"])
-            if self.exists(username):
-                return self.exists(username)
+            if UserAdapter.exists(username):
+                return UserAdapter.exists(username)
             else:
                 return None
