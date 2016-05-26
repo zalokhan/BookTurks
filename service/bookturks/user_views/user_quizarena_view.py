@@ -82,11 +82,15 @@ def user_quizarena_result_view(request):
     # Get the user model from the request.
     user = user_adapter.get_user_instance_from_request(request)
 
-    if not quiz:
-        set_alert_session(session=request.session, message="Invalid quiz attempt. No such quiz.", alert_type=DANGER)
+    if not quiz or not user:
+        set_alert_session(session=request.session, message="Invalid quiz attempt.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
 
     content = quiz_tools.download_quiz_content(quiz_model=quiz)
+    if not content:
+        set_alert_session(session=request.session, message="This quiz is unavailable", alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
+
     answer_key = content.get('answer_key')
     user_answer_key = dict(request.POST)
 
@@ -100,5 +104,6 @@ def user_quizarena_result_view(request):
         'result': result
     }
 
+    # Clearing the session
     del request.session['quiz']
     return render(request, USER_QUIZARENA_RESULT_PAGE, context)

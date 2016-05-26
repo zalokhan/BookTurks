@@ -18,7 +18,8 @@ class QuizTools:
     def __init__(self):
         self.dbx = DropboxClient(settings.DROPBOX_CLIENT)
 
-    def get_quiz_id(self, username, quiz_name):
+    @staticmethod
+    def get_quiz_id(username, quiz_name):
         """
         Concatenate to form the quiz_id
         :param username:
@@ -32,7 +33,8 @@ class QuizTools:
         else:
             return None
 
-    def create_filename(self, quiz):
+    @staticmethod
+    def create_filename(quiz):
         """
         Create filename for dropbox upload
         :param quiz:
@@ -43,7 +45,8 @@ class QuizTools:
             raise ValueError("QuizMaker:create_filename:Invalid Quiz model passed")
         return "".join(["/quiz/", str(quiz.quiz_id), ".JSON"])
 
-    def create_content(self, quiz_form, quiz_data, quiz_model, answer_key):
+    @staticmethod
+    def create_content(quiz_form, quiz_data, quiz_model, answer_key):
         """
         Creates quiz content to be uploaded to storage
         :param quiz_form:
@@ -80,7 +83,8 @@ class QuizTools:
             raise
         return content
 
-    def parse_form(self, quiz_form):
+    @staticmethod
+    def parse_form(quiz_form):
         """
         Removes redundant data from form
         :param quiz_form: String form data
@@ -123,7 +127,8 @@ class QuizTools:
             return None
         return return_code
 
-    def content_verifier(self, content):
+    @staticmethod
+    def content_verifier(content):
         """
         Verifies the content
         :param content:
@@ -146,7 +151,7 @@ class QuizTools:
         if not quiz_model or not quiz_model.quiz_id or not quiz_model.quiz_owner:
             raise ValueError("Invalid model is passed. Quiz not recognized.")
         try:
-            path, metadata = self.dbx.get_file(filename=self.create_filename(quiz_model))
+            path, metadata = self.dbx.get_file(filename=QuizTools.create_filename(quiz_model))
         except ApiError as err:
             # TODO: Something went wrong here. Handle this properly
             # print err
@@ -164,18 +169,19 @@ class QuizTools:
         os.remove(path)
         content = json.loads(content)
         try:
-            self.content_verifier(content)
-        except ValueError, err:
+            QuizTools.content_verifier(content)
+        except ValueError as err:
             # TODO: Delete this quiz from dropbox and remove it from the database as it is now useless.
             # print (err)
             return None
         return content
 
-    def compare_quiz_dict(self, answer_key, user_answer_key):
+    @staticmethod
+    def compare_quiz_dict(answer_key, user_answer_key):
         """
         Compares the 2 dictionaries. Only works with quiz dicts
         :param answer_key:
-        :param d2:
+        :param user_answer_key:
         :return: right answers, wrong answers
         """
         correct_answers = list()
@@ -191,9 +197,12 @@ class QuizTools:
                 correct_answers.append(key)
         return correct_answers, wrong_answers
 
-    def get_quiz_result(self, user_model, quiz_model, answer_key, user_answer_key):
+    @staticmethod
+    def get_quiz_result(user_model, quiz_model, answer_key, user_answer_key):
         """
         Checks and returns the result of the quiz
+        :param user_model:
+        :param quiz_model:
         :param answer_key:
         :param user_answer_key:
         :return:
@@ -203,7 +212,7 @@ class QuizTools:
         if 'csrfmiddlewaretoken' in answer_key:
             del answer_key['csrfmiddlewaretoken']
         max_score = len(answer_key.keys())
-        correct_answers, wrong_answers = self.compare_quiz_dict(answer_key, user_answer_key)
+        correct_answers, wrong_answers = QuizTools.compare_quiz_dict(answer_key, user_answer_key)
         result = QuizResultModel(user_model=user_model,
                                  quiz_model=quiz_model,
                                  answer_key=answer_key,
@@ -225,5 +234,5 @@ class QuizTools:
         if not quiz or not quiz.quiz_id or not quiz.quiz_owner:
             raise ValueError("Quiz model invalid")
 
-        filename = self.create_filename(quiz)
+        filename = QuizTools.create_filename(quiz)
         self.dbx.delete_file(filename)

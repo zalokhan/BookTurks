@@ -23,3 +23,14 @@ class QuizResultModel:
         self.wrong_score = wrong_score
         # Maximum possible score
         self.max_score = max_score
+
+    def __str__(self):
+        return "".join(["USER : ", str(self.user_model), "\n",
+                        "QUIZ : ", str(self.quiz_model), "\n",
+                        "ANSWER KEY : ", str(self.answer_key), "\n",
+                        "USER KEY : ", str(self.user_answer_key), "\n",
+                        "CORRECT ANSWERS : ", str(self.correct_answers), "\n",
+                        "WRONG ANSWERS : ", str(self.wrong_answers), "\n",
+                        "CORRECT SCORE : ", str(self.correct_score), "\n",
+                        "WRONG SCORE : ", str(self.wrong_score), "\n",
+                        "MAX SCORE : ", str(self.max_score)])

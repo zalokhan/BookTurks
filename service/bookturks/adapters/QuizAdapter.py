@@ -15,7 +15,8 @@ class QuizAdapter(AbstractAdapter):
         """
         pass
 
-    def create_and_save_model(self, quiz_id, quiz_name, quiz_description, quiz_owner):
+    @staticmethod
+    def create_and_save_model(quiz_id, quiz_name, quiz_description, quiz_owner):
         """
         Creates and saves quiz object
         :param quiz_id:
@@ -37,7 +38,8 @@ class QuizAdapter(AbstractAdapter):
             quiz.save()
         return quiz
 
-    def create_model(self, quiz_id, quiz_name, quiz_description, quiz_owner):
+    @staticmethod
+    def create_model(quiz_id, quiz_name, quiz_description, quiz_owner):
         """
         Creates model
         :param quiz_id:
@@ -58,7 +60,8 @@ class QuizAdapter(AbstractAdapter):
             quiz = Quiz(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description, quiz_owner=quiz_owner)
         return quiz
 
-    def exists(self, quiz_id):
+    @staticmethod
+    def exists(quiz_id):
         """
         Checks if quiz present
         :param quiz_id:
@@ -70,16 +73,18 @@ class QuizAdapter(AbstractAdapter):
         except Http404:
             return None
 
-    def delete_model(self, quiz):
+    @staticmethod
+    def delete_model(quiz):
         """
         Deletes model from database
         :param quiz:
         :return:
         """
-        if quiz and quiz.quiz_id and self.exists(quiz.quiz_id):
+        if quiz and quiz.quiz_id and QuizAdapter.exists(quiz.quiz_id):
             quiz.delete()
 
-    def get_models_for_owner(self, user_model):
+    @staticmethod
+    def get_models_for_owner(user_model):
         """
         Returns a list of all quizzes owned by the user passed in the argument
         :param user_model:
@@ -87,7 +92,8 @@ class QuizAdapter(AbstractAdapter):
         """
         return Quiz.objects.filter(quiz_owner=user_model)
 
-    def get_all_models(self):
+    @staticmethod
+    def get_all_models():
         """
         Returns list of all quizzes
         :return:
