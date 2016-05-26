@@ -11,7 +11,7 @@ from service.bookturks.quiz.QuizTools import QuizTools
 
 from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import REQUEST, USER, ALERT_MESSAGE, ALERT_TYPE, DANGER, \
-    USER_MYQUIZ_HOME_PAGE, USER_MYQUIZ_INFO_PAGE, SERVICE_USER_HOME
+    USER_MYQUIZ_HOME_PAGE, USER_MYQUIZ_INFO_PAGE, SERVICE_USER_HOME, SERVICE_USER_MYQUIZ_HOME
 
 
 def user_myquiz_home_view(request):
@@ -65,6 +65,10 @@ def user_myquiz_info_view(request, quiz_id):
 
     # Downloading the content from storage.
     content = quiz_tools.download_quiz_content(quiz_model=quiz)
+    if not content:
+        set_alert_session(session=request.session, message="This quiz is unavailable", alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_MYQUIZ_HOME))
+
     # Passing these session objects as this page submits the result to user_quiz_create view which checks for them.
     request.session['quiz_form'] = content['quiz_form']
     request.session['quiz_data'] = content['quiz_data']

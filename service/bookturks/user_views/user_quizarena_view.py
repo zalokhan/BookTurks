@@ -52,6 +52,9 @@ def user_quizarena_solve_view(request, quiz_id):
         set_alert_session(session=request.session, message="No such quiz present", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
     content = quiz_tools.download_quiz_content(quiz_model=quiz)
+    if not content:
+        set_alert_session(session=request.session, message="This quiz is unavailable", alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
 
     context = {
         REQUEST: request,

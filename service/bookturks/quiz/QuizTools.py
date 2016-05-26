@@ -123,6 +123,20 @@ class QuizTools:
             return None
         return return_code
 
+    def content_verifier(self, content):
+        """
+        Verifies the content
+        :param content:
+        :return:
+        """
+        if not content.get('quiz_name') or \
+                not content.get('quiz_name') or \
+                not content.get('quiz_name') or \
+                not content.get('quiz_name') or \
+                not content.get('quiz_name') or \
+                not content.get('quiz_name'):
+            raise ValueError("Invalid quiz_file stored")
+
     def download_quiz_content(self, quiz_model):
         """
         Downloads the quiz and returns the content as JSON
@@ -148,7 +162,14 @@ class QuizTools:
                 content += temp_data
             quiz_file.close()
         os.remove(path)
-        return json.loads(content)
+        content = json.loads(content)
+        try:
+            self.content_verifier(content)
+        except ValueError, err:
+            # TODO: Delete this quiz from dropbox and remove it from the database as it is now useless.
+            # print (err)
+            return None
+        return content
 
     def compare_quiz_dict(self, answer_key, user_answer_key):
         """
