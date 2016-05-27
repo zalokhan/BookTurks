@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^', include('service.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^google1117183b5e0affa6\.html$',
-     lambda r: HttpResponse("google-site-verification: google1117183b5e0affa6.html", mimetype="text/plain")),
+     lambda r: HttpResponse("google-site-verification: google1117183b5e0affa6.html")),
     url('', include('social.apps.django_app.urls', namespace='social')),
     url('', include('django.contrib.auth.urls', namespace='auth')),
 ]
