@@ -21,7 +21,7 @@ from django.conf import settings
 urlpatterns = [
     url(r'^', include('service.urls')),
     url(r'^admin/', admin.site.urls),
-    (r'^google1117183b5e0affa6\.html$',
+    url(r'^google1117183b5e0affa6\.html$',
      lambda r: HttpResponse("google-site-verification: google1117183b5e0affa6.html", mimetype="text/plain")),
     url('', include('social.apps.django_app.urls', namespace='social')),
     url('', include('django.contrib.auth.urls', namespace='auth')),
