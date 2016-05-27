@@ -14,12 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include, patterns
+from django.http import HttpResponse
 from django.contrib import admin
 from django.conf import settings
 
 urlpatterns = [
     url(r'^', include('service.urls')),
     url(r'^admin/', admin.site.urls),
+    (r'^google1117183b5e0affa6\.html$',
+     lambda r: HttpResponse("google-site-verification: google1117183b5e0affa6.html", mimetype="text/plain")),
     url('', include('social.apps.django_app.urls', namespace='social')),
     url('', include('django.contrib.auth.urls', namespace='auth')),
 ]
