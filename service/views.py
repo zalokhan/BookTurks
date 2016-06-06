@@ -4,7 +4,7 @@ Views
 from django.contrib.auth.decorators import login_required
 from service.bookturks.Constants import SERVICE_MAIN_HOME
 from service.bookturks.main_home_view import main_home_view
-from service.bookturks.auth.authentication import login_check_view, logout_view
+from service.bookturks.auth.authentication import login_check_view, logout_view, user_setup_view
 from service.bookturks.register_view import register_view, register_check_view
 
 from service.bookturks.user_views.user_home_view import user_home_main_view
@@ -33,6 +33,16 @@ def login(request):
     :return: Renders a page
     """
     return login_check_view(request)
+
+
+@login_required(login_url=SERVICE_MAIN_HOME)
+def user_setup(request):
+    """
+    User profile setup
+    :param request:
+    :return:
+    """
+    return user_setup_view(request)
 
 
 def logout(request):

@@ -1,10 +1,11 @@
+futures
 dj-database-url==0.4.1
 pytz==2013.7
 python-social-auth==0.2.16
-Django==1.9.5
-gunicorn==19.4.5
+Django
+gunicorn
 psycopg2==2.6.1
-whitenoise==2.0.6
+whitenoise
 coveralls
 mock
 dropbox

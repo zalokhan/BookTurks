@@ -5,23 +5,11 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils import timezone
+from dateutil.parser import parse
+import json
+
 
 # Create your models here.
-"""
-For example:
-
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
-
-
-class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
-"""
-
-
 class User(models.Model):
     """
     Basic user details:
@@ -48,6 +36,30 @@ class User(models.Model):
                        "DOB:" + self.user_dob + "; " + \
                        "CREATE_DATETIME:" + str(self.user_creation_datetime) + "; "
         return model_string
+
+    def to_json(self):
+        """
+        Returns a JSon for the model
+        :return:
+        """
+        model = dict()
+        model['username'] = self.username
+        model['user_first_name'] = self.user_first_name
+        model['user_last_name'] = self.user_last_name
+        model['user_phone'] = self.user_phone
+        model['user_dob'] = self.user_dob
+        model['user_creation_datetime'] = str(self.user_creation_datetime)
+        return json.dumps(model, ensure_ascii=False)
+
+    @staticmethod
+    def from_json(json_object):
+        model = json.loads(json_object)
+        return User(username=model.get('username'),
+                    user_first_name=model.get('user_first_name'),
+                    user_last_name=model.get('user_last_name'),
+                    user_phone=model.get('user_phone'),
+                    user_dob=model.get('user_dob'),
+                    user_creation_datetime=parse(model.get('user_creation_datetime')).astimezone(timezone.utc))
 
 
 class Message(models.Model):
@@ -86,3 +98,21 @@ class Quiz(models.Model):
                        "OWNER:" + str(self.quiz_owner) + "; " + \
                        "QUIZ_DATETIME:" + str(self.quiz_creation_datetime) + ";"
         return model_string
+
+    def to_json(self):
+        model = dict()
+        model['quiz_id'] = self.quiz_id
+        model['quiz_name'] = self.quiz_name
+        model['quiz_description'] = self.quiz_description
+        model['quiz_owner'] = self.quiz_owner.to_json()
+        model['quiz_creation_datetime'] = str(self.quiz_creation_datetime)
+        return json.dumps(model, ensure_ascii=False)
+
+    @staticmethod
+    def from_json(json_object):
+        model = json.loads(json_object)
+        return Quiz(quiz_id=model.get('quiz_id'),
+                    quiz_name=model.get('quiz_name'),
+                    quiz_description=model.get('quiz_description'),
+                    quiz_owner=User.from_json(model.get('quiz_owner')),
+                    quiz_creation_datetime=model.get('quiz_creation_datetime'))

@@ -7,11 +7,16 @@ urlpatterns = [
 
     # Home page
     url(r'^$', views.main_home, name='main_home'),
+
     # Login authentication
     url(r'^login/$', views.login, name='login'),
     url(r'^logout/$', views.logout, name='logout'),
+    # Sets up the user profile and user models
+    url(r'^usersetup/$', views.user_setup, name='user_setup'),
+
     # Register new user
     url(r'^register/$', views.register, name='register'),
+
     # Register successful
     url(r'^register/check/$', views.register_check, name='register_check'),
 

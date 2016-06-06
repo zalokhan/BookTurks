@@ -33,6 +33,7 @@ class MainLoginViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         # Testing redirection
         redirect_chain = list()
+        redirect_chain.append(("/usersetup/", 302))
         redirect_chain.append(("/home/", 302))
         self.assertEqual(response.redirect_chain, redirect_chain)
 

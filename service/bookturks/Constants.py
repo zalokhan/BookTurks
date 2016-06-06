@@ -27,6 +27,8 @@ SUCCESS = "success"
 SERVICE_MAIN_HOME = "service:main_home"
 SERVICE_REGISTER = "service:register"
 SERVICE_USER_HOME = "service:user_home"
+# User Setup
+SERVICE_USER_SETUP = "service:user_setup"
 # Quiz Create pages
 SERVICE_USER_QUIZ_INIT = "service:user_quiz_init"
 SERVICE_USER_QUIZ_MAKER = "service:user_quiz_maker"
@@ -57,6 +59,7 @@ USER_MYQUIZ_INFO_PAGE = "service/user_myquiz_info.html"
 USER_QUIZARENA_HOME_PAGE = "service/user_quizarena_home.html"
 USER_QUIZARENA_SOLVE_PAGE = "service/user_quizarena_solve.html"
 USER_QUIZARENA_RESULT_PAGE = "service/user_quizarena_result.html"
+
 """
 Quiz
 """

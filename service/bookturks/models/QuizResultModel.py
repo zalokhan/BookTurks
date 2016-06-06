@@ -1,3 +1,7 @@
+import json
+from service.models import User, Quiz
+
+
 class QuizResultModel:
     """
     Contains the result of the quiz
@@ -34,3 +38,29 @@ class QuizResultModel:
                         "CORRECT SCORE : ", str(self.correct_score), "\n",
                         "WRONG SCORE : ", str(self.wrong_score), "\n",
                         "MAX SCORE : ", str(self.max_score)])
+
+    def to_json(self):
+        model = dict()
+        model['user_model'] = self.user_model.to_json()
+        model['quiz_model'] = self.quiz_model.to_json()
+        model['answer_key'] = self.answer_key
+        model['user_answer_key'] = self.user_answer_key
+        model['correct_answers'] = self.correct_answers
+        model['wrong_answers'] = self.wrong_answers
+        model['correct_score'] = self.correct_score
+        model['wrong_score'] = self.wrong_score
+        model['max_score'] = self.max_score
+        return json.dumps(model, ensure_ascii=False)
+
+    @staticmethod
+    def from_json(json_object):
+        model = json.loads(json_object)
+        return QuizResultModel(user_model=User.from_json(model.get('user_model')),
+                               quiz_model=Quiz.from_json(model.get('quiz_model')),
+                               answer_key=model.get('answer_key'),
+                               user_answer_key=model.get('user_answer_key'),
+                               correct_answers=model.get('correct_answers'),
+                               wrong_answers=model.get('wrong_answers'),
+                               correct_score=model.get('correct_score'),
+                               wrong_score=model.get('wrong_score'),
+                               max_score=model.get('max_score'))
