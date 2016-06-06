@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
-from service.tests.create_user import create_user, context
+from service.tests.create_user import create_user, create_user_model_in_database, context
 
 
 class UserHomeViewTest(TestCase):
@@ -17,6 +17,9 @@ class UserHomeViewTest(TestCase):
         user = create_user()
         self.assertEqual(user.is_active, True)
         client.login(username=context.get('username'), password=context.get('password'))
+        session = client.session
+        session['user_profile_model'] = "mock_model"
+        session.save()
         response = client.post(reverse('service:user_home'), context)
         self.assertEqual(response.status_code, 200)
 

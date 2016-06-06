@@ -284,6 +284,7 @@ class UserQuizCreateViewTest(TestCase):
             quiz_owner=self.mock_user
         )
         session = client.session
+        session['user_profile_model'] = "mock_model"
         session['quiz_form'] = "mock_quiz_form"
         session['quiz_data'] = "mock_quiz_data"
         session['quiz'] = quiz

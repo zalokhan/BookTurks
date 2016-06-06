@@ -29,6 +29,11 @@ class MainLoginViewTest(TestCase):
         """
         create_user()
         client = Client()
+
+        session = client.session
+        session['user_profile_model'] = "mock_model"
+        session.save()
+
         response = client.post(reverse('service:login'), context, follow=True)
         self.assertEqual(response.status_code, 200)
         # Testing redirection

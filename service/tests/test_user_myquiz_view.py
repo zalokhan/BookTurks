@@ -140,6 +140,9 @@ class UserMyquizViewTest(TestCase):
         AuthUser.objects.create_user(username="mock2@mock.com", email=context.get('mock2@mock.com'),
                                      password=context.get('password'))
         client.login(username="mock2@mock.com", password=context.get('password'))
+        session = client.session
+        session['user_profile_model'] = "mock_model"
+        session.save()
 
         # Quiz not yet created
         response = client.post(reverse('service:user_myquiz_info', kwargs={'quiz_id': 'test_id'}), context, follow=True)
