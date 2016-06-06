@@ -1,6 +1,7 @@
 import json
 from service.models import User, Quiz
-from service.bookturks.models.QuizResultModel import QuizResultModel, NotificationModel
+from service.bookturks.models.QuizResultModel import QuizResultModel
+from service.bookturks.models.NotificationModel import NotificationModel
 
 
 class UserProfileModel:
@@ -47,4 +48,4 @@ class UserProfileModel:
                                                 model.get('attempted_quiz')],
                                 my_quiz=[Quiz.from_json(quiz) for quiz in model.get('my_quiz')],
                                 notifications=[NotificationModel.from_json(notification) for notification in
-                                               model.get('notification')])
+                                               model.get('notifications')])

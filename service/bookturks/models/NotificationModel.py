@@ -1,4 +1,6 @@
 import json
+from django.utils import timezone
+from dateutil.parser import parse
 
 
 class NotificationModel:
@@ -15,6 +17,7 @@ class NotificationModel:
         WARN = 'WARN'
         DANGER = 'DANGER'
         REMINDER = 'REMINDER'
+        SUCCESS = 'SUCCESS'
 
     def __init__(self, sender, level, message, time):
         # String full name
@@ -31,7 +34,7 @@ class NotificationModel:
         model['sender'] = self.sender
         model['level'] = self.level
         model['message'] = self.message
-        model['time'] = self.time
+        model['time'] = str(self.time)
         return json.dumps(model, ensure_ascii=False)
 
     @staticmethod
@@ -40,4 +43,4 @@ class NotificationModel:
         NotificationModel(sender=model.get('sender'),
                           level=model.get('level'),
                           message=model.get('message'),
-                          time=model.get('time'))
+                          time=parse(model.get('time')).astimezone(timezone.utc))
