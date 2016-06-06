@@ -11,5 +11,6 @@ Travis build history [https://travis-ci.org/zalokhan/BookTurks](hhttps://travis-
 
 Feel free to open issues if required.
 Contributors:
+* Zeeshan Lokhandwala
 
 Work in progress !
