@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.quiz.QuizTools import QuizTools
+from service.bookturks.user.UserProfileTools import UserProfileTools
 
 from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import REQUEST, USER, ALERT_MESSAGE, ALERT_TYPE, DANGER, \
@@ -94,16 +95,25 @@ def user_quizarena_result_view(request):
     answer_key = content.get('answer_key')
     user_answer_key = dict(request.POST)
 
-    result = quiz_tools.get_quiz_result(user_model=user, quiz_model=quiz, answer_key=answer_key,
-                                        user_answer_key=user_answer_key)
+    quiz_result_model = quiz_tools.get_quiz_result(user_model=user, quiz_model=quiz, answer_key=answer_key,
+                                                   user_answer_key=user_answer_key)
+    # Save result in model
+    UserProfileTools.save_attempted_quiz_profile(session=request.session, quiz_result_model=quiz_result_model)
+    # Save the profile
+    user_profile_tools = UserProfileTools()
+    future = user_profile_tools.save_profile(request.session)
+
     context = {
         REQUEST: request,
         USER: request.user,
         ALERT_MESSAGE: alert_message,
         ALERT_TYPE: alert_type,
-        'result': result
+        'result': quiz_result_model
     }
 
     # Clearing the session
     del request.session['quiz']
+    
+    # Wait for asynchronous callback
+    future.result()
     return render(request, USER_QUIZARENA_RESULT_PAGE, context)

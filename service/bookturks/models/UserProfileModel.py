@@ -27,8 +27,11 @@ class UserProfileModel:
                "Display Picture : {1} \n" \
                "Attempted quizzes : {2} \n" \
                "My quizzes : {3} \n" \
-               "Notifications : {4}".format(str(self.user_model), self.display_picture, self.attempted_quiz,
-                                            self.my_quiz, self.notifications)
+               "Notifications : {4}".format(str(self.user_model),
+                                            self.display_picture,
+                                            [str(quiz_result_model) for quiz_result_model in self.attempted_quiz],
+                                            [str(quiz) for quiz in self.my_quiz],
+                                            [str(notification) for notification in self.notifications])
 
     def to_json(self):
         model = dict()

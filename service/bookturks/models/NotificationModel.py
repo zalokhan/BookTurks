@@ -29,6 +29,15 @@ class NotificationModel:
         # Time of sending the notification
         self.time = time
 
+    def __str__(self):
+        return "SENDER : {0}\n" \
+               "LEVEL : {1}\n" \
+               "MESSAGE : {2}\n" \
+               "TIME : {3}".format(str(self.sender),
+                                   str(self.level),
+                                   str(self.message),
+                                   str(self.time))
+
     def to_json(self):
         model = dict()
         model['sender'] = self.sender
@@ -40,7 +49,7 @@ class NotificationModel:
     @staticmethod
     def from_json(json_object):
         model = json.loads(json_object)
-        NotificationModel(sender=model.get('sender'),
-                          level=model.get('level'),
-                          message=model.get('message'),
-                          time=parse(model.get('time')).astimezone(timezone.utc))
+        return NotificationModel(sender=model.get('sender'),
+                                 level=model.get('level'),
+                                 message=model.get('message'),
+                                 time=parse(model.get('time')).astimezone(timezone.utc))

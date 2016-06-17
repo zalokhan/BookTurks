@@ -7,7 +7,8 @@ from dropbox.exceptions import ApiError
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from service.bookturks.models.UserProfileModel import UserProfileModel
 from service.bookturks.models.NotificationModel import NotificationModel
-from service.bookturks.models.QuizResultModel import QuizResultModel
+# App Config
+from service.apps import ServiceConfig
 
 
 class UserProfileTools:
@@ -114,12 +115,76 @@ class UserProfileTools:
             user_profile_model = self.download_profile_content(user_model)
         except ApiError as err:
             metadata, error = err.args
-            if error.is_path():
-                if error.get_path().is_not_found():
-                    user_profile_model = UserProfileTools.create_profile(user_model)
-                    rc = self.upload_profile(filename=UserProfileTools.create_filename(user_model),
-                                             content=UserProfileTools.create_content(user_profile_model))
-                    if rc:
-                        return user_profile_model
+            if error.is_path() and error.get_path().is_not_found():
+                user_profile_model = UserProfileTools.create_profile(user_model)
+                rc = self.upload_profile(filename=UserProfileTools.create_filename(user_model),
+                                         content=UserProfileTools.create_content(user_profile_model))
+                if rc:
+                    return user_profile_model
             return None
         return user_profile_model
+
+    def save_profile(self, session):
+        """
+        Called by threads. Saves the profile to storage asynchronously
+        :param session:
+        :return:
+        """
+        if not session or not session.get('user_profile_model'):
+            raise ValueError("UserProfileTool: Error in saving the profile to dropbox")
+        user_profile_model = session.get('user_profile_model')
+        future = ServiceConfig.profile_sync_thread_pool.submit(self.upload_profile, user_profile_model.to_json(),
+                                                               UserProfileTools.create_filename(
+                                                                   user_profile_model.user_model))
+        # Returning for debugging and assertions
+        return future
+
+    @staticmethod
+    def save_attempted_quiz_profile(session, quiz_result_model):
+        """
+        Saves the quiz result to the profile if not already present
+        :return:
+        """
+        if not session or not quiz_result_model:
+            return False
+        user_profile_model = session.get('user_profile_model')
+        attempted_quiz = user_profile_model.attempted_quiz
+        for quiz_result in attempted_quiz:
+            if quiz_result.quiz_model.quiz_id == quiz_result_model.quiz_model.quiz_id:
+                attempted_quiz.remove(quiz_result)
+        attempted_quiz.append(quiz_result_model)
+        session.save()
+        return True
+
+    @staticmethod
+    def save_my_quiz_profile(session, quiz_model):
+        """
+        Saves the quiz model to the profile.
+        :return:
+        """
+        # Do not check for duplicates as that is already taken care of.
+        if not session or not quiz_model:
+            return False
+        user_profile_model = session.get('user_profile_model')
+        my_quiz = user_profile_model.my_quiz
+        my_quiz.append(quiz_model)
+        session.save()
+        return True
+
+    @staticmethod
+    def remove_my_quiz_profile(session, quiz_model):
+        """
+        Removes the quiz model from the profile.
+        :return:
+        """
+        # Do not check for duplicates as that is already taken care of.
+        if not session or not quiz_model:
+            return False
+        user_profile_model = session.get('user_profile_model')
+        my_quiz = user_profile_model.my_quiz
+        for quiz in my_quiz:
+            if quiz.quiz_id == quiz_model.quiz_id:
+                my_quiz.remove(quiz)
+                session.save()
+                return True
+        return False

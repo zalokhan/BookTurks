@@ -1,15 +1,14 @@
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
-from django.conf import settings
 import mock
 
 from django.contrib.auth.models import User as AuthUser
-from service.tests.create_user import create_user, context
+from service.tests.create_user import create_user, context, prepare_client
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.quiz.QuizTools import QuizTools
 from service.models import Quiz, User
-from service.tests.dropbox_tools import MockFileList
+from service.tests.dropbox_tools import mock_dropbox
 
 
 class UserQuizCreateViewTest(TestCase):
@@ -26,13 +25,7 @@ class UserQuizCreateViewTest(TestCase):
         self.user_adapter = UserAdapter()
         self.quiz_adapter = QuizAdapter()
         self.quiz_tools = QuizTools()
-
-        dbx = mock_dbx.return_value
-        dbx.files_upload.return_value = "mock_id"
-        self.mock_file_list = MockFileList()
-        dbx.files_list_folder.return_value = self.mock_file_list
-        dbx.files_delete.return_value = None
-        self.dbx = dbx
+        mock_dropbox(self, mock_dbx)
         # Creating test user in database
         new_user = self.user_adapter.create_and_save_model(
             username='test@email.com',
@@ -42,7 +35,6 @@ class UserQuizCreateViewTest(TestCase):
             dob='01/01/1990',
         )
         self.mock_user = new_user
-        settings.DROPBOX_CLIENT = self.dbx
 
     def test_user_quiz_init_view(self):
         """
@@ -283,8 +275,8 @@ class UserQuizCreateViewTest(TestCase):
             quiz_description="mock_description",
             quiz_owner=self.mock_user
         )
+        client = prepare_client(client)
         session = client.session
-        session['user_profile_model'] = "mock_model"
         session['quiz_form'] = "mock_quiz_form"
         session['quiz_data'] = "mock_quiz_data"
         session['quiz'] = quiz
@@ -395,7 +387,7 @@ class UserQuizCreateViewTest(TestCase):
         user = create_user()
         self.assertEqual(user.is_active, True)
         client.login(username=context.get('username'), password=context.get('password'))
-
+        client = prepare_client(client)
         # Preparing quiz model to be deleted
         quiz = self.quiz_adapter.create_and_save_model(quiz_id="test_id",
                                                        quiz_name="mock_name",

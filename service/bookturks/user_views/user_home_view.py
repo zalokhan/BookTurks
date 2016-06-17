@@ -36,4 +36,9 @@ def user_home_main_view(request):
         user_profile_model = user_profile_tools.get_profile(user_model)
         request.session['user_profile_model'] = user_profile_model
 
+    user_profile_tools = UserProfileTools()
+    future = user_profile_tools.save_profile(request.session)
+    # Wait for asynchronous callback
+    future.result()
+
     return render(request, USER_HOME_PAGE, context)

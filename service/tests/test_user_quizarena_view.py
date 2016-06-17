@@ -4,11 +4,11 @@ from django.conf import settings
 import mock
 import json
 
-from service.tests.create_user import create_user, context
+from service.tests.create_user import create_user, context, prepare_client
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.quiz.QuizTools import QuizTools
-from service.tests.dropbox_tools import MockFileList, MOCK_FILE_CONTENT
+from service.tests.dropbox_tools import mock_dropbox, MOCK_QUIZ_FILE_CONTENT
 
 
 class UserQuizArenaViewTest(TestCase):
@@ -25,15 +25,8 @@ class UserQuizArenaViewTest(TestCase):
         self.user_adapter = UserAdapter()
         self.quiz_adapter = QuizAdapter()
         self.quiz_tools = QuizTools()
+        mock_dropbox(self, mock_dbx)
 
-        dbx = mock_dbx.return_value
-        dbx.files_upload.return_value = "mock_id"
-        self.mock_file_list = MockFileList()
-        dbx.files_list_folder.return_value = self.mock_file_list
-        dbx.files_delete.return_value = None
-        # It should return an object not contents
-        dbx.files_download_to_file.return_value = MOCK_FILE_CONTENT
-        self.dbx = dbx
         # Creating test user in database
         new_user = self.user_adapter.create_and_save_model(
             username='test@email.com',
@@ -43,7 +36,6 @@ class UserQuizArenaViewTest(TestCase):
             dob='01/01/1990',
         )
         self.mock_user = new_user
-        settings.DROPBOX_CLIENT = self.dbx
 
     def test_user_quizarena_view_without_login(self):
         """
@@ -105,7 +97,7 @@ class UserQuizArenaViewTest(TestCase):
         # Preparing mock file for test
         with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
                   'w') as mock_file:
-            mock_file.write(json.dumps(MOCK_FILE_CONTENT))
+            mock_file.write(json.dumps(MOCK_QUIZ_FILE_CONTENT))
             mock_file.close()
         response = client.post(reverse('service:user_quizarena_solve', kwargs={'quiz_id': 'test_id'}), context,
                                follow=True)
@@ -155,6 +147,7 @@ class UserQuizArenaViewTest(TestCase):
         """
         client = Client()
         create_user()
+        client = prepare_client(client)
         client.login(username=context.get('username'), password=context.get('password'))
         # Preparing quiz model to be displayed
         quiz = self.quiz_adapter.create_and_save_model(quiz_id="test_id",
@@ -169,7 +162,7 @@ class UserQuizArenaViewTest(TestCase):
         # Preparing mock file for test
         with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
                   'w') as mock_file:
-            mock_file.write(json.dumps(MOCK_FILE_CONTENT))
+            mock_file.write(json.dumps(MOCK_QUIZ_FILE_CONTENT))
             mock_file.close()
 
         response = client.post(reverse('service:user_quizarena_result'), context, follow=True)

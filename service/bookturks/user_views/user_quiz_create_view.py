@@ -8,6 +8,7 @@ from django.shortcuts import render
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.quiz.QuizTools import QuizTools
+from service.bookturks.user.UserProfileTools import UserProfileTools
 
 from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
@@ -173,6 +174,14 @@ def user_quiz_create_view(request):
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
     quiz.save()
+    # Save quiz in model of user profile
+    UserProfileTools.save_my_quiz_profile(session=request.session, quiz_model=quiz)
+
+    # Save the profile
+    user_profile_tools = UserProfileTools()
+    future = user_profile_tools.save_profile(request.session)
+    # Wait for asynchronous callback
+    future.result()
 
     # Remove the quiz objects
     if 'quiz' in request.session and 'quiz_data' in request.session and 'quiz_form' in request.session:
@@ -210,6 +219,14 @@ def user_quiz_delete_view(request):
     quiz_tools.delete_quiz_from_storage(quiz)
     # Deletes from database
     quiz_adapter.delete_model(quiz)
+    # Deletes from the user profile
+    UserProfileTools.remove_my_quiz_profile(session=request.session, quiz_model=quiz)
+
+    # Save the profile
+    user_profile_tools = UserProfileTools()
+    future = user_profile_tools.save_profile(request.session)
+    # Wait for asynchronous callback
+    future.result()
 
     set_alert_session(session=request.session, message="The quiz has been successfully deleted", alert_type=SUCCESS)
     return HttpResponseRedirect(reverse(SERVICE_USER_MYQUIZ_HOME))

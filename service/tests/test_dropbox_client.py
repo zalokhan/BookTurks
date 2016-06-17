@@ -4,7 +4,7 @@ import mock
 import dropbox
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from service.bookturks.Constants import QUIZ_HOME
-from service.tests.dropbox_tools import MockFileList, MOCK_FILE_CONTENT
+from service.tests.dropbox_tools import MockFileList, MOCK_QUIZ_FILE_CONTENT
 
 
 class DropboxClientTest(TestCase):
@@ -24,7 +24,7 @@ class DropboxClientTest(TestCase):
         dbx.files_list_folder.return_value = self.mock_file_list
         dbx.files_delete.return_value = None
         # It should return an object not contents
-        dbx.files_download_to_file.return_value = MOCK_FILE_CONTENT
+        dbx.files_download_to_file.return_value = MOCK_QUIZ_FILE_CONTENT
         self.dbx = dbx
         self.client = DropboxClient(dbx)
 

@@ -1,13 +1,24 @@
+import mock
+
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
 
-from service.tests.create_user import context, create_user
+from service.tests.create_user import context, create_user, prepare_client
+from service.tests.dropbox_tools import mock_dropbox
 
 
 class MainLoginViewTest(TestCase):
     """
     Test case for the Login Modules
     """
+
+    @mock.patch('dropbox.Dropbox', autospec=True)
+    def setUp(self, mock_dbx):
+        """
+        Initialization for all tests
+        :return:
+        """
+        mock_dropbox(self, mock_dbx)
 
     def test_register_view_with_no_input(self):
         """
@@ -30,9 +41,7 @@ class MainLoginViewTest(TestCase):
         create_user()
         client = Client()
 
-        session = client.session
-        session['user_profile_model'] = "mock_model"
-        session.save()
+        client = prepare_client(client)
 
         response = client.post(reverse('service:login'), context, follow=True)
         self.assertEqual(response.status_code, 200)
