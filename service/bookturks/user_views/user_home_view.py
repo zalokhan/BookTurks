@@ -20,12 +20,7 @@ def user_home_main_view(request):
     :return: Renders user_home page (dashboard)
     """
     request, alert_type, alert_message = init_alerts(request=request)
-    context = {
-        REQUEST: request,
-        USER: request.user,
-        ALERT_MESSAGE: alert_message,
-        ALERT_TYPE: alert_type
-    }
+
     user_adapter = UserAdapter()
     user_profile_tools = UserProfileTools()
 
@@ -40,5 +35,13 @@ def user_home_main_view(request):
     future = user_profile_tools.save_profile(request.session)
     # Wait for asynchronous callback
     future.result()
+
+    context = {
+        REQUEST: request,
+        USER: request.user,
+        ALERT_MESSAGE: alert_message,
+        ALERT_TYPE: alert_type,
+        'UserProfileModel': request.session.get('user_profile_model')
+    }
 
     return render(request, USER_HOME_PAGE, context)
