@@ -5,9 +5,8 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
-from service.bookturks.alerts import init_alerts, set_alert_session
-from service.bookturks.Constants import USER_HOME_PAGE, REQUEST, USER, ALERT_MESSAGE, ALERT_TYPE, \
-    DANGER, SERVICE_USER_SETUP
+from service.bookturks.alerts import init_alerts
+from service.bookturks.Constants import USER_HOME_PAGE, REQUEST, USER, ALERT_MESSAGE, ALERT_TYPE, SERVICE_USER_SETUP
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.user.UserProfileTools import UserProfileTools
 
