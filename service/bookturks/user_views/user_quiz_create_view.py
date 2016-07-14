@@ -12,8 +12,7 @@ from service.bookturks.user.UserProfileTools import UserProfileTools
 
 from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
-    USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, SERVICE_USER_MYQUIZ_HOME, \
-    REQUEST, USER, \
+    USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, SERVICE_USER_MYQUIZ_HOME, REQUEST, USER, \
     ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS
 
 

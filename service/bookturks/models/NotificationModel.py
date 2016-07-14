@@ -12,12 +12,11 @@ class NotificationModel:
         """
         Level of notification alertness
         """
-        DEFAULT = 'DEFAULT'
-        INFO = 'INFO'
-        WARN = 'WARN'
-        DANGER = 'DANGER'
-        REMINDER = 'REMINDER'
-        SUCCESS = 'SUCCESS'
+        DEFAULT = 'default'
+        INFO = 'info'
+        WARN = 'warn'
+        DANGER = 'danger'
+        SUCCESS = 'success'
 
     def __init__(self, sender, level, message, time):
         # String full name
