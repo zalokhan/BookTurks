@@ -9,6 +9,8 @@ from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.quiz.QuizTools import QuizTools
 from service.bookturks.user.UserProfileTools import UserProfileTools
+from service.bookturks.models.QuizCompleteModel import QuizCompleteModel
+from service.bookturks.models.EventModel import EventModel
 
 from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
@@ -155,6 +157,17 @@ def user_quiz_create_view(request):
                                             answer_key=answer_key)
         # Create filename for file in storage
         filename = quiz_tools.create_filename(quiz=quiz)
+
+        # Creating an eventModel
+        event_model = EventModel()
+        # Adding all details to QuizCompleteModel and will upload that to storage
+        quiz_complete_model = QuizCompleteModel(quiz_model=quiz,
+                                                quiz_data=quiz_data,
+                                                quiz_form=quiz_form,
+                                                attempts=1,
+                                                pass_percentage=100.00,
+                                                event_model=event_model)
+
         # Upload file to storage and get the return code (file id)
         return_code = quiz_tools.upload_quiz(content=content, filename=filename)
     except Exception as err:
