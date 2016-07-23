@@ -62,9 +62,14 @@
                 <div class="panel-body">
                     <div class="list-group">
                         {% for notification in UserProfileModel.notifications %}
-                            {{ notification }}
+                            <div class="alert alert-{{ notification.level }}">
+                                {{ notification.message }}
+                                <span class="pull-right text-muted small alert-{{ notification.level }}"><em>
+                                    {{ notification.sender }}</em>
+                                </span>
+                            </div>
                         {% empty %}
-                            <li>Sorry, no athletes in this list.</li>
+                            <li>No notifications.</li>
                         {% endfor %}
                     </div>
                 </div>
