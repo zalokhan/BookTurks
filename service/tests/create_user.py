@@ -2,6 +2,7 @@ import json
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from service.models import User as UserModel
+from service.models import Quiz
 from service.bookturks.models.UserProfileModel import UserProfileModel
 
 context = {
@@ -13,6 +14,18 @@ context = {
     'password': 'test',
     'repassword': 'test'
 }
+
+mock_user_model = UserModel(
+    username='test@email.com',
+    user_first_name='testfirstname',
+    user_last_name='testlastname',
+    user_phone='1234567890',
+    user_dob='01/01/1990')
+
+mock_quiz_model = Quiz(quiz_id='test_quiz_id',
+                       quiz_name='test_quiz_name',
+                       quiz_description='test_quiz_description',
+                       quiz_owner=mock_user_model)
 
 mock_user_profile_model_json = {
     "notifications":

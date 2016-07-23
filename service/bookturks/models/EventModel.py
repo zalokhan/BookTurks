@@ -8,7 +8,7 @@ class EventModel:
     Event Model
     """
 
-    def __init__(self, start_time, end_time):
+    def __init__(self, start_time=None, end_time=None):
         # Start time of event
         self.start_time = start_time
         # End time of event

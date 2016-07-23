@@ -4,6 +4,9 @@ User Quiz Views
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
+from dateutil.parser import parse
+from django.utils import timezone
+import pytz
 
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
@@ -45,6 +48,17 @@ def user_quiz_maker_view(request):
     # Get the post variables from the quiz init view.
     quiz_name = request.POST.get('quiz_name')
     quiz_description = request.POST.get('quiz_description')
+    start_date_time = request.POST.get('start_date_time')
+    end_date_time = request.POST.get('end_date_time')
+    attempts = request.POST.get('attempts')
+    pass_percentage = request.POST.get('pass_percentage')
+
+    local = timezone.get_current_timezone()
+    event_model = None
+    if start_date_time and end_date_time:
+        event_start_date_time = (local.localize(parse(start_date_time), is_dst=None)).astimezone(timezone.utc)
+        event_end_date_time = (local.localize(parse(end_date_time), is_dst=None)).astimezone(timezone.utc)
+        event_model = EventModel(start_time=event_start_date_time, end_time=event_end_date_time)
 
     request, alert_type, alert_message = init_alerts(request=request)
 
@@ -91,6 +105,12 @@ def user_quiz_maker_view(request):
         set_alert_session(session=request.session, message="Quiz ID already present", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
+    quiz_complete_model = QuizCompleteModel(quiz_model=quiz,
+                                            attempts=attempts,
+                                            pass_percentage=pass_percentage,
+                                            event_model=event_model)
+
+    request.session['quiz_complete_model'] = quiz_complete_model
     request.session['quiz'] = quiz
 
     return render(request, USER_QUIZ_MAKER_PAGE, context)
@@ -128,6 +148,8 @@ def user_quiz_verifier_view(request):
         'quiz_form': quiz_form,
     }
     # Save to session to pass to the next view
+    request.session.get('quiz_complete_model').quiz_form = quiz_form
+    request.session.get('quiz_complete_model').quiz_data = quiz_data
     request.session['quiz_form'] = quiz_form
     request.session['quiz_data'] = quiz_data
 
@@ -157,16 +179,6 @@ def user_quiz_create_view(request):
                                             answer_key=answer_key)
         # Create filename for file in storage
         filename = quiz_tools.create_filename(quiz=quiz)
-
-        # Creating an eventModel
-        event_model = EventModel()
-        # Adding all details to QuizCompleteModel and will upload that to storage
-        quiz_complete_model = QuizCompleteModel(quiz_model=quiz,
-                                                quiz_data=quiz_data,
-                                                quiz_form=quiz_form,
-                                                attempts=1,
-                                                pass_percentage=100.00,
-                                                event_model=event_model)
 
         # Upload file to storage and get the return code (file id)
         return_code = quiz_tools.upload_quiz(content=content, filename=filename)

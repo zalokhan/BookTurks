@@ -4,10 +4,11 @@ import mock
 
 from django.contrib.auth.models import User as AuthUser
 from service.tests.create_user import create_user, context, prepare_client
+from service.bookturks.models.QuizCompleteModel import QuizCompleteModel
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.quiz.QuizTools import QuizTools
-from service.models import Quiz, User
+from service.models import Quiz
 from service.tests.dropbox_tools import mock_dropbox
 
 
@@ -242,6 +243,14 @@ class UserQuizCreateViewTest(TestCase):
         client.login(username=context.get('username'), password=context.get('password'))
 
         # Preparing the context
+        quiz_model = self.quiz_adapter.create_and_save_model(
+            quiz_id=self.quiz_tools.get_quiz_id(user.username, 'test_quiz_name'),
+            quiz_name="mock_name",
+            quiz_description="mock_description",
+            quiz_owner=self.mock_user)
+        session = client.session
+        session['quiz_complete_model'] = QuizCompleteModel(quiz_model=quiz_model)
+        session.save()
         quiz_parameters = dict(context)
         quiz_parameters['quiz_data'] = '<form-template>\r\n\t<fields>\r\n\t\t<field class="header" label="Header" ' \
                                        'type="header" subtype="h1"></field>\r\n\t</fields>\r\n</form-template>'

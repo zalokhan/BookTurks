@@ -8,7 +8,8 @@ class QuizCompleteModel:
     Quiz Complete Model
     """
 
-    def __init__(self, quiz_model, quiz_data, quiz_form, attempts, pass_percentage, event_model):
+    def __init__(self, quiz_model, quiz_data=None, quiz_form=None, attempts=None, pass_percentage=None,
+                 event_model=None):
         # Quiz Model from the database
         self.quiz_model = quiz_model
         # Raw quiz data (editable)
@@ -48,9 +49,14 @@ class QuizCompleteModel:
     @staticmethod
     def from_json(json_object):
         model = json.loads(json_object)
+        event_model = model.get('event_model')
+        if event_model is not 'None':
+            event_model = EventModel.from_json(event_model)
+        else:
+            event_model = None
         return QuizCompleteModel(quiz_model=Quiz.from_json(model.get('quiz_model')),
                                  quiz_data=model.get('quiz_data'),
                                  quiz_form=model.get('quiz_form'),
                                  attempts=model.get('attempts'),
                                  pass_percentage=model.get('pass_percentage'),
-                                 event_model=EventModel.from_json(model.get('event_model')))
+                                 event_model=event_model)
