@@ -25,7 +25,7 @@ class User(models.Model):
     user_last_name = models.CharField(max_length=50)
     user_phone = models.CharField(max_length=20)
     user_dob = models.CharField(max_length=20)
-    user_creation_datetime = models.DateTimeField('creation datetime', default=timezone.now())
+    user_creation_datetime = models.DateTimeField('creation datetime', default=timezone.now)
 
     # To print out the model in a readable format
     def __str__(self):
@@ -89,7 +89,7 @@ class Quiz(models.Model):
     quiz_name = models.CharField(max_length=200)
     quiz_description = models.CharField(max_length=1000)
     quiz_owner = models.ForeignKey('User')
-    quiz_creation_datetime = models.DateTimeField('quiz datetime', default=timezone.now())
+    quiz_creation_datetime = models.DateTimeField('quiz datetime', default=timezone.now)
 
     def __str__(self):
         model_string = "ID:" + self.quiz_id + "; " + \
