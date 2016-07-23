@@ -17,6 +17,7 @@ from django.conf.urls import url, include, patterns
 from django.http import HttpResponse
 from django.contrib import admin
 from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^', include('service.urls')),
@@ -25,11 +26,11 @@ urlpatterns = [
      lambda r: HttpResponse("google-site-verification: google1117183b5e0affa6.html")),
     url('', include('social.apps.django_app.urls', namespace='social')),
     url('', include('django.contrib.auth.urls', namespace='auth')),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # if not settings.DEBUG:
-urlpatterns += patterns('',
-                        (
-                            r'^static/(?P<path>.*)$', 'django.views.static.serve',
-                            {'document_root': settings.STATIC_ROOT}),
-                        )
+# urlpatterns += patterns('',
+#                         (
+#                             r'^static/(?P<path>.*)$', 'django.views.static.serve',
+#                             {'document_root': settings.STATIC_ROOT}),
+#                         )

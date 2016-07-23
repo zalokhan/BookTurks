@@ -3,10 +3,9 @@ from django.core.urlresolvers import reverse
 import mock
 
 from django.contrib.auth.models import User as AuthUser
-from service.tests.create_user import create_user, context, prepare_client
+from service.tests.create_user import create_user, context, prepare_client, mock_user_model, mock_quiz_model
 from service.bookturks.models.QuizCompleteModel import QuizCompleteModel
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
-from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.quiz.QuizTools import QuizTools
 from service.models import Quiz
 from service.tests.dropbox_tools import mock_dropbox
@@ -23,19 +22,12 @@ class UserQuizCreateViewTest(TestCase):
         Initialization for all tests
         :return:
         """
-        self.user_adapter = UserAdapter()
         self.quiz_adapter = QuizAdapter()
         self.quiz_tools = QuizTools()
         mock_dropbox(self, mock_dbx)
         # Creating test user in database
-        new_user = self.user_adapter.create_and_save_model(
-            username='test@email.com',
-            first_name='testfirstname',
-            last_name='testlastname',
-            phone='1234567890',
-            dob='01/01/1990',
-        )
-        self.mock_user = new_user
+        mock_user_model.save()
+        self.mock_user = mock_user_model
 
     def test_user_quiz_init_view(self):
         """
