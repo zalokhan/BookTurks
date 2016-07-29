@@ -8,7 +8,8 @@ class QuizResultModel:
     """
 
     def __init__(self, user_model=None, quiz_model=None, answer_key=None, user_answer_key=None,
-                 correct_answers=None, wrong_answers=None, correct_score=None, wrong_score=None, max_score=None):
+                 correct_answers=None, wrong_answers=None, correct_score=None, wrong_score=None, max_score=None,
+                 attempts=0):
         # User attempting the quiz
         self.user_model = user_model
         # Quiz being attempted
@@ -27,6 +28,8 @@ class QuizResultModel:
         self.wrong_score = wrong_score
         # Maximum possible score
         self.max_score = max_score
+        # Number of attempts user has made on this quiz
+        self.attempts = attempts
 
     def __str__(self):
         return "".join(["USER : ", str(self.user_model), "\n",
@@ -37,7 +40,8 @@ class QuizResultModel:
                         "WRONG ANSWERS : ", str(self.wrong_answers), "\n",
                         "CORRECT SCORE : ", str(self.correct_score), "\n",
                         "WRONG SCORE : ", str(self.wrong_score), "\n",
-                        "MAX SCORE : ", str(self.max_score)])
+                        "MAX SCORE : ", str(self.max_score), "\n",
+                        "ATTEMPTS : ", str(self.max_score)])
 
     def to_json(self):
         model = dict()
@@ -50,6 +54,7 @@ class QuizResultModel:
         model['correct_score'] = self.correct_score
         model['wrong_score'] = self.wrong_score
         model['max_score'] = self.max_score
+        model['attempts'] = self.max_score
         return json.dumps(model, ensure_ascii=False)
 
     @staticmethod
@@ -63,4 +68,5 @@ class QuizResultModel:
                                wrong_answers=model.get('wrong_answers'),
                                correct_score=model.get('correct_score'),
                                wrong_score=model.get('wrong_score'),
-                               max_score=model.get('max_score'))
+                               max_score=model.get('max_score'),
+                               attempts=model.get('attempts'))

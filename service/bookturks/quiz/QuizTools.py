@@ -212,6 +212,8 @@ class QuizTools:
         if 'csrfmiddlewaretoken' in answer_key:
             del answer_key['csrfmiddlewaretoken']
         max_score = len(answer_key.keys())
+
+        # Compares the answer key and the solution.
         correct_answers, wrong_answers = QuizTools.compare_quiz_dict(answer_key, user_answer_key)
         result = QuizResultModel(user_model=user_model,
                                  quiz_model=quiz_model,
