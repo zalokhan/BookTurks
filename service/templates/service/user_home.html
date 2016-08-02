@@ -1,6 +1,15 @@
 {% extends "service/skeleton.html" %}
 {% load static %}
 
+{% block head %}
+    <!-- DataTables CSS -->
+    <link href="{% static 'service/userpages/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css' %}"
+          rel="stylesheet">
+    <!-- DataTables Responsive CSS -->
+    <link href="{% static 'service/userpages/bower_components/datatables-responsive/css/dataTables.responsive.css' %}"
+          rel="stylesheet">
+{% endblock %}
+
 {% block main_container %}
 
     <div class="row">
@@ -13,39 +22,41 @@
 
     <div class="row">
         <div class="col-lg-8">
-
-
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <i class="fa fa-bar-chart-o fa-fw"></i> Your attempts
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
-                    <div id="morris-area-chart"></div>
-                    {% load tz %}
-                    {% get_current_timezone as TIME_ZONE %}
-                </div>
-                <!-- /.panel-body -->
-            </div>
-            <!-- /.panel -->
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <i class="fa fa-bar-chart-o fa-fw"></i> What are your friends reading
-                </div>
-                <!-- /.panel-heading -->
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-lg-4">
-
-                            <!-- /.table-responsive -->
-                        </div>
-                        <!-- /.col-lg-4 (nested) -->
-                        <div class="col-lg-8">
-                            <div id="morris-bar-chart"></div>
-                        </div>
-                        <!-- /.col-lg-8 (nested) -->
+                    <div class="dataTable_wrapper">
+                        <table width="100%" class="table table-striped table-bordered table-hover"
+                               id="dataTables">
+                            <thead>
+                            <tr>
+                                <th>Quiz Name</th>
+                                <th>Created By</th>
+                                <th>Score</th>
+                                <th>Max Score</th>
+                                <th>Attempts</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for QuizResultModel in UserProfileModel.attempted_quiz %}
+                                <tr>
+                                    <td>{{ QuizResultModel.quiz_model.quiz_name }}</td>
+                                    <td>{{ QuizResultModel.quiz_model.quiz_owner.user_first_name }}
+                                        {{ QuizResultModel.quiz_model.quiz_owner.user_last_name }}</td>
+                                    <td align="center">{{ QuizResultModel.correct_score }}</td>
+                                    <td align="center">{{ QuizResultModel.max_score }}</td>
+                                    <td align="center">{{ QuizResultModel.attempts }}</td>
+                                </tr>
+                            {% empty %}
+                                <li>No notifications.</li>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                    <!-- /.row -->
+                    <!-- /.table-responsive -->
                 </div>
                 <!-- /.panel-body -->
             </div>
@@ -81,4 +92,14 @@
     </div>
     <!-- /.row -->
 
+{% endblock %}
+
+{% block script %}
+    <script>
+        $(document).ready(function () {
+            $('#dataTables').DataTable({
+                responsive: true
+            });
+        });
+    </script>
 {% endblock %}
