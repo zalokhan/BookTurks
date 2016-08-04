@@ -101,3 +101,28 @@ class UserAdapter(AbstractAdapter):
                 return UserAdapter.exists(username)
             else:
                 return None
+
+    @staticmethod
+    def get_user_instance_from_django_user(user):
+        """
+        Fetches User model
+        :param user:
+        :return:
+        """
+        # User Exists and nothing else required
+        if UserAdapter.exists(user):
+            return UserAdapter.exists(user)
+
+        # User does not exist but has email field in social authentication
+        elif user.email and str(user.email).strip():
+            username = "".join([str(user.pk), user.email])
+            if UserAdapter.exists(username):
+                return UserAdapter.exists(username)
+
+        # User not present and no email field (facebook) so creating username from username and pk
+        else:
+            username = "".join([str(user.pk), user.username, "@bookturks.com"])
+            if UserAdapter.exists(username):
+                return UserAdapter.exists(username)
+            else:
+                return None
