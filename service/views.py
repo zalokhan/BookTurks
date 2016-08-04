@@ -2,17 +2,18 @@
 Views
 """
 from django.contrib.auth.decorators import login_required
-from service.bookturks.Constants import SERVICE_MAIN_HOME
-from service.bookturks.main_home_view import main_home_view
-from service.bookturks.auth.authentication import login_check_view, logout_view, user_setup_view
-from service.bookturks.register_view import register_view, register_check_view
 
+from service.bookturks.Constants import SERVICE_MAIN_HOME
+from service.bookturks.auth.authentication import login_check_view, logout_view, user_setup_view
+from service.bookturks.main_home_view import main_home_view
+from service.bookturks.register_view import register_view, register_check_view
 from service.bookturks.user_views.user_home_view import user_home_main_view
+from service.bookturks.user_views.user_myquiz_view import user_myquiz_home_view, user_myquiz_info_view
 from service.bookturks.user_views.user_quiz_create_view import user_quiz_init_view, user_quiz_maker_view, \
     user_quiz_verifier_view, user_quiz_create_view, user_quiz_delete_view
-from service.bookturks.user_views.user_myquiz_view import user_myquiz_home_view, user_myquiz_info_view
 from service.bookturks.user_views.user_quizarena_view import user_quizarena_home_view, user_quizarena_solve_view, \
     user_quizarena_result_view
+from service.bookturks.user_views.user_story_view import user_story_home_view
 
 
 def main_home(request):
@@ -150,7 +151,8 @@ def user_myquiz_home(request):
 def user_myquiz_info(request, quiz_id):
     """
     One page for all quiz id related tasks
-    :param requset:
+    :param request:
+    :param quiz_id:
     :return:
     """
     return user_myquiz_info_view(request, quiz_id)
@@ -185,3 +187,13 @@ def user_quizarena_result(request):
     :return:
     """
     return user_quizarena_result_view(request)
+
+
+@login_required(login_url=SERVICE_MAIN_HOME)
+def user_story_home(request):
+    """
+    Home page of write a story.
+    :param request:
+    :return:
+    """
+    return user_story_home_view(request)

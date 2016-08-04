@@ -84,9 +84,9 @@
                 <ul class="dropdown-menu dropdown-user">
                     <li>
                         <a class="avatar" href="#">
-                            {% if UserProfileModel.display_picture %}
+                            {% if user_profile_model.display_picture %}
                                 <img class="img-rounded img-responsive" width="25"
-                                     src="{{ UserProfileModel.display_picture }}" alt="">
+                                     src="{{ user_profile_model.display_picture }}" alt="">
                                 <span style="float: right" class="bold">
                                     {{ user.first_name }} {{ user.last_name }}
                                 </span>
@@ -138,6 +138,10 @@
                             </li>
                         </ul>
                         <!-- /.nav-second-level -->
+                    </li>
+                    <li>
+                        <a href="{% url 'service:user_story_home' %}">
+                            <i class="fa fa-pencil fa-fw"></i> Write a Story</a>
                     </li>
                     {% block sidebar_item %}{% endblock %}
                 </ul>

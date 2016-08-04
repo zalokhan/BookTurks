@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+
 import dj_database_url
 import dropbox
 
@@ -113,7 +114,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.associate_user',
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details',
-    'service.bookturks.pipelines.get_avatar', #save profile image,
+    # To save profile image
+    'service.bookturks.pipeline.get_avatar',
 )
 
 LOGIN_REDIRECT_URL = '/usersetup/'

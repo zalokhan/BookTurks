@@ -41,7 +41,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for QuizResultModel in UserProfileModel.attempted_quiz %}
+                            {% for QuizResultModel in user_profile_model.attempted_quiz %}
                                 <tr>
                                     <td>{{ QuizResultModel.quiz_model.quiz_name }}</td>
                                     <td>{{ QuizResultModel.quiz_model.quiz_owner.user_first_name }}
@@ -72,7 +72,7 @@
                 <!-- /.panel-heading -->
                 <div class="panel-body">
                     <div class="list-group">
-                        {% for notification in UserProfileModel.notifications %}
+                        {% for notification in user_profile_model.notifications %}
                             <div class="alert alert-{{ notification.level }}">
                                 {{ notification.message }}
                                 <span class="pull-right text-muted small alert-{{ notification.level }}"><em>
