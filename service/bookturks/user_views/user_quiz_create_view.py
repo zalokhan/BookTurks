@@ -6,7 +6,6 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from dateutil.parser import parse
 from django.utils import timezone
-import pytz
 
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
@@ -111,7 +110,7 @@ def user_quiz_maker_view(request):
                                             event_model=event_model)
 
     request.session['quiz_complete_model'] = quiz_complete_model
-    request.session['quiz'] = quiz
+    # request.session['quiz'] = quiz
 
     return render(request, USER_QUIZ_MAKER_PAGE, context)
 
@@ -150,8 +149,8 @@ def user_quiz_verifier_view(request):
     # Save to session to pass to the next view
     request.session.get('quiz_complete_model').quiz_form = quiz_form
     request.session.get('quiz_complete_model').quiz_data = quiz_data
-    request.session['quiz_form'] = quiz_form
-    request.session['quiz_data'] = quiz_data
+    # request.session['quiz_form'] = quiz_form
+    # request.session['quiz_data'] = quiz_data
 
     return render(request, USER_QUIZ_VERIFIER_PAGE, context)
 
@@ -164,31 +163,29 @@ def user_quiz_create_view(request):
     """
     answer_key = request.POST
 
-    # Quiz Form is the HTML form which can be displayed as quiz and submitted
-    quiz_form = request.session.get('quiz_form')
-    # Quiz Data is the editable form which needs to be rendered to obtain the HTML form
-    quiz_data = request.session.get('quiz_data')
-    quiz = request.session.get('quiz')
+    # # Quiz Form is the HTML form which can be displayed as quiz and submitted
+    # quiz_form = request.session.get('quiz_form')
+    # # Quiz Data is the editable form which needs to be rendered to obtain the HTML form
+    # quiz_data = request.session.get('quiz_data')
+    # quiz = request.session.get('quiz')
+    quiz_complete_model = request.session.get('quiz_complete_model')
 
     quiz_tools = QuizTools()
     try:
-        if not quiz_form or not quiz_data or not quiz or not answer_key:
+        if not quiz_complete_model or not answer_key:
             raise ValueError("quiz_data or quiz_form or quiz is None")
         # Create a JSON content to be uploaded to storage
-        content = quiz_tools.create_content(quiz_form=quiz_form, quiz_data=quiz_data, quiz_model=quiz,
-                                            answer_key=answer_key)
+        content = quiz_tools.create_content(quiz_complete_model=quiz_complete_model, answer_key=answer_key)
         # Create filename for file in storage
-        filename = quiz_tools.create_filename(quiz=quiz)
+        filename = quiz_tools.create_filename(quiz=quiz_complete_model.quiz_model)
 
         # Upload file to storage and get the return code (file id)
         return_code = quiz_tools.upload_quiz(content=content, filename=filename)
     except Exception as err:
         # print (err)
         # Remove the quiz objects so that new form can be generated without mixing up old data
-        if 'quiz' in request.session and 'quiz_data' in request.session and 'quiz_form' in request.session:
-            del request.session['quiz']
-            del request.session['quiz_data']
-            del request.session['quiz_form']
+        if 'quiz_complete_model' in request.session:
+            del request.session['quiz_complete_model']
         set_alert_session(session=request.session, message="An error occurred creating the quiz.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
@@ -197,9 +194,9 @@ def user_quiz_create_view(request):
         set_alert_session(session=request.session, message="An error occurred creating the quiz.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
-    quiz.save()
+    quiz_complete_model.quiz_model.save()
     # Save quiz in model of user profile
-    UserProfileTools.save_my_quiz_profile(session=request.session, quiz_model=quiz)
+    UserProfileTools.save_my_quiz_profile(session=request.session, quiz_model=quiz_complete_model.quiz_model)
 
     # Save the profile
     user_profile_tools = UserProfileTools()
@@ -208,10 +205,8 @@ def user_quiz_create_view(request):
     future.result()
 
     # Remove the quiz objects
-    if 'quiz' in request.session and 'quiz_data' in request.session and 'quiz_form' in request.session:
-        del request.session['quiz']
-        del request.session['quiz_data']
-        del request.session['quiz_form']
+    if 'quiz_complete_model' in request.session:
+        del request.session['quiz_complete_model']
 
     set_alert_session(session=request.session, message="The quiz has been successfully saved", alert_type=SUCCESS)
     return HttpResponseRedirect(reverse(SERVICE_USER_HOME))

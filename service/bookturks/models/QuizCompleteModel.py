@@ -8,14 +8,16 @@ class QuizCompleteModel:
     Quiz Complete Model
     """
 
-    def __init__(self, quiz_model, quiz_data=None, quiz_form=None, attempts=None, pass_percentage=None,
-                 event_model=None):
+    def __init__(self, quiz_model, quiz_data=None, quiz_form=None, answer_key=None, attempts=None,
+                 pass_percentage=None, event_model=None):
         # Quiz Model from the database
         self.quiz_model = quiz_model
         # Raw quiz data (editable)
         self.quiz_data = quiz_data
         # HTML quiz form attempted by user
         self.quiz_form = quiz_form
+        # Answer key
+        self.answer_key = answer_key
         # Number of retries (-1 = infinite)
         self.attempts = attempts
         # pass % for the quiz
