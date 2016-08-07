@@ -42,6 +42,8 @@ SERVICE_USER_MYQUIZ_INFO = "service:user_myquiz_info"
 SERVICE_USER_QUIZARENA_HOME = "service:user_quizarena_home"
 SERVICE_USER_QUIZARENA_SOLVE = "service:user_quizarena_solve"
 SERVICE_USER_QUIZARENA_RESULT = "service:user_quizarena_result"
+# Write a story pages
+SERVICE_USER_STORY_HOME = "service:user_story_home"
 
 # HTML pages
 # Main pages
@@ -59,8 +61,17 @@ USER_MYQUIZ_INFO_PAGE = "service/user_myquiz_info.html"
 USER_QUIZARENA_HOME_PAGE = "service/user_quizarena_home.html"
 USER_QUIZARENA_SOLVE_PAGE = "service/user_quizarena_solve.html"
 USER_QUIZARENA_RESULT_PAGE = "service/user_quizarena_result.html"
+# Write a story pages
+USER_STORY_HOME_PAGE = "service/user_story_home.html"
 
 """
 Quiz
 """
 QUIZ_HOME = "/quiz"
+QUIZ_TAGS = "/quiz_tags"
+
+"""
+User Profile
+"""
+USER_PROFILE = "/user_profile"
+USER_PROFILE_MODEL = "user_profile_model"

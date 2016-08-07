@@ -12,7 +12,7 @@ from service.bookturks.user.UserProfileTools import UserProfileTools
 
 from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import REQUEST, USER, ALERT_MESSAGE, ALERT_TYPE, DANGER, \
-    USER_QUIZARENA_HOME_PAGE, SERVICE_USER_QUIZARENA_HOME, USER_QUIZARENA_SOLVE_PAGE, USER_QUIZARENA_RESULT_PAGE
+    USER_QUIZARENA_HOME_PAGE, SERVICE_USER_QUIZARENA_HOME, USER_QUIZARENA_SOLVE_PAGE, USER_QUIZARENA_RESULT_PAGE, USER_PROFILE_MODEL
 
 
 def user_quizarena_home_view(request):
@@ -113,7 +113,7 @@ def user_quizarena_result_view(request):
 
     # Clearing the session
     del request.session['quiz']
-    
+
     # Wait for asynchronous callback
     future.result()
     return render(request, USER_QUIZARENA_RESULT_PAGE, context)

@@ -47,4 +47,7 @@ urlpatterns = [
     # Quiz result
     url(r'^quizarena/home/result$', views.user_quizarena_result, name='user_quizarena_result'),
 
+    # User Story home page
+    url(r'^story/home/', views.user_story_home, name='user_story_home'),
+
 ]

@@ -9,6 +9,7 @@ from service.bookturks.models.UserProfileModel import UserProfileModel
 from service.bookturks.models.NotificationModel import NotificationModel
 # App Config
 from service.apps import ServiceConfig
+from service.bookturks.Constants import USER_PROFILE, USER_PROFILE_MODEL
 
 
 class UserProfileTools:
@@ -28,7 +29,7 @@ class UserProfileTools:
         """
         if not user_model or not user_model.username or not str(user_model.username).strip():
             raise ValueError("UserProfileTools:create_filename:Invalid User model passed")
-        return "".join(["/user_profile/", str(user_model.username), "_profile.JSON"])
+        return "".join([USER_PROFILE, "/", str(user_model.username), "_profile.JSON"])
 
     @staticmethod
     def create_profile(user_model):
@@ -130,9 +131,9 @@ class UserProfileTools:
         :param session:
         :return:
         """
-        if not session or not session.get('user_profile_model'):
+        if not session or not session.get(USER_PROFILE_MODEL):
             raise ValueError("UserProfileTool: Error in saving the profile to dropbox")
-        user_profile_model = session.get('user_profile_model')
+        user_profile_model = session.get(USER_PROFILE_MODEL)
         future = ServiceConfig.profile_sync_thread_pool.submit(self.upload_profile, user_profile_model.to_json(),
                                                                UserProfileTools.create_filename(
                                                                    user_profile_model.user_model))
@@ -147,11 +148,13 @@ class UserProfileTools:
         """
         if not session or not quiz_result_model:
             return False
-        user_profile_model = session.get('user_profile_model')
+        user_profile_model = session.get(USER_PROFILE_MODEL)
         attempted_quiz = user_profile_model.attempted_quiz
         for quiz_result in attempted_quiz:
             if quiz_result.quiz_model.quiz_id == quiz_result_model.quiz_model.quiz_id:
+                quiz_result_model.attempts = quiz_result.attempts + 1
                 attempted_quiz.remove(quiz_result)
+                break
         attempted_quiz.append(quiz_result_model)
         session.save()
         return True
@@ -165,7 +168,7 @@ class UserProfileTools:
         # Do not check for duplicates as that is already taken care of.
         if not session or not quiz_model:
             return False
-        user_profile_model = session.get('user_profile_model')
+        user_profile_model = session.get(USER_PROFILE_MODEL)
         my_quiz = user_profile_model.my_quiz
         my_quiz.append(quiz_model)
         session.save()
@@ -180,7 +183,7 @@ class UserProfileTools:
         # Do not check for duplicates as that is already taken care of.
         if not session or not quiz_model:
             return False
-        user_profile_model = session.get('user_profile_model')
+        user_profile_model = session.get(USER_PROFILE_MODEL)
         my_quiz = user_profile_model.my_quiz
         for quiz in my_quiz:
             if quiz.quiz_id == quiz_model.quiz_id:

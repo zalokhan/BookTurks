@@ -1,4 +1,5 @@
 import json
+
 from service.models import User, Quiz
 
 
@@ -7,11 +8,9 @@ class QuizResultModel:
     Contains the result of the quiz
     """
 
-    def __init__(self, user_model=None, quiz_model=None, answer_key=None, user_answer_key=None,
+    def __init__(self, quiz_model=None, answer_key=None, user_answer_key=None,
                  correct_answers=None, wrong_answers=None, correct_score=None, wrong_score=None, max_score=None,
-                 attempts=0):
-        # User attempting the quiz
-        self.user_model = user_model
+                 attempts=1):
         # Quiz being attempted
         self.quiz_model = quiz_model
         # Correct answer key set by the quiz owner
@@ -32,8 +31,7 @@ class QuizResultModel:
         self.attempts = attempts
 
     def __str__(self):
-        return "".join(["USER : ", str(self.user_model), "\n",
-                        "QUIZ : ", str(self.quiz_model), "\n",
+        return "".join(["QUIZ : ", str(self.quiz_model), "\n",
                         "ANSWER KEY : ", str(self.answer_key), "\n",
                         "USER KEY : ", str(self.user_answer_key), "\n",
                         "CORRECT ANSWERS : ", str(self.correct_answers), "\n",
@@ -45,7 +43,6 @@ class QuizResultModel:
 
     def to_json(self):
         model = dict()
-        model['user_model'] = self.user_model.to_json()
         model['quiz_model'] = self.quiz_model.to_json()
         model['answer_key'] = self.answer_key
         model['user_answer_key'] = self.user_answer_key
@@ -60,8 +57,7 @@ class QuizResultModel:
     @staticmethod
     def from_json(json_object):
         model = json.loads(json_object)
-        return QuizResultModel(user_model=User.from_json(model.get('user_model')),
-                               quiz_model=Quiz.from_json(model.get('quiz_model')),
+        return QuizResultModel(quiz_model=Quiz.from_json(model.get('quiz_model')),
                                answer_key=model.get('answer_key'),
                                user_answer_key=model.get('user_answer_key'),
                                correct_answers=model.get('correct_answers'),

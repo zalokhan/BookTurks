@@ -215,8 +215,7 @@ class QuizTools:
 
         # Compares the answer key and the solution.
         correct_answers, wrong_answers = QuizTools.compare_quiz_dict(answer_key, user_answer_key)
-        result = QuizResultModel(user_model=user_model,
-                                 quiz_model=quiz_model,
+        result = QuizResultModel(quiz_model=quiz_model,
                                  answer_key=answer_key,
                                  user_answer_key=user_answer_key,
                                  correct_answers=correct_answers,
@@ -237,4 +236,7 @@ class QuizTools:
             raise ValueError("Quiz model invalid")
 
         filename = QuizTools.create_filename(quiz)
-        self.dbx.delete_file(filename)
+        try:
+            self.dbx.delete_file(filename)
+        except ApiError as err:
+            raise ValueError("Quiz file not found in storage.")
