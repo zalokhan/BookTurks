@@ -1,4 +1,4 @@
-import cPickle
+import pickle
 
 
 def serialize(value):
@@ -7,7 +7,7 @@ def serialize(value):
     :param value:
     :return:
     """
-    return cPickle.dumps(value)
+    return pickle.dumps(value)
 
 
 def deserialize(value):
@@ -16,4 +16,4 @@ def deserialize(value):
     :param value:
     :return:
     """
-    return cPickle.loads(value)
+    return pickle.loads(value)
