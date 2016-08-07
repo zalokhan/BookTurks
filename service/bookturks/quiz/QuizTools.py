@@ -6,6 +6,7 @@ from dropbox.exceptions import ApiError
 
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from service.bookturks.models.QuizResultModel import QuizResultModel
+from service.bookturks.serializer import serialize
 
 
 class QuizTools:
@@ -43,19 +44,18 @@ class QuizTools:
         if not quiz or not quiz.quiz_owner or not str(quiz.quiz_owner).strip() or \
                 not quiz.quiz_id or not str(quiz.quiz_id).strip():
             raise ValueError("QuizMaker:create_filename:Invalid Quiz model passed")
-        return "".join(["/quiz/", str(quiz.quiz_id), ".JSON"])
+        return "".join(["/quiz/", str(quiz.quiz_id)])
 
     @staticmethod
-    def create_content(quiz_form, quiz_data, quiz_model, answer_key):
+    def create_content(quiz_complete_model, answer_key):
         """
         Creates quiz content to be uploaded to storage
-        :param quiz_form:
-        :param quiz_data:
-        :param quiz_model:
+        :param quiz_complete_model:
         :param answer_key:
         :return:
         """
-        content = dict()
+        # content = dict()
+        content = None
 
         # Converting from immutable dict to mutable
         answer_key = dict(answer_key)
@@ -64,20 +64,15 @@ class QuizTools:
             # Not required in the answer key so deleting
             del answer_key['csrfmiddlewaretoken']
 
-        if not quiz_form or not quiz_data or not quiz_model or not answer_key:
+        if not quiz_complete_model or not answer_key:
             raise ValueError("QuizMaker:create_quiz_content:Parameter missing quiz, quiz_data, quiz_form or answer_key")
-        if not quiz_model.quiz_id or not quiz_model.quiz_name:
+        if not quiz_complete_model.quiz_model.quiz_id or not quiz_complete_model.quiz_model.quiz_name:
             raise ValueError("QuizMaker:create_quiz_content:Invalid Quiz model passed")
 
-        content['quiz_id'] = quiz_model.quiz_id
-        content['quiz_name'] = quiz_model.quiz_name
-        content['quiz_description'] = quiz_model.quiz_description
-        content['quiz_owner'] = quiz_model.quiz_owner.username
-        content['quiz_form'] = quiz_form
-        content['quiz_data'] = quiz_data
-        content['answer_key'] = answer_key
+        quiz_complete_model.answer_key = answer_key
+
         try:
-            content = json.dumps(content, ensure_ascii=False)
+            content = serialize(quiz_complete_model)
         except Exception as err:
             # print (err)
             raise

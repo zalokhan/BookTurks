@@ -270,17 +270,21 @@ class UserQuizCreateViewTest(TestCase):
         quiz_parameters = dict(context)
         quiz_parameters['answer_key'] = {'answer_key': 'test'}
         # Preparing session
-        quiz = Quiz(
-            quiz_id="test_id",
-            quiz_name="mock_name",
-            quiz_description="mock_description",
-            quiz_owner=self.mock_user
-        )
+        quiz_model = mock_quiz_model
+
+        # Use the user model created in setUp
+        mock_quiz_model.quiz_owner = self.mock_user
+
+        quiz_complete_model = QuizCompleteModel(quiz_model=quiz_model,
+                                                quiz_data="mock_quiz_data",
+                                                quiz_form="mock_quiz_form",
+                                                answer_key={"key": "value"},
+                                                pass_percentage=100,
+                                                attempts=1)
+
         client = prepare_client(client)
         session = client.session
-        session['quiz_form'] = "mock_quiz_form"
-        session['quiz_data'] = "mock_quiz_data"
-        session['quiz'] = quiz
+        session['quiz_complete_model'] = quiz_complete_model
         session.save()
         # Testing response status code
         response = client.post(reverse('service:user_quiz_create'), quiz_parameters, follow=True)

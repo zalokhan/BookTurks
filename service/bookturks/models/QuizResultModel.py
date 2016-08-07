@@ -1,6 +1,6 @@
 import json
 
-from service.models import User, Quiz
+from service.models import Quiz
 
 
 class QuizResultModel:
