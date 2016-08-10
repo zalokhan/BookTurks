@@ -95,10 +95,7 @@ def user_quiz_maker_view(request):
         # Create the quiz model
         quiz = quiz_adapter.create_model(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description,
                                          quiz_owner=user)
-        # This could be None if there were errors in creating the model
-        if not quiz:
-            set_alert_session(session=request.session, message="Quiz ID already present", alert_type=DANGER)
-            return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
+
     # Quiz ID is duplicate
     else:
         set_alert_session(session=request.session, message="Quiz ID already present", alert_type=DANGER)
@@ -147,8 +144,10 @@ def user_quiz_verifier_view(request):
         'quiz_form': quiz_form,
     }
     # Save to session to pass to the next view
-    request.session.get('quiz_complete_model').quiz_form = quiz_form
-    request.session.get('quiz_complete_model').quiz_data = quiz_data
+    quiz_complete_model=request.session.get('quiz_complete_model')
+    quiz_complete_model.quiz_form = quiz_form
+    quiz_complete_model.quiz_data = quiz_data
+    request.session['quiz_complete_model'] = quiz_complete_model
     # request.session['quiz_form'] = quiz_form
     # request.session['quiz_data'] = quiz_data
 

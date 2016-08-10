@@ -70,9 +70,9 @@ def user_myquiz_info_view(request, quiz_id):
         return HttpResponseRedirect(reverse(SERVICE_USER_MYQUIZ_HOME))
 
     # Passing these session objects as this page submits the result to user_quiz_create view which checks for them.
-    request.session['quiz_form'] = content['quiz_form']
-    request.session['quiz_data'] = content['quiz_data']
+    request.session['quiz_form'] = content.quiz_form
+    request.session['quiz_data'] = content.quiz_data
     request.session['quiz'] = quiz
 
-    context = {'quiz_data': content['quiz_data']}
+    context = {'quiz_data': content.quiz_data}
     return render(request, USER_MYQUIZ_INFO_PAGE, context)
