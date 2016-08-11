@@ -62,9 +62,9 @@ def user_quizarena_solve_view(request, quiz_id):
         USER: request.user,
         ALERT_MESSAGE: alert_message,
         ALERT_TYPE: alert_type,
-        'quiz_form': content.get('quiz_form')
+        'quiz_form': content.quiz_form
     }
-    request.session['quiz'] = quiz
+    request.session['quiz'] = content.quiz_model
 
     return render(request, USER_QUIZARENA_SOLVE_PAGE, context)
 
@@ -92,7 +92,7 @@ def user_quizarena_result_view(request):
         set_alert_session(session=request.session, message="This quiz is unavailable", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
 
-    answer_key = content.get('answer_key')
+    answer_key = content.answer_key
     user_answer_key = dict(request.POST)
 
     quiz_result_model = quiz_tools.get_quiz_result(user_model=user, quiz_model=quiz, answer_key=answer_key,

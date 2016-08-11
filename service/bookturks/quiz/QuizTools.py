@@ -7,7 +7,7 @@ from dropbox.exceptions import ApiError
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from service.bookturks.models.QuizResultModel import QuizResultModel
 from service.bookturks.serializer import serialize
-
+from service.bookturks.serializer import deserialize
 
 class QuizTools:
     """
@@ -129,12 +129,7 @@ class QuizTools:
         :param content:
         :return:
         """
-        if not content.get('quiz_name') or \
-                not content.get('quiz_name') or \
-                not content.get('quiz_name') or \
-                not content.get('quiz_name') or \
-                not content.get('quiz_name') or \
-                not content.get('quiz_name'):
+        if not content:
             raise ValueError("Invalid quiz_file stored")
 
     def download_quiz_content(self, quiz_model):
@@ -143,7 +138,7 @@ class QuizTools:
         :param quiz_model:
         :return:
         """
-        if not quiz_model or not quiz_model.quiz_id or not quiz_model.quiz_owner:
+        if not quiz_model:
             raise ValueError("Invalid model is passed. Quiz not recognized.")
         try:
             path, metadata = self.dbx.get_file(filename=QuizTools.create_filename(quiz_model))
@@ -152,24 +147,28 @@ class QuizTools:
             # print err
             return None
         # Open files with the keyword 'with' only
-        with open(path, 'r') as quiz_file:
+        with open(path, 'rb') as quiz_file:
             content = ""
+            deserializedContent = ""
             # Read in chunks to avoid memory over utilization
             while True:
                 temp_data = quiz_file.read(1000)
                 if not temp_data:
                     break
                 content += temp_data
+            print content
+            deserializedContent = deserialize(content)
+            print deserializedContent
             quiz_file.close()
         os.remove(path)
-        content = json.loads(content)
+
         try:
-            QuizTools.content_verifier(content)
+            QuizTools.content_verifier(deserializedContent)
         except ValueError as err:
             # TODO: Delete this quiz from dropbox and remove it from the database as it is now useless.
             # print (err)
             return None
-        return content
+        return deserializedContent
 
     @staticmethod
     def compare_quiz_dict(answer_key, user_answer_key):
