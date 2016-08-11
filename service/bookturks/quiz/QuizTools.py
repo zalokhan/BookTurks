@@ -10,7 +10,7 @@ from service.bookturks.serializer import deserialize
 from service.bookturks.serializer import serialize
 
 
-class QuizTools:
+class QuizTools(object):
     """
     Creates quizzes
     Parses and checks for errors

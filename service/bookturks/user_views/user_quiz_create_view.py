@@ -1,23 +1,23 @@
 """
 User Quiz Views
 """
-from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
-from django.shortcuts import render
+
 from dateutil.parser import parse
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.utils import timezone
 
-from service.bookturks.adapters.UserAdapter import UserAdapter
-from service.bookturks.adapters.QuizAdapter import QuizAdapter
-from service.bookturks.quiz.QuizTools import QuizTools
-from service.bookturks.user.UserProfileTools import UserProfileTools
-from service.bookturks.models.QuizCompleteModel import QuizCompleteModel
-from service.bookturks.models.EventModel import EventModel
-
-from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
     USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, SERVICE_USER_MYQUIZ_HOME, REQUEST, USER, \
     ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS
+from service.bookturks.adapters.QuizAdapter import QuizAdapter
+from service.bookturks.adapters.UserAdapter import UserAdapter
+from service.bookturks.alerts import init_alerts, set_alert_session
+from service.bookturks.models.EventModel import EventModel
+from service.bookturks.models.QuizCompleteModel import QuizCompleteModel
+from service.bookturks.quiz.QuizTools import QuizTools
+from service.bookturks.user.UserProfileTools import UserProfileTools
 
 
 def user_quiz_init_view(request):
@@ -32,7 +32,8 @@ def user_quiz_init_view(request):
         REQUEST: request,
         USER: request.user,
         ALERT_MESSAGE: alert_message,
-        ALERT_TYPE: alert_type
+        ALERT_TYPE: alert_type,
+        # "quiz_tag_names": json.dumps(quiz_tag_names, ensure_ascii=False)
     }
 
     return render(request, USER_QUIZ_INIT_PAGE, context)
@@ -148,7 +149,7 @@ def user_quiz_verifier_view(request):
         'quiz_form': quiz_form,
     }
     # Save to session to pass to the next view
-    quiz_complete_model=request.session.get('quiz_complete_model')
+    quiz_complete_model = request.session.get('quiz_complete_model')
     quiz_complete_model.quiz_form = quiz_form
     quiz_complete_model.quiz_data = quiz_data
     request.session['quiz_complete_model'] = quiz_complete_model

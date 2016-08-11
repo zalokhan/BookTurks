@@ -3,7 +3,7 @@ from django.conf import settings
 from service.bookturks.Constants import QUIZ_HOME
 
 
-class DropboxClient:
+class DropboxClient(object):
     """
      DropBox client
         Quiz related functions

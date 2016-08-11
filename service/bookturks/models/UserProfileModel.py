@@ -1,10 +1,4 @@
-import json
-from service.models import User, Quiz
-from service.bookturks.models.QuizResultModel import QuizResultModel
-from service.bookturks.models.NotificationModel import NotificationModel
-
-
-class UserProfileModel:
+class UserProfileModel(object):
     """
     Contains the User Profile.
     Do not store objects here.
@@ -32,23 +26,3 @@ class UserProfileModel:
                                             [str(quiz_result_model) for quiz_result_model in self.attempted_quiz],
                                             [str(quiz) for quiz in self.my_quiz],
                                             [str(notification) for notification in self.notifications])
-
-    def to_json(self):
-        model = dict()
-        model['user_model'] = self.user_model.to_json()
-        model['display_picture'] = self.display_picture
-        model['attempted_quiz'] = [quiz.to_json() for quiz in self.attempted_quiz]
-        model['my_quiz'] = [quiz.to_json() for quiz in self.my_quiz]
-        model['notifications'] = [notification.to_json() for notification in self.notifications]
-        return json.dumps(model, ensure_ascii=False)
-
-    @staticmethod
-    def from_json(json_object):
-        model = json.loads(json_object)
-        return UserProfileModel(user_model=User.from_json(model.get('user_model')),
-                                display_picture=model.get('display_picture'),
-                                attempted_quiz=[QuizResultModel.from_json(quiz) for quiz in
-                                                model.get('attempted_quiz')],
-                                my_quiz=[Quiz.from_json(quiz) for quiz in model.get('my_quiz')],
-                                notifications=[NotificationModel.from_json(notification) for notification in
-                                               model.get('notifications')])

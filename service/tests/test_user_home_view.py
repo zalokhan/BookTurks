@@ -2,7 +2,7 @@ import mock
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
 
-from service.tests.create_user import create_user, create_user_model_in_database, context, prepare_client
+from service.tests.create_user import create_user, context, prepare_client
 from service.tests.dropbox_tools import mock_dropbox
 
 

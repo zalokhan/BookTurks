@@ -1,10 +1,10 @@
-from django.shortcuts import get_object_or_404
 from django.http import Http404
+from django.shortcuts import get_object_or_404
+
 from service.models import Quiz
-from service.bookturks.adapters.AbstractAdapter import AbstractAdapter
 
 
-class QuizAdapter(AbstractAdapter):
+class QuizAdapter(object):
     """
     Quiz Adapter
     """

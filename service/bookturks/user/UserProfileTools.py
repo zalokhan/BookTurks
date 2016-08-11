@@ -1,15 +1,17 @@
 import os
+
 from django.conf import settings
 from django.utils import timezone
-
 from dropbox.exceptions import ApiError
 
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
-from service.bookturks.models.UserProfileModel import UserProfileModel
 from service.bookturks.models.NotificationModel import NotificationModel
+from service.bookturks.models.UserProfileModel import UserProfileModel
+
 # App Config
 from service.apps import ServiceConfig
 from service.bookturks.Constants import USER_PROFILE, USER_PROFILE_MODEL
+from service.bookturks.serializer import serialize, deserialize
 
 
 class UserProfileTools:
@@ -29,7 +31,7 @@ class UserProfileTools:
         """
         if not user_model or not user_model.username or not str(user_model.username).strip():
             raise ValueError("UserProfileTools:create_filename:Invalid User model passed")
-        return "".join([USER_PROFILE, "/", str(user_model.username), "_profile.JSON"])
+        return "".join([USER_PROFILE, "/", str(user_model.username), "_profile"])
 
     @staticmethod
     def create_profile(user_model):
@@ -55,13 +57,13 @@ class UserProfileTools:
     @staticmethod
     def create_content(user_profile):
         """
-        Return a json object
+        Return a serialized object
         :param user_profile:
         :return:
         """
         if not user_profile:
             raise ValueError("UserProfile:create_content:Invalid User profile passed")
-        return user_profile.to_json()
+        return serialize(user_profile)
 
     def upload_profile(self, content, filename):
         """
@@ -92,18 +94,12 @@ class UserProfileTools:
             # TODO: Something went wrong here. Handle this properly
             raise
         # Open files with the keyword 'with' only
-        with open(path, 'r') as user_file:
-            content = ""
-            # Read in chunks to avoid memory over utilization
-            while True:
-                temp_data = user_file.read(1000)
-                if not temp_data:
-                    break
-                content += temp_data
+        with open(path, 'rb') as user_file:
+            content = user_file.read()
             user_file.close()
         os.remove(path)
-        content = UserProfileModel.from_json(content)
-        return content
+        deserialized_content = deserialize(content)
+        return deserialized_content
 
     def get_profile(self, user_model):
         """
@@ -134,7 +130,8 @@ class UserProfileTools:
         if not session or not session.get(USER_PROFILE_MODEL):
             raise ValueError("UserProfileTool: Error in saving the profile to dropbox")
         user_profile_model = session.get(USER_PROFILE_MODEL)
-        future = ServiceConfig.profile_sync_thread_pool.submit(self.upload_profile, user_profile_model.to_json(),
+        future = ServiceConfig.profile_sync_thread_pool.submit(self.upload_profile,
+                                                               self.create_content(user_profile_model),
                                                                UserProfileTools.create_filename(
                                                                    user_profile_model.user_model))
         # Returning for debugging and assertions
