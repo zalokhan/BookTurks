@@ -95,7 +95,7 @@ def user_quizarena_result_view(request):
     answer_key = content.answer_key
     user_answer_key = dict(request.POST)
 
-    quiz_result_model = quiz_tools.get_quiz_result(user_model=user, quiz_model=quiz, answer_key=answer_key,
+    quiz_result_model = quiz_tools.get_quiz_result(quiz_model=quiz, answer_key=answer_key,
                                                    user_answer_key=user_answer_key)
     # Save result in model
     UserProfileTools.save_attempted_quiz_profile(session=request.session, quiz_result_model=quiz_result_model)

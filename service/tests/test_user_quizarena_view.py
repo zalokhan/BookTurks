@@ -1,14 +1,16 @@
-from django.test import TestCase, Client
-from django.core.urlresolvers import reverse
-from django.conf import settings
-import mock
 import json
 
-from service.tests.create_user import create_user, context, prepare_client
+import mock
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.test import TestCase, Client
+
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.quiz.QuizTools import QuizTools
-from service.tests.dropbox_tools import mock_dropbox, MOCK_QUIZ_FILE_CONTENT
+from service.bookturks.serializer import serialize
+from service.tests.create_user import create_user, context, prepare_client, mock_quiz_complete_model
+from service.tests.dropbox_tools import mock_dropbox
 
 
 class UserQuizArenaViewTest(TestCase):
@@ -93,11 +95,13 @@ class UserQuizArenaViewTest(TestCase):
                                                        quiz_name="mock_name",
                                                        quiz_description="mock_description",
                                                        quiz_owner=self.mock_user)
+        quiz_complete_model = mock_quiz_complete_model
+        quiz_complete_model.quiz_model = quiz
 
         # Preparing mock file for test
         with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
                   'w') as mock_file:
-            mock_file.write(json.dumps(MOCK_QUIZ_FILE_CONTENT))
+            mock_file.write(serialize(quiz_complete_model))
             mock_file.close()
         response = client.post(reverse('service:user_quizarena_solve', kwargs={'quiz_id': 'test_id'}), context,
                                follow=True)
@@ -154,6 +158,9 @@ class UserQuizArenaViewTest(TestCase):
                                                        quiz_name="mock_name",
                                                        quiz_description="mock_description",
                                                        quiz_owner=self.mock_user)
+        quiz_complete_model = mock_quiz_complete_model
+        quiz_complete_model.quiz_model = quiz
+
         # Preparing session
         session = client.session
         session['quiz'] = quiz
@@ -162,7 +169,7 @@ class UserQuizArenaViewTest(TestCase):
         # Preparing mock file for test
         with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
                   'w') as mock_file:
-            mock_file.write(json.dumps(MOCK_QUIZ_FILE_CONTENT))
+            mock_file.write(serialize(quiz_complete_model))
             mock_file.close()
 
         response = client.post(reverse('service:user_quizarena_result'), context, follow=True)

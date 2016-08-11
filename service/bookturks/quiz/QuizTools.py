@@ -1,13 +1,14 @@
 import os
-import json
 import re
+
 from django.conf import settings
 from dropbox.exceptions import ApiError
 
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from service.bookturks.models.QuizResultModel import QuizResultModel
-from service.bookturks.serializer import serialize
 from service.bookturks.serializer import deserialize
+from service.bookturks.serializer import serialize
+
 
 class QuizTools:
     """
@@ -54,9 +55,6 @@ class QuizTools:
         :param answer_key:
         :return:
         """
-        # content = dict()
-        content = None
-
         # Converting from immutable dict to mutable
         answer_key = dict(answer_key)
 
@@ -138,7 +136,7 @@ class QuizTools:
         :param quiz_model:
         :return:
         """
-        if not quiz_model:
+        if not quiz_model or not quiz_model.quiz_id or not quiz_model.quiz_owner:
             raise ValueError("Invalid model is passed. Quiz not recognized.")
         try:
             path, metadata = self.dbx.get_file(filename=QuizTools.create_filename(quiz_model))
@@ -149,26 +147,23 @@ class QuizTools:
         # Open files with the keyword 'with' only
         with open(path, 'rb') as quiz_file:
             content = ""
-            deserializedContent = ""
             # Read in chunks to avoid memory over utilization
             while True:
                 temp_data = quiz_file.read(1000)
                 if not temp_data:
                     break
                 content += temp_data
-            print content
-            deserializedContent = deserialize(content)
-            print deserializedContent
+            deserialized_content = deserialize(content)
             quiz_file.close()
         os.remove(path)
 
         try:
-            QuizTools.content_verifier(deserializedContent)
+            QuizTools.content_verifier(deserialized_content)
         except ValueError as err:
             # TODO: Delete this quiz from dropbox and remove it from the database as it is now useless.
             # print (err)
             return None
-        return deserializedContent
+        return deserialized_content
 
     @staticmethod
     def compare_quiz_dict(answer_key, user_answer_key):
@@ -192,10 +187,9 @@ class QuizTools:
         return correct_answers, wrong_answers
 
     @staticmethod
-    def get_quiz_result(user_model, quiz_model, answer_key, user_answer_key):
+    def get_quiz_result(quiz_model, answer_key, user_answer_key):
         """
         Checks and returns the result of the quiz
-        :param user_model:
         :param quiz_model:
         :param answer_key:
         :param user_answer_key:

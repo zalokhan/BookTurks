@@ -5,11 +5,13 @@ from django.contrib.auth.models import User as AuthUser
 import mock
 import json
 
-from service.tests.create_user import create_user, context, prepare_client
+from service.tests.create_user import create_user, context, prepare_client, mock_quiz_complete_model
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.quiz.QuizTools import QuizTools
 from service.tests.dropbox_tools import mock_dropbox, MOCK_QUIZ_FILE_CONTENT
+
+from service.bookturks.serializer import serialize
 
 
 class UserMyquizViewTest(TestCase):
@@ -108,10 +110,13 @@ class UserMyquizViewTest(TestCase):
                                                        quiz_name="mock_name",
                                                        quiz_description="mock_description",
                                                        quiz_owner=self.mock_user)
+        quiz_complete_model = mock_quiz_complete_model
+        quiz_complete_model.quiz_model = quiz
+
         # Preparing mock file for test
         with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
                   'w') as mock_file:
-            mock_file.write(json.dumps(MOCK_QUIZ_FILE_CONTENT))
+            mock_file.write(serialize(quiz_complete_model))
             mock_file.close()
 
         response = client.post(reverse('service:user_myquiz_info', kwargs={'quiz_id': 'test_id'}), context, follow=True)
@@ -147,10 +152,13 @@ class UserMyquizViewTest(TestCase):
                                                        quiz_name="mock_name",
                                                        quiz_description="mock_description",
                                                        quiz_owner=self.mock_user)
+        quiz_complete_model = mock_quiz_complete_model
+        quiz_complete_model.quiz_model = quiz
+
         # Preparing mock file for test
         with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
                   'w') as mock_file:
-            mock_file.write(json.dumps(MOCK_QUIZ_FILE_CONTENT))
+            mock_file.write(serialize(quiz_complete_model))
             mock_file.close()
 
         # User not allowed to modify this

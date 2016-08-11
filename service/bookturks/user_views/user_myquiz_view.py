@@ -69,10 +69,8 @@ def user_myquiz_info_view(request, quiz_id):
         set_alert_session(session=request.session, message="This quiz is unavailable", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_MYQUIZ_HOME))
 
-    # Passing these session objects as this page submits the result to user_quiz_create view which checks for them.
-    request.session['quiz_form'] = content.quiz_form
-    request.session['quiz_data'] = content.quiz_data
-    request.session['quiz'] = quiz
+    # Passing these session objects as this page submits the result to user_quiz_verifier view which checks for them.
+    request.session['quiz_complete_model'] = content
 
     context = {'quiz_data': content.quiz_data}
     return render(request, USER_MYQUIZ_INFO_PAGE, context)

@@ -75,6 +75,11 @@ def user_quiz_maker_view(request):
     # Get the user model from the request.
     user = user_adapter.get_user_instance_from_request(request)
 
+    # This could be None if there were errors in creating the model
+    if not quiz_name.rstrip():
+        set_alert_session(session=request.session, message="Quiz Name cannot be blank", alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
+
     quiz_id = quiz_tools.get_quiz_id(username=user.username, quiz_name=quiz_name)
 
     # Check if quiz_id is not set. (This will mostly be true as we already have this check in the javascript)
@@ -107,7 +112,6 @@ def user_quiz_maker_view(request):
                                             event_model=event_model)
 
     request.session['quiz_complete_model'] = quiz_complete_model
-    # request.session['quiz'] = quiz
 
     return render(request, USER_QUIZ_MAKER_PAGE, context)
 
@@ -148,8 +152,6 @@ def user_quiz_verifier_view(request):
     quiz_complete_model.quiz_form = quiz_form
     quiz_complete_model.quiz_data = quiz_data
     request.session['quiz_complete_model'] = quiz_complete_model
-    # request.session['quiz_form'] = quiz_form
-    # request.session['quiz_data'] = quiz_data
 
     return render(request, USER_QUIZ_VERIFIER_PAGE, context)
 
@@ -162,19 +164,16 @@ def user_quiz_create_view(request):
     """
     answer_key = request.POST
 
-    # # Quiz Form is the HTML form which can be displayed as quiz and submitted
-    # quiz_form = request.session.get('quiz_form')
-    # # Quiz Data is the editable form which needs to be rendered to obtain the HTML form
-    # quiz_data = request.session.get('quiz_data')
-    # quiz = request.session.get('quiz')
     quiz_complete_model = request.session.get('quiz_complete_model')
 
     quiz_tools = QuizTools()
+    quiz_adapter = QuizAdapter()
     try:
         if not quiz_complete_model or not answer_key:
             raise ValueError("quiz_data or quiz_form or quiz is None")
         # Create a JSON content to be uploaded to storage
         content = quiz_tools.create_content(quiz_complete_model=quiz_complete_model, answer_key=answer_key)
+
         # Create filename for file in storage
         filename = quiz_tools.create_filename(quiz=quiz_complete_model.quiz_model)
 
@@ -193,7 +192,11 @@ def user_quiz_create_view(request):
         set_alert_session(session=request.session, message="An error occurred creating the quiz.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
-    quiz_complete_model.quiz_model.save()
+    # Same model treated as 2 different objects if constructed again from string.
+    # This is executed twice when someone edits the quiz. Redirected from myquiz_info
+    if not quiz_adapter.exists(quiz_complete_model.quiz_model.quiz_id):
+        quiz_complete_model.quiz_model.save()
+
     # Save quiz in model of user profile
     UserProfileTools.save_my_quiz_profile(session=request.session, quiz_model=quiz_complete_model.quiz_model)
 
