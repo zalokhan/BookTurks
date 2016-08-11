@@ -115,7 +115,7 @@ class UserMyquizViewTest(TestCase):
 
         # Preparing mock file for test
         with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
-                  'w') as mock_file:
+                  'wb') as mock_file:
             mock_file.write(serialize(quiz_complete_model))
             mock_file.close()
 
@@ -157,7 +157,7 @@ class UserMyquizViewTest(TestCase):
 
         # Preparing mock file for test
         with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
-                  'w') as mock_file:
+                  'wb') as mock_file:
             mock_file.write(serialize(quiz_complete_model))
             mock_file.close()
 
