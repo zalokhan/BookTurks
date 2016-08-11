@@ -146,13 +146,7 @@ class QuizTools:
             return None
         # Open files with the keyword 'with' only
         with open(path, 'rb') as quiz_file:
-            content = ""
-            # Read in chunks to avoid memory over utilization
-            while True:
-                temp_data = quiz_file.read(1000)
-                if not temp_data:
-                    break
-                content += temp_data
+            content = quiz_file.read()
             deserialized_content = deserialize(content)
             quiz_file.close()
         os.remove(path)
