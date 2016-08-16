@@ -12,6 +12,7 @@ from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOM
     USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, SERVICE_USER_MYQUIZ_HOME, REQUEST, USER, \
     ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
+from service.bookturks.adapters.QuizTagAdapter import QuizTagAdapter
 from service.bookturks.adapters.UserAdapter import UserAdapter
 from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.models.EventModel import EventModel
@@ -52,9 +53,11 @@ def user_quiz_maker_view(request):
     end_date_time = request.POST.get('end_date_time')
     attempts = request.POST.get('attempts')
     pass_percentage = request.POST.get('pass_percentage')
+    tag_names = request.POST.get('quiz_tags')
 
     local = timezone.get_current_timezone()
     event_model = None
+    # TODO: Remove this from here and put it in a function.
     if start_date_time and end_date_time:
         event_start_date_time = (local.localize(parse(start_date_time), is_dst=None)).astimezone(timezone.utc)
         event_end_date_time = (local.localize(parse(end_date_time), is_dst=None)).astimezone(timezone.utc)
@@ -65,6 +68,7 @@ def user_quiz_maker_view(request):
     # Initialize the adapters.
     user_adapter = UserAdapter()
     quiz_adapter = QuizAdapter()
+    quiz_tag_adapter = QuizTagAdapter()
     quiz_tools = QuizTools()
 
     context = {
@@ -73,44 +77,45 @@ def user_quiz_maker_view(request):
         ALERT_MESSAGE: alert_message,
         ALERT_TYPE: alert_type
     }
-    # Get the user model from the request.
-    user = user_adapter.get_user_instance_from_request(request)
 
-    # This could be None if there were errors in creating the model
-    if not quiz_name.rstrip():
-        set_alert_session(session=request.session, message="Quiz Name cannot be blank", alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
+    try:
 
-    quiz_id = quiz_tools.get_quiz_id(username=user.username, quiz_name=quiz_name)
+        # Get the user model from the request.
+        user = user_adapter.get_user_instance_from_request(request)
 
-    # Check if quiz_id is not set. (This will mostly be true as we already have this check in the javascript)
-    if not quiz_id or not quiz_id.rstrip():
-        set_alert_session(session=request.session,
-                          message="The quiz Name can contain ony alphanumeric characters, spaces, "
-                                  "'-', '?' and '_'",
-                          alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
-
-    # Check if the quiz_id is already used before.
-    if not quiz_adapter.exists(quiz_id):
-        # If quiz id is original, check if user is not None
         if not user:
-            set_alert_session(session=request.session, message="User not recognized", alert_type=DANGER)
-            return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
+            raise ValueError("User not recognized")
+
+        # quiz_name could be None if there were errors in creating the model
+        # Check if quiz_id is not set after creating the id. (This will mostly be true as we already have this check in
+        # the javascript)
+        quiz_id = quiz_tools.get_quiz_id(username=user.username, quiz_name=quiz_name)
+
+        # Quiz ID is duplicate
+        if quiz_adapter.exists(quiz_id):
+            raise ValueError("Quiz ID already present")
 
         # Create the quiz model
         quiz = quiz_adapter.create_model(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description,
                                          quiz_owner=user)
 
-    # Quiz ID is duplicate
-    else:
-        set_alert_session(session=request.session, message="Quiz ID already present", alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
+        quiz_complete_model = QuizCompleteModel(quiz_model=quiz,
+                                                attempts=attempts,
+                                                pass_percentage=pass_percentage,
+                                                event_model=event_model,
+                                                tags=list())
 
-    quiz_complete_model = QuizCompleteModel(quiz_model=quiz,
-                                            attempts=attempts,
-                                            pass_percentage=pass_percentage,
-                                            event_model=event_model)
+        # Create the tag names and put them into the quiz_complete_model
+        tag_names_list = quiz_tag_adapter.split_and_verify_tag_names(tag_names)
+        if tag_names_list:
+            for tag_name in tag_names_list:
+                quiz_complete_model.tags.append(tag_name)
+
+    except ValueError as err:
+        set_alert_session(session=request.session,
+                          message=str(err),
+                          alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
     request.session['quiz_complete_model'] = quiz_complete_model
 
@@ -150,6 +155,7 @@ def user_quiz_verifier_view(request):
     }
     # Save to session to pass to the next view
     quiz_complete_model = request.session.get('quiz_complete_model')
+    del request.session['quiz_complete_model']
     quiz_complete_model.quiz_form = quiz_form
     quiz_complete_model.quiz_data = quiz_data
     request.session['quiz_complete_model'] = quiz_complete_model
@@ -169,6 +175,7 @@ def user_quiz_create_view(request):
 
     quiz_tools = QuizTools()
     quiz_adapter = QuizAdapter()
+    quiz_tag_adapter = QuizTagAdapter()
     try:
         if not quiz_complete_model or not answer_key:
             raise ValueError("quiz_data or quiz_form or quiz is None")
@@ -183,7 +190,7 @@ def user_quiz_create_view(request):
     except Exception as err:
         # print (err)
         # Remove the quiz objects so that new form can be generated without mixing up old data
-        if 'quiz_complete_model' in request.session:
+        if request.session.get("quiz_complete_model"):
             del request.session['quiz_complete_model']
         set_alert_session(session=request.session, message="An error occurred creating the quiz.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
@@ -198,6 +205,12 @@ def user_quiz_create_view(request):
     if not quiz_adapter.exists(quiz_complete_model.quiz_model.quiz_id):
         quiz_complete_model.quiz_model.save()
 
+    # Save the quiz tags and links
+    for tag_name in quiz_complete_model.tags:
+        if not quiz_tag_adapter.exists(tag_name):
+            quiz_tag_adapter.create_and_save_model(tag_name)
+        quiz_tag_adapter.link_quiz(tag_name=tag_name, quiz_id=quiz_complete_model.quiz_model.quiz_id)
+
     # Save quiz in model of user profile
     UserProfileTools.save_my_quiz_profile(session=request.session, quiz_model=quiz_complete_model.quiz_model)
 
@@ -208,7 +221,7 @@ def user_quiz_create_view(request):
     future.result()
 
     # Remove the quiz objects
-    if 'quiz_complete_model' in request.session:
+    if request.session.get("quiz_complete_model"):
         del request.session['quiz_complete_model']
 
     set_alert_session(session=request.session, message="The quiz has been successfully saved", alert_type=SUCCESS)
@@ -224,6 +237,7 @@ def user_quiz_delete_view(request):
     quiz_tools = QuizTools()
     user_adapter = UserAdapter()
     quiz_adapter = QuizAdapter()
+
     quiz_id = request.POST.get('quiz_id')
     quiz = quiz_adapter.exists(quiz_id)
 
@@ -237,6 +251,8 @@ def user_quiz_delete_view(request):
         set_alert_session(session=request.session, message="No such quiz.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_MYQUIZ_HOME))
 
+    # Unlink all tags from the quiz
+    quiz_tools.unlink_all_tags_of_quiz(quiz)
     # Deletes from storage
     quiz_tools.delete_quiz_from_storage(quiz)
     # Deletes from database

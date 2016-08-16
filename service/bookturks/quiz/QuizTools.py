@@ -4,6 +4,7 @@ import re
 from django.conf import settings
 from dropbox.exceptions import ApiError
 
+from service.bookturks.adapters.QuizTagAdapter import QuizTagAdapter
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from service.bookturks.models.QuizResultModel import QuizResultModel
 from service.bookturks.serializer import deserialize
@@ -28,12 +29,15 @@ class QuizTools(object):
         :param quiz_name:
         :return:
         """
+        if not quiz_name.rstrip():
+            raise ValueError("Quiz Name cannot be blank")
         quiz_id = "_".join([username, quiz_name])
         if re.match("^[A-Za-z0-9_ -]*$", quiz_name):
             quiz_id = ''.join(character for character in quiz_id if character.isalnum())
-            return quiz_id
+            if quiz_id.rstrip():
+                return quiz_id
         else:
-            return None
+            raise ValueError("The quiz Name can contain ony alphanumeric characters, spaces, '-', '?' and '_'")
 
     @staticmethod
     def create_filename(quiz):
@@ -222,3 +226,13 @@ class QuizTools(object):
             self.dbx.delete_file(filename)
         except ApiError as err:
             raise ValueError("Quiz file not found in storage.")
+
+    @staticmethod
+    def unlink_all_tags_of_quiz(quiz):
+        """
+        Unlinks all the tags of the quiz
+        :param quiz:
+        :return:
+        """
+        for tag in quiz.quiztag_set.all():
+            QuizTagAdapter.unlink_quiz(tag_name=tag.tag_name, quiz_id=quiz.quiz_id)

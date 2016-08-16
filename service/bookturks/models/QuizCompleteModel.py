@@ -3,8 +3,8 @@ class QuizCompleteModel(object):
     Quiz Complete Model
     """
 
-    def __init__(self, quiz_model, quiz_data=None, quiz_form=None, answer_key=None, attempts=None,
-                 pass_percentage=None, event_model=None):
+    def __init__(self, quiz_model, quiz_data=None, quiz_form=None, answer_key=None, attempts=-1,
+                 pass_percentage=None, event_model=None, tags=list()):
         # Quiz Model from the database
         self.quiz_model = quiz_model
         # Raw quiz data (editable)
@@ -19,6 +19,8 @@ class QuizCompleteModel(object):
         self.pass_percentage = pass_percentage
         # Event of quiz
         self.event_model = event_model
+        # Quiz Tags
+        self.tags = tags
 
     def __str__(self):
         return "quiz_model : {0}\n" \
@@ -26,9 +28,11 @@ class QuizCompleteModel(object):
                "quiz_form : {2}\n" \
                "retries : {3}\n" \
                "pass_percentage: {4}\n" \
-               "event_model : {5}".format(str(self.quiz_model),
-                                          str(self.quiz_data),
-                                          str(self.quiz_form),
-                                          str(self.attempts),
-                                          str(self.pass_percentage),
-                                          str(self.event_model))
+               "event_model : {5}\n" \
+               "tags: {6}".format(str(self.quiz_model),
+                                  str(self.quiz_data),
+                                  str(self.quiz_form),
+                                  str(self.attempts),
+                                  str(self.pass_percentage),
+                                  str(self.event_model),
+                                  str(self.tags))
