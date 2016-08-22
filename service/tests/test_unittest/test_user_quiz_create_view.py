@@ -1,33 +1,18 @@
-from django.test import TestCase, Client
-from django.core.urlresolvers import reverse
-import mock
-
 from django.contrib.auth.models import User as AuthUser
-from service.tests.create_user import create_user, context, prepare_client, mock_user_model, mock_quiz_model
+from django.core.urlresolvers import reverse
+from django.test import Client
+
 from service.bookturks.models.QuizCompleteModel import QuizCompleteModel
-from service.bookturks.adapters.QuizAdapter import QuizAdapter
-from service.bookturks.quiz.QuizTools import QuizTools
 from service.models import Quiz
-from service.tests.dropbox_tools import mock_dropbox
+from service.tests.create_user import create_user, prepare_client
+from service.tests.constants_models import context, mock_quiz_model
+from service.tests.test_setup_teardown.quiz_test_setup import QuizTest
 
 
-class UserQuizCreateViewTest(TestCase):
+class UserQuizCreateViewTest(QuizTest):
     """
     Test case for the Quiz pages
     """
-
-    @mock.patch('dropbox.Dropbox', autospec=True)
-    def setUp(self, mock_dbx):
-        """
-        Initialization for all tests
-        :return:
-        """
-        self.quiz_adapter = QuizAdapter()
-        self.quiz_tools = QuizTools()
-        mock_dropbox(self, mock_dbx)
-        # Creating test user in database
-        mock_user_model.save()
-        self.mock_user = mock_user_model
 
     def test_user_quiz_init_view(self):
         """

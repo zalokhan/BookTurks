@@ -67,7 +67,7 @@ def user_setup_view(request):
         # Create user
         else:
             if user_adapter.create_and_save_model(username=username, first_name=request.user.first_name,
-                                                  last_name=request.user.last_name, phone="", dob=""):
+                                                  last_name=request.user.last_name):
                 return HttpResponseRedirect(reverse(SERVICE_USER_HOME))
             # This condition should never be encountered
             else:
@@ -83,7 +83,7 @@ def user_setup_view(request):
             return HttpResponseRedirect(reverse(SERVICE_USER_HOME))
         else:
             if user_adapter.create_and_save_model(username=username, first_name=request.user.first_name,
-                                                  last_name=request.user.last_name, phone="", dob=""):
+                                                  last_name=request.user.last_name):
                 return HttpResponseRedirect(reverse(SERVICE_USER_HOME))
             else:
                 set_alert_session(session=request.session, message="Trouble signing in. Contact the support for help !",

@@ -4,7 +4,8 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 
-from service.tests.create_user import context, create_user
+from service.tests.create_user import create_user
+from service.tests.constants_models import context
 
 from service.models import User
 

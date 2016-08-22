@@ -73,6 +73,8 @@ SOCIAL_AUTH_FACEBOOK_SECRET = get_env_variable('SOCIAL_AUTH_FACEBOOK_SECRET')
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_env_variable('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 DROPBOX_ACCESS_TOKEN = get_env_variable('DROPBOX_ACCESS_TOKEN')
+SAUCE_USERNAME = get_env_variable('SAUCE_USERNAME')
+SAUCE_ACCESS_KEY = get_env_variable('SAUCE_ACCESS_KEY')
 
 database_config = dj_database_url.config()
 
@@ -241,3 +243,6 @@ STATICFILES_DIRS = [
 
 # Dropbox client
 DROPBOX_CLIENT = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
+
+# Sauce Labs integration
+SAUCE_TEST = False

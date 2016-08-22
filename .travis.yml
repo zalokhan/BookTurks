@@ -3,19 +3,32 @@ cache: pip
 python:
 - '2.7'
 - '3.5'
+
 before_install:
-- export DJANGO_SETTINGS_MODULE=mysite.settings
+  - export DJANGO_SETTINGS_MODULE=mysite.settings
+  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
+
 install:
 - pip install -r requirements.txt
+
 services:
 - postgresql
+
 before_script:
-- psql -c "CREATE DATABASE travisdb;" -U postgres
+  - psql -c "CREATE DATABASE travisdb;" -U postgres
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+
+#addons:
+#  sauce_connect: true
+
 script:
-- python manage.py test service.tests
-- coverage run --source=service manage.py test
+- coverage run --source=service manage.py test service.tests
+
 after_success:
 - coveralls
+
 deploy:
   provider: heroku
   api_key:
@@ -25,6 +38,7 @@ deploy:
     dev: devbookturks
   on:
     repo: zalokhan/BookTurks
+
 env:
   global:
   # DJANGO
@@ -37,4 +51,7 @@ env:
   - secure: ixSvQdd8K6ku5DePzB26UhjjKXNpu12or50HzL7C7qPeYHvOd6XT0rKiBgMcqovCPp/u1Cu8uYYqECogrnqN/1LtGAtbZoDsnXjol4TpF/SMP6KX0qqPwjLfbmJd5Y5LaJfEVf78rWo2kOPiXMch7X/ZGBH4AtSksUrJS0Xf3OIXiMWoo6Xw2Uh2KfCNFqoa2OQfUlMEobRcO/ysvnekyFqO5jXAmF0ORCk9JIQhR537QI70jS7oQbV2XKBHVKq3iIL9JAN2O54PQjE6noLYoqpRmXFC+7IpkPQQXsNC+xDSzj0gBddqrULxwJkcc9ifibO1Swo//rXeHjy5KYEPxRz/Cl13L166b/VXOZY4xNDxReO7VIT+S1bPY3fvL5R5A838A1GpAzQl7u/5UtRdTNz2KS94aHfWrIh1QN3X98GDiVUX+/hn/RtRuO3B1KKf3zLhf64ML1f6MUq1AemvRsHUwL1Snn6yG1pBtFkwG3vuTNi1jHsG0vH1uhl5HAvp4k/WKnHJrax9U6lQ6nQMSVwriY2IRRHBetoQIv4TF4b6R/menZjbR88K8uamPuVxurUm6SLRFlKDIzsDPWR4YFo7qzLLwk0cCSxZmBUSwh86hFh7athaOot1+Tqk51AGjFUjdJUisOMvIUUUIQLS/RMCAK6u9ks+ec6/7//qLIs=
   - secure: xqmVEiToGAqFSFw/LFn7PeEU0v10azqjGQifsOomp5CTrAsVs0S52P918jeLGOoNlnmejzX6y6x8ioWo/G8I93rw4Ti6tYLoI/D1VUAFnO6CwExrikDw8ihrA0tInxFulqhozKDkU3flyL8yEJaoLEB64z+dUSen7WNn2kiiS+ywgGmAjCxikr5jJHP+kOWQj95idgT8GKYyEokI2yt66gpIAtUsFgarBjYN/IvnNRBT7U7HQZUX3vyG6roKfeu3Y2lvTxZSOd82/noSMJ9ULdY6DnPHi8l1lrrte/n6POE7R/IEoBr8ZymDUDPKBGhkk8+CM5prHX/iQ60vN4FySdaHEyLMm6y1z98jfwbjbQcCuGOZmGGt6lw0Z75WHuzooChyLaHFBaTTFSft648imS1XVedY4eGOho4tVS+PZEuE/kCWo8MkabW0Cp2+ozOAgkIWfRO6hfkMIVCK1qHEh70fDZwR1+G28AbGTsxbIbaFff6IdNzV2kGgCtcL86a082ZY4QiaKtuQpbog65uYTQaSClPP0tXb3zj8BPON3DOuN27M2a7kthkaoi4natUrZjqapYkHSWU2V7BTG44n3lRIWL1XkzKCoe3HdCBRHJHj0aExdiD8URg+GkD+jvGG3csFOvZIq6N2pb6oZ2XdAb0DbtH6boWSknkJ5PuQZi8=
   # DROPBOX ACCESS TOKEN
-  - secure: vU7X1XtqzQBBMKzhVuMbBGWryNXkMxRN8CWdOP86Emfe6hc8WqHCImoyQ6UMtxhwOiFAX+2HVJLROgLsMpeYoqroUTz5PFq1Lad2z8UjOCWHL9RWaBP8Aamm6rPNvCGDA5bonpc5hkjlqTfKYSURdguEq4ikmaV7GmsM2Bd4yHRv/KFBr+vj0kLCl3sG+foYjqWXfwHh0ISpP/senCJj4x/272H86UY3SOEAa3Ppu3jyXeA/hCwf5xqTXeavpWL/9tgyOk3UfsC8/nbuMdbOof9VWI2cJ+wDA1FFU2VrUdWIyfajqa1AACfkKc/QhJu15ZUc0dmM2IMqhvR/JUsigpRl2dLKOELWOSQjUYJQ1lODjlcgfaJMcdZWyQbKv0764AjN7N6RnLHLQYXSryc0/Y2SWqcH7XPrnPkQUd/J2Z40cxf6/CgRJRINV4fwGJAvjo4BmZxX4vr8Mb/IyUAfZgBj56hcB5BeXwq1dnPNu0uAXl30YYxw6+BfyhcX3+a9LfGS9l55pVDmu216NlXRMFFPv068uBtHFzlFfeOM5rC6HhFNmhWNlgUdBZFLRN99MJjsAoLJovenH72chpINccNbtbqj+zu0lT0+GZvq4JYx8vmuNris+eiihM3sWSJiAnmN8k1jdDO4wdgfSmZJ6zr+HnEncPcjV0aMe1htWBU=
+  - secure: U7Ze5fzd/oz4Bmw0idfDjC8Ybbw9f26re9hnP8r39NOnZhd0SZM10D+pERBpZRMmPb3ql9S4V8RpmVp9+tpId64cavBO5CSaazaGktmskxjzpkMWPwVlxpyA4jsIkhhS1AENeS7keC1LSVatYmgPG6nF9fIFKHdnG5cOYaTFGk+mZQZ7oMP9++NpEKxmwbFR4SWbgtywC7HPRqtSuyfi8X27qPGiGydLXSdmMbNOIwiN2acpO2Hu6PF6fXWYGD5ZysBxjqsG2b/ggaa/Pqt8BAhzOGyxVWy93zIMBlOOBcsUIi5lwLn2mxwxRwEOlUax2atUOBB3yC00WEmF6TOijs9ZBzYAchemy5Lht2RK5KnFGcv0MwbEZyxxdPlFlxPtLW1QGoC0llP/3uo26QKhds7xtpmfFKay0dVwV4hpcwPeUU4FDNsekUfW6vTcQYex7XH63xSd4zbSIVrzPTsO8dxIr2dnBgetyA4AaeRHaKlTHOkBQFP8fUsJMtiFxAHZnkTAS9/Sd7xZpPQJ/BMwrmPwCpWbpwX5T+Ou8jHLWOP6FR6VItKNptbPtDxQRIBL5tVw7LQfJYUd1XzjaIzXWaxCbzV9ENSqVDyswqXsKQPoJ0gUGOivi7yQ+UN+SlOHS44og4cfqkRHi45eL5ys+ivt6T6jIrrtekQFO+doyT8=
+  # SAUCE LABS
+  - secure: NY3H/liRVwZhlU8VNQR7feyWmT6rwu5YzGj7d2IUuXqkEA0UWsiVK7TRSVWzcUukxs6i6+0mXfY0mTZ59gJMcKotynfQf49NIXcrORk1YEp42oRGQD/ya0FAUMXuSOjXQTTVYSr6x9hkAetxP+yJY7jZk3fa5exW4ejZu2IdvS0uY6oQkzvTYjHQYpRBdMNIejiESrRBRddKkot1XRmqbYk+pLvbWmtvhiSDl3cUJOW2a3ec+Rv7PAV3N0lHjbsxc6LGHYmlbHOIFJ4xaF1JOzPm2NEgHYRGWU95LGXP16UO6XitswGexWWqk6kRTDi1LjxZWBXwh3VtYKLb3RA3MtGhzCRb0USGPasxILP8anHtI04YxfZTAII1cHIYiPMfskpwWLNWECpdxQWAVG3jlJAg6rKT1cIaHeY8rNAtl16rAfK1oxMFzeVBs18ftFtg4oESgnqt/BVI1+cfVsyIf4K+zk56BJnUB34uQGqINYmDdtVrsAzXnRFsiQTZe7mAEvlU+4SVSYGhvljV/rkwihvmshLc/0mSeP+QssohjMnK2vay3qtcZrddsBiEh7w0u2jf+wlBx7XfkJHwx5JfWxSU4Dh9tFAFaJVUN8rLZstTvF+8ox8oGVW7G0m+Mi5WezauMsejLwRogZRqrrUl07Ow0grLcZ+hsSgAzkNVWVU=
+  - secure: jvaSqsC+0C1cWYJRX2HMHgY0cO3L70wox6uXJGj+yLgaJ0aEBf8nUhSQ66ysF7p1pV/dmTAzKLydQ47uFQHsjlwh4frowiFOxxEIyf6xEI4Lu2emJNN45MRU6v/9zMb7N08PPbbV4dGCIeehNPcyEjc5/v1P8JtaF4SJDKXYkGSMYciLIpg55h5oWHorKrMARP1jLm8YgCzLBfqaT0dvIRFIXUhBlxW08eJCfbbs965288IyXI4bosNgTZWatKn3wz0CRTBXr241Q4wOKXqHy0+tGoKp3jmDLCszp614MFUSF/uU7Koen/9yZBgh9PpJJs+wmLwKpFg2+g2fyT3JqqabS+UoMpKmLIO3uE4rxDLS0lWrnCLx83XwG00G16jodDJEn8yirtgN12XGam1WPg+V4/SKchfcUDTjNcIvkRBo2kYUvguTapJFzlFqezkyGbN0+h1Evv2/RwojDDgh/qusVV643QK+vWK6jR8244PWlyIp0Aj9k0RI1BgIUFiagJ6uTqUMaXmeWOiIGTj6bmwYka/7db57bopmBlPT7GXocqYwYfIBWAako4sVR2fRXTOaWi4z8iRlce9g5z7Bz/+eMVPF+s0Nd/kRnXDhb2UjNEca3AOPBdXJZZZ1aBgsCfPTfZdxjX92cK4Ir/TtovYGs0mscPUCVpy3apFc9S0=

@@ -30,5 +30,5 @@ def get_avatar(backend, strategy, details, response, user=None, *args, **kwargs)
         if user_model:
             user_profile_model = user_profile_tools.get_profile(user_model=user_model)
             user_profile_model.display_picture = url
-            user_profile_tools.upload_profile(filename=user_profile_tools.create_filename(user_model),
+            user_profile_tools.upload_profile(filename=user_profile_tools.create_filename(user_model.username),
                                               content=user_profile_tools.create_content(user_profile_model))

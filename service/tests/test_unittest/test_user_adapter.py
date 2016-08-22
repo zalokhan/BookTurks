@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 
-from service.tests.create_user import create_user, context
+from service.tests.create_user import create_user
+from service.tests.constants_models import context
 from service.bookturks.adapters.UserAdapter import UserAdapter
 
 

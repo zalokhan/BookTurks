@@ -278,7 +278,7 @@
             <div class="row">
                 <div class="col-lg-12" style="text-align:center;">
                     {{ state }}
-                    <form action="{% url 'service:login' %}" method="post" class="form-signin">
+                    <form id="login_form" action="{% url 'service:login' %}" method="post" class="form-signin">
                         {% csrf_token %}
                         <div class="row">
                             <div style="width: 50%; margin: 0 auto;">

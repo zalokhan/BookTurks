@@ -4,13 +4,11 @@ from django.conf import settings
 from django.utils import timezone
 from dropbox.exceptions import ApiError
 
+from service.apps import ServiceConfig
+from service.bookturks.Constants import USER_PROFILE, USER_PROFILE_MODEL
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from service.bookturks.models.NotificationModel import NotificationModel
 from service.bookturks.models.UserProfileModel import UserProfileModel
-
-# App Config
-from service.apps import ServiceConfig
-from service.bookturks.Constants import USER_PROFILE, USER_PROFILE_MODEL
 from service.bookturks.serializer import serialize, deserialize
 
 
@@ -23,15 +21,15 @@ class UserProfileTools:
         self.dbx = DropboxClient(settings.DROPBOX_CLIENT)
 
     @staticmethod
-    def create_filename(user_model):
+    def create_filename(username):
         """
         Creates filename to store the profile in storage
-        :param user_model:
+        :param username:
         :return:
         """
-        if not user_model or not user_model.username or not str(user_model.username).strip():
-            raise ValueError("UserProfileTools:create_filename:Invalid User model passed")
-        return "".join([USER_PROFILE, "/", str(user_model.username), "_profile"])
+        if not username or not username.strip():
+            raise ValueError("UserProfileTools:create_filename:Invalid username passed")
+        return "".join([USER_PROFILE, "/", username, "_profile"])
 
     @staticmethod
     def create_profile(user_model):
@@ -89,7 +87,7 @@ class UserProfileTools:
         if not user_model or not user_model.username:
             raise ValueError("Invalid model is passed. User not recognized.")
         try:
-            path, metadata = self.dbx.get_file(filename=UserProfileTools.create_filename(user_model))
+            path, metadata = self.dbx.get_file(filename=UserProfileTools.create_filename(user_model.username))
         except ApiError:
             # TODO: Something went wrong here. Handle this properly
             raise
@@ -114,7 +112,7 @@ class UserProfileTools:
             metadata, error = err.args
             if error.is_path() and error.get_path().is_not_found():
                 user_profile_model = UserProfileTools.create_profile(user_model)
-                rc = self.upload_profile(filename=UserProfileTools.create_filename(user_model),
+                rc = self.upload_profile(filename=UserProfileTools.create_filename(user_model.username),
                                          content=UserProfileTools.create_content(user_profile_model))
                 if rc:
                     return user_profile_model
@@ -133,7 +131,7 @@ class UserProfileTools:
         future = ServiceConfig.profile_sync_thread_pool.submit(self.upload_profile,
                                                                self.create_content(user_profile_model),
                                                                UserProfileTools.create_filename(
-                                                                   user_profile_model.user_model))
+                                                                   user_profile_model.user_model.username))
         # Returning for debugging and assertions
         return future
 
@@ -188,3 +186,19 @@ class UserProfileTools:
                 session.save()
                 return True
         return False
+
+    def delete_profile_from_storage(self, username):
+        """
+        Deletes the users profile from the storage.
+        Should not be used !
+        :param username:
+        :return:
+        """
+        if not username:
+            raise ValueError("DeleteProfile : username invalid")
+
+        filename = self.create_filename(username)
+        try:
+            self.dbx.delete_file(filename)
+        except ApiError:
+            raise ValueError("UserProfile file not found in storage.")

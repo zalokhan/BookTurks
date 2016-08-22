@@ -78,7 +78,7 @@
 
             <!-- /.dropdown -->
             <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <a id="navbar_dropdown" class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
@@ -101,7 +101,9 @@
                         </a>
                     </li>
                     <li class="divider"></li>
-                    <li><a href="{% url 'auth:logout' %}?next=/logout"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                    <li><a id="user_logout" href="{% url 'auth:logout' %}?next=/logout"><i class="fa fa-sign-out
+                    fa-fw"></i>
+                        Logout</a>
                     </li>
 
                 </ul>

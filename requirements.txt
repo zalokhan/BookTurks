@@ -10,3 +10,4 @@ whitenoise
 coveralls
 mock
 dropbox
+selenium
