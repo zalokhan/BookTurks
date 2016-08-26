@@ -4,8 +4,8 @@ from django.test import Client
 
 from service.bookturks.models.QuizCompleteModel import QuizCompleteModel
 from service.models import Quiz
-from service.tests.create_user import create_user, prepare_client
 from service.tests.constants_models import context, mock_quiz_model
+from service.tests.create_user import create_user, prepare_client
 from service.tests.test_setup_teardown.quiz_test_setup import QuizTest
 
 
@@ -39,6 +39,11 @@ class UserQuizCreateViewTest(QuizTest):
         quiz_parameters['quiz_id'] = 'test_quiz_id'
         quiz_parameters['quiz_name'] = 'test_quiz_name'
         quiz_parameters['quiz_description'] = 'test_quiz_description'
+        quiz_parameters['attempts'] = -1
+        quiz_parameters['pass_percentage'] = 100
+        quiz_parameters['start_date_time'] = '02/08/1993 1:42 PM'
+        quiz_parameters['end_date_time'] = '02/08/1993 2:42 PM'
+        quiz_parameters['quiz_tags'] = 'test1,test2'
 
         self.assertEqual(user.is_active, True)
         client.login(username=context.get('username'), password=context.get('password'))
@@ -265,7 +270,8 @@ class UserQuizCreateViewTest(QuizTest):
                                                 quiz_form="mock_quiz_form",
                                                 answer_key={"key": "value"},
                                                 pass_percentage=100,
-                                                attempts=1)
+                                                attempts=1,
+                                                tags=list())
 
         client = prepare_client(client)
         session = client.session

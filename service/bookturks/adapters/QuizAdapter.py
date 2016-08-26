@@ -29,11 +29,11 @@ class QuizAdapter(object):
                 not quiz_name or not quiz_name.strip() or \
                 not quiz_description or not quiz_description.strip() or \
                 not quiz_owner:
-            return None
-        try:
-            get_object_or_404(Quiz, quiz_id=quiz_id)
-            return None
-        except Http404:
+            raise ValueError("Quiz model cannot be created. Parameter missing.")
+
+        if QuizAdapter.exists(quiz_id=quiz_id):
+            raise ValueError("Model already present")
+        else:
             quiz = Quiz(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description, quiz_owner=quiz_owner)
             quiz.save()
         return quiz
@@ -52,11 +52,10 @@ class QuizAdapter(object):
                 not quiz_name or not quiz_name.strip() or \
                 not quiz_description or not quiz_description.strip() or \
                 not quiz_owner:
-            return None
-        try:
-            get_object_or_404(Quiz, quiz_id=quiz_id)
-            return None
-        except Http404:
+            raise ValueError("Quiz model cannot be created. Parameter missing.")
+        if QuizAdapter.exists(quiz_id=quiz_id):
+            raise ValueError("Model already present")
+        else:
             quiz = Quiz(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description, quiz_owner=quiz_owner)
         return quiz
 

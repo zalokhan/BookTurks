@@ -11,13 +11,12 @@ from django.utils import timezone
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
     USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, SERVICE_USER_MYQUIZ_HOME, REQUEST, USER, \
     ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS
-from service.bookturks.adapters.QuizAdapter import QuizAdapter
-from service.bookturks.adapters.QuizTagAdapter import QuizTagAdapter
-from service.bookturks.adapters.UserAdapter import UserAdapter
+from service.bookturks.adapters import UserAdapter, QuizAdapter, QuizTagAdapter
 from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.models.EventModel import EventModel
 from service.bookturks.models.QuizCompleteModel import QuizCompleteModel
 from service.bookturks.quiz.QuizTools import QuizTools
+from service.bookturks.session_handler import session_insert_keys, session_remove_keys
 from service.bookturks.user.UserProfileTools import UserProfileTools
 
 
@@ -81,7 +80,7 @@ def user_quiz_maker_view(request):
     try:
 
         # Get the user model from the request.
-        user = user_adapter.get_user_instance_from_request(request)
+        user = user_adapter.get_user_instance_from_django_user(request.user)
 
         if not user:
             raise ValueError("User not recognized")
@@ -117,7 +116,7 @@ def user_quiz_maker_view(request):
                           alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
-    request.session['quiz_complete_model'] = quiz_complete_model
+    session_insert_keys(session=request.session, quiz_complete_model=quiz_complete_model)
 
     return render(request, USER_QUIZ_MAKER_PAGE, context)
 
@@ -136,17 +135,20 @@ def user_quiz_verifier_view(request):
     quiz_form = request.POST.get('quiz_form')
     # Quiz data is the template created by the form builder. This can be editted
     quiz_data = request.POST.get('quiz_data')
-    # Do not allow empty forms to be submitted
-    if not quiz_data or not quiz_form:
-        set_alert_session(session=request.session, message="Quiz data was not provided", alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
     try:
+        # Do not allow empty forms to be submitted
+        if not quiz_data or not quiz_form:
+            raise ValueError("Quiz data was not provided")
+
         # Parse the form to remove irrelevant data.
         # It will be better and cleaner to change the javascript so this will not be required
         quiz_form = quiz_tools.parse_form(quiz_form=quiz_form)
-    except ValueError:
-        set_alert_session(session=request.session, message="Empty quizzes cannot be submitted", alert_type=DANGER)
+
+    except ValueError as err:
+        set_alert_session(session=request.session,
+                          message=str(err),
+                          alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
     # Add this form so that it can be displayed in the next page
@@ -155,10 +157,9 @@ def user_quiz_verifier_view(request):
     }
     # Save to session to pass to the next view
     quiz_complete_model = request.session.get('quiz_complete_model')
-    del request.session['quiz_complete_model']
     quiz_complete_model.quiz_form = quiz_form
     quiz_complete_model.quiz_data = quiz_data
-    request.session['quiz_complete_model'] = quiz_complete_model
+    session_insert_keys(request.session, quiz_complete_model=quiz_complete_model)
 
     return render(request, USER_QUIZ_VERIFIER_PAGE, context)
 
@@ -169,34 +170,32 @@ def user_quiz_create_view(request):
     :param request: User request
     :return: Redirects to dashboard on successful quiz creation.
     """
-    answer_key = request.POST
-
-    quiz_complete_model = request.session.get('quiz_complete_model')
-
     quiz_tools = QuizTools()
     quiz_adapter = QuizAdapter()
     quiz_tag_adapter = QuizTagAdapter()
+
+    answer_key = request.POST
+    quiz_complete_model = request.session.get('quiz_complete_model')
+
     try:
-        if not quiz_complete_model or not answer_key:
-            raise ValueError("quiz_data or quiz_form or quiz is None")
-        # Create a JSON content to be uploaded to storage
+        # Create serialized content to be uploaded to storage
         content = quiz_tools.create_content(quiz_complete_model=quiz_complete_model, answer_key=answer_key)
 
         # Create filename for file in storage
         filename = quiz_tools.create_filename(quiz=quiz_complete_model.quiz_model)
 
         # Upload file to storage and get the return code (file id)
-        return_code = quiz_tools.upload_quiz(content=content, filename=filename)
-    except Exception as err:
-        # print (err)
-        # Remove the quiz objects so that new form can be generated without mixing up old data
-        if request.session.get("quiz_complete_model"):
-            del request.session['quiz_complete_model']
-        set_alert_session(session=request.session, message="An error occurred creating the quiz.", alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
+        quiz_tools.upload_quiz(content=content, filename=filename)
 
-    # If return code was not None, save quiz in database
-    if not return_code:
+    except ValueError as err:
+        set_alert_session(session=request.session,
+                          message=str(err),
+                          alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
+    except Exception:
+        # Remove the quiz objects so that new form can be generated without mixing up old data
+        session_remove_keys(request.session, "quiz_complete_model")
+
         set_alert_session(session=request.session, message="An error occurred creating the quiz.", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
 
@@ -221,8 +220,7 @@ def user_quiz_create_view(request):
     future.result()
 
     # Remove the quiz objects
-    if request.session.get("quiz_complete_model"):
-        del request.session['quiz_complete_model']
+    session_remove_keys(request.session, "quiz_complete_model")
 
     set_alert_session(session=request.session, message="The quiz has been successfully saved", alert_type=SUCCESS)
     return HttpResponseRedirect(reverse(SERVICE_USER_HOME))
@@ -241,30 +239,34 @@ def user_quiz_delete_view(request):
     quiz_id = request.POST.get('quiz_id')
     quiz = quiz_adapter.exists(quiz_id)
 
-    # Check whether user deleting this quiz is admin or owner or any other staff person
-    if not request.user.is_staff and not (user_adapter.get_user_instance_from_request(request) == quiz.quiz_owner):
+    try:
+        # Check whether user deleting this quiz is admin or owner or any other staff person
+        if not request.user.is_staff and \
+                not (user_adapter.get_user_instance_from_django_user(request.user) == quiz.quiz_owner):
+            raise ValueError("You do not have the permission to delete this quiz. This action will be reported")
+        if not quiz:
+            raise ValueError("No such quiz.")
+
+        # Unlink all tags from the quiz
+        quiz_tools.unlink_all_tags_of_quiz(quiz)
+        # Deletes from storage
+        quiz_tools.delete_quiz_from_storage(quiz)
+        # Deletes from database
+        quiz_adapter.delete_model(quiz)
+        # Deletes from the user profile
+        UserProfileTools.remove_my_quiz_profile(session=request.session, quiz_model=quiz)
+
+        # Save the profile
+        user_profile_tools = UserProfileTools()
+        future = user_profile_tools.save_profile(request.session)
+        # Wait for asynchronous callback
+        future.result()
+
+    except ValueError as err:
         set_alert_session(session=request.session,
-                          message="You do not have the permission to delete this quiz. This action will be reported",
+                          message=str(err),
                           alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_MYQUIZ_HOME))
-    if not quiz:
-        set_alert_session(session=request.session, message="No such quiz.", alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_USER_MYQUIZ_HOME))
-
-    # Unlink all tags from the quiz
-    quiz_tools.unlink_all_tags_of_quiz(quiz)
-    # Deletes from storage
-    quiz_tools.delete_quiz_from_storage(quiz)
-    # Deletes from database
-    quiz_adapter.delete_model(quiz)
-    # Deletes from the user profile
-    UserProfileTools.remove_my_quiz_profile(session=request.session, quiz_model=quiz)
-
-    # Save the profile
-    user_profile_tools = UserProfileTools()
-    future = user_profile_tools.save_profile(request.session)
-    # Wait for asynchronous callback
-    future.result()
 
     set_alert_session(session=request.session, message="The quiz has been successfully deleted", alert_type=SUCCESS)
     return HttpResponseRedirect(reverse(SERVICE_USER_MYQUIZ_HOME))

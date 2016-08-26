@@ -78,6 +78,6 @@ class DropboxClient(object):
             if not list_of_files.more:
                 break
             else:
-                # Check if more than 100 files are available and search in batchse of 100.
+                # Check if more than 100 files are available and search in batches of 100.
                 list_of_files = self.client.files_search(path=QUIZ_HOME, query=username, start=list_of_files.start)
         return result_list

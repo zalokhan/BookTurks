@@ -13,7 +13,7 @@ def get_sauce_driver(capabilities):
     """
     username = settings.SAUCE_USERNAME
     access_key = settings.SAUCE_ACCESS_KEY
-    hub_url = "%s:%s@ondemand.saucelabs.com:80" % (username, access_key)
+    hub_url = "{0}:{1}@ondemand.saucelabs.com:80".format(username, access_key)
 
     capabilities['tunnel-identifier'] = os.environ["TRAVIS_JOB_NUMBER"]
     capabilities['build'] = os.environ['TRAVIS_BUILD_NUMBER']
@@ -33,6 +33,10 @@ def get_local_driver():
 
 
 class SeleniumTests(StaticLiveServerTestCase):
+    """
+    Base setup and tear down for integration tests.
+    Distribute into different files if integration tests grow.
+    """
     @classmethod
     def setUpClass(cls):
         super(SeleniumTests, cls).setUpClass()

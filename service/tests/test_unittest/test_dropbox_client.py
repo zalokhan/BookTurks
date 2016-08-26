@@ -1,10 +1,10 @@
+import os
+
+from django.conf import settings
 from django.test import TestCase
 
-import mock
-import dropbox
-from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from service.bookturks.Constants import QUIZ_HOME
-from service.tests.dropbox_tools import MockFileList, MOCK_QUIZ_FILE_CONTENT
+from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 
 
 class DropboxClientTest(TestCase):
@@ -12,37 +12,41 @@ class DropboxClientTest(TestCase):
     Test case for the DropBox Client
     """
 
-    @mock.patch('dropbox.Dropbox', autospec=True)
-    def setUp(self, mock_dbx):
+    def setUp(self):
         """
         Initialization for all tests
         :return:
         """
-        dbx = mock_dbx.return_value
-        dbx.files_upload.return_value = "mock_id"
-        self.mock_file_list = MockFileList()
-        dbx.files_list_folder.return_value = self.mock_file_list
-        dbx.files_delete.return_value = None
-        # It should return an object not contents
-        dbx.files_download_to_file.return_value = MOCK_QUIZ_FILE_CONTENT
-        self.dbx = dbx
-        self.client = DropboxClient(dbx)
+        self.dbx = DropboxClient(settings.DROPBOX_CLIENT)
 
-    def test_dropbox_upload_file(self):
+    def test_dropbox_upload_find_remove_file(self):
         """
         Testing the dropbox client
         :return:
         """
-        result = self.client.upload_file(content="mock_content", filename="mock_filename")
-        self.assertEqual("mock_id", result)
-        self.dbx.files_upload.assert_called_once_with("mock_content", "mock_filename",
-                                                      mode=dropbox.files.WriteMode.overwrite)
+        mock_filename = "".join([QUIZ_HOME, "/mock_user_quiz_name"])
 
-    def test_dropbox_list_all_quiz_files(self):
-        """
-        Testing dropbox client
-        :return:
-        """
-        result = self.client.list_all_quiz_files()
-        self.assertEqual(self.mock_file_list.entries, result)
-        self.dbx.files_list_folder.assert_called_once_with(QUIZ_HOME)
+        # Checking uploads
+        upload_result = self.dbx.upload_file(content="mock_content", filename=mock_filename)
+        self.assertIsNotNone(upload_result)
+        self.assertEqual(mock_filename, upload_result.path_display)
+
+        # Checking different queries
+        all_quiz_list = self.dbx.list_all_quiz_files()
+        self.assertGreaterEqual(len(all_quiz_list), 1)
+        quiz_for_mock_user = self.dbx.list_quiz_files_for_user("mock_user")
+        self.assertEqual(quiz_for_mock_user[0].metadata.path_display, mock_filename)
+
+        # Checking downloads
+        path, download_result = self.dbx.get_file(mock_filename)
+        with open(path) as quiz_file:
+            content = quiz_file.read()
+            quiz_file.close()
+        os.remove(path)
+        self.assertEqual(content, "mock_content")
+
+        # Checking deletions
+        delete_result = self.dbx.delete_file(mock_filename)
+        self.assertEqual(mock_filename, delete_result.path_display)
+        quiz_for_mock_user = self.dbx.list_quiz_files_for_user("mock_user")
+        self.assertIs(len(quiz_for_mock_user), 0)

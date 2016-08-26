@@ -81,7 +81,7 @@ def user_quizarena_result_view(request):
     user_adapter = UserAdapter()
     quiz_tools = QuizTools()
     # Get the user model from the request.
-    user = user_adapter.get_user_instance_from_request(request)
+    user = user_adapter.get_user_instance_from_django_user(request.user)
 
     if not quiz or not user:
         set_alert_session(session=request.session, message="Invalid quiz attempt.", alert_type=DANGER)

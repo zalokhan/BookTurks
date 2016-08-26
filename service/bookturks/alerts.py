@@ -3,6 +3,7 @@ Check and refresh alerts
 """
 
 from service.bookturks.Constants import ALERT_TYPE, ALERT_MESSAGE
+from service.bookturks.session_handler import session_insert_keys, session_remove_keys
 
 
 def init_alerts(request):
@@ -17,9 +18,7 @@ def init_alerts(request):
     alert_type = request.session.get(ALERT_TYPE)
 
     # Remove the alerts from the request to prevent repetition of alerts on reload of the page
-    if ALERT_MESSAGE in request.session:
-        del request.session[ALERT_MESSAGE]
-        del request.session[ALERT_TYPE]
+    session_remove_keys(request.session, ALERT_MESSAGE, ALERT_TYPE)
 
     return request, alert_type, alert_message
 
@@ -32,6 +31,4 @@ def set_alert_session(session, message, alert_type):
     :param alert_type:
     :return:
     """
-    session[ALERT_MESSAGE] = message
-    session[ALERT_TYPE] = alert_type
-    session.save()
+    session_insert_keys(session, alert_message=message, alert_type=alert_type)

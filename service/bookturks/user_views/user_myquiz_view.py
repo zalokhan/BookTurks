@@ -1,17 +1,16 @@
 """
 My quizzes page
 """
-from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 
-from service.bookturks.adapters.UserAdapter import UserAdapter
-from service.bookturks.adapters.QuizAdapter import QuizAdapter
-from service.bookturks.quiz.QuizTools import QuizTools
-
-from service.bookturks.alerts import init_alerts, set_alert_session
 from service.bookturks.Constants import REQUEST, USER, ALERT_MESSAGE, ALERT_TYPE, DANGER, \
     USER_MYQUIZ_HOME_PAGE, USER_MYQUIZ_INFO_PAGE, SERVICE_USER_HOME, SERVICE_USER_MYQUIZ_HOME
+from service.bookturks.adapters.QuizAdapter import QuizAdapter
+from service.bookturks.adapters.UserAdapter import UserAdapter
+from service.bookturks.alerts import init_alerts, set_alert_session
+from service.bookturks.quiz.QuizTools import QuizTools
 
 
 def user_myquiz_home_view(request):
@@ -24,7 +23,7 @@ def user_myquiz_home_view(request):
     user_adapter = UserAdapter()
     quiz_adapter = QuizAdapter()
 
-    user = user_adapter.get_user_instance_from_request(request)
+    user = user_adapter.get_user_instance_from_django_user(request.user)
 
     quiz_list = quiz_adapter.get_models_for_owner(user_model=user)
     context = {
@@ -49,7 +48,7 @@ def user_myquiz_info_view(request, quiz_id):
     quiz_adapter = QuizAdapter()
     quiz_tools = QuizTools()
 
-    user = user_adapter.get_user_instance_from_request(request)
+    user = user_adapter.get_user_instance_from_django_user(request.user)
     quiz = quiz_adapter.exists(quiz_id)
     if not quiz or not user:
         set_alert_session(session=request.session,

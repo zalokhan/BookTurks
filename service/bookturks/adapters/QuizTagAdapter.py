@@ -26,11 +26,10 @@ class QuizTagAdapter(object):
         :return:
         """
         if not tag_name:
-            return None
-        try:
-            get_object_or_404(QuizTag, tag_name=tag_name)
-            return None
-        except Http404:
+            raise ValueError("tag_name cannot be empty or None")
+        if QuizTagAdapter.exists(tag_name):
+            raise ValueError("Cannot create new tag. Tag already exists")
+        else:
             quiz_tag = QuizTag(tag_name=tag_name)
             quiz_tag.save()
         return quiz_tag
@@ -43,11 +42,10 @@ class QuizTagAdapter(object):
         :return:
         """
         if not tag_name:
-            return None
-        try:
-            get_object_or_404(QuizTag, tag_name=tag_name)
-            return None
-        except Http404:
+            raise ValueError("tag_name cannot be empty or None")
+        if QuizTagAdapter.exists(tag_name):
+            raise ValueError("Cannot create new tag. Tag already exists")
+        else:
             quiz_tag = QuizTag(tag_name=tag_name)
         return quiz_tag
 
@@ -85,10 +83,9 @@ class QuizTagAdapter(object):
         if not tag_name or \
                 not QuizTagAdapter.exists(tag_name) or \
                 not QuizAdapter.exists(quiz_id):
-            raise ValueError("Tag name is none or quiz does not exist.")
+            raise ValueError("Tag name invalid or quiz does not exist.")
         quiz_tag = QuizTagAdapter.exists(tag_name)
         quiz_tag.tagged_quiz.add(QuizAdapter.exists(quiz_id))
-        return True
 
     @staticmethod
     def unlink_quiz(tag_name, quiz_id):
@@ -101,12 +98,11 @@ class QuizTagAdapter(object):
         if not tag_name or \
                 not QuizTagAdapter.exists(tag_name) or \
                 not QuizAdapter.exists(quiz_id):
-            return False
+            raise ValueError("Cannot unlink tag. Invalid tag_name or quiz does not exist.")
         quiz_tag = QuizTagAdapter.exists(tag_name)
         quiz_tag.tagged_quiz.remove(QuizAdapter.exists(quiz_id))
         if not quiz_tag.tagged_quiz.count():
             quiz_tag.delete()
-        return True
 
     @staticmethod
     def verify_tag_name(tag_name):

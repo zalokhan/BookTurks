@@ -27,11 +27,10 @@ class UserAdapter(object):
         :return: True if new user created or already present else false
         """
         if not username or not username.strip():
-            return None
-        try:
-            get_object_or_404(User, username=username)
-            return None
-        except Http404:
+            raise ValueError("User model cannot be created. Parameter missing.")
+        if UserAdapter.exists(username=username):
+            raise ValueError("User Model already present")
+        else:
             user = User(username=username,
                         user_first_name=first_name,
                         user_last_name=last_name,
@@ -52,11 +51,10 @@ class UserAdapter(object):
         :return: True if new user created or already present else false
         """
         if not username or not username.strip():
-            return None
-        try:
-            get_object_or_404(User, username=username)
-            return None
-        except Http404:
+            raise ValueError("User model cannot be created. Parameter missing.")
+        if UserAdapter.exists(username=username):
+            raise ValueError("User Model already present")
+        else:
             user = User(username=username,
                         user_first_name=first_name,
                         user_last_name=last_name,
@@ -76,31 +74,6 @@ class UserAdapter(object):
             return user
         except Http404:
             return None
-
-    @staticmethod
-    def get_user_instance_from_request(request):
-        """
-        Fetches User model
-        :param request:
-        :return:
-        """
-        # User Exists and nothing else required
-        if UserAdapter.exists(request.user):
-            return UserAdapter.exists(request.user)
-
-        # User does not exist but has email field in social authentication
-        elif request.user.email and str(request.user.email).strip():
-            username = "".join([str(request.user.pk), request.user.email])
-            if UserAdapter.exists(username):
-                return UserAdapter.exists(username)
-
-        # User not present and no email field (facebook) so creating username from username and pk
-        else:
-            username = "".join([str(request.user.pk), request.user.username, "@bookturks.com"])
-            if UserAdapter.exists(username):
-                return UserAdapter.exists(username)
-            else:
-                return None
 
     @staticmethod
     def get_user_instance_from_django_user(user):

@@ -1,8 +1,8 @@
 from django.test import TestCase, Client
 
-from service.tests.create_user import create_user
+from service.bookturks.adapters import UserAdapter
 from service.tests.constants_models import context
-from service.bookturks.adapters.UserAdapter import UserAdapter
+from service.tests.create_user import create_user
 
 
 class UserAdapterTest(TestCase):
@@ -27,8 +27,7 @@ class UserAdapterTest(TestCase):
         client.login(username=context.get('username'), password=context.get('password'))
 
         # Empty username should not create model
-        user = self.user_adapter.create_model(username=" ")
-        self.assertEqual(user, None)
+        self.assertRaises(ValueError, self.user_adapter.create_model, username=" ")
 
         # Valid flow
         user = self.user_adapter.create_model(username=context.get('username'),
@@ -41,5 +40,4 @@ class UserAdapterTest(TestCase):
         self.assertEqual(self.user_adapter.exists(context.get('username')), user)
 
         # Duplicate user should not create model too
-        user = self.user_adapter.create_model(username=context.get('username'))
-        self.assertEqual(user, None)
+        self.assertRaises(ValueError, self.user_adapter.create_model, username=context.get('username'))

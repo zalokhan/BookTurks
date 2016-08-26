@@ -59,6 +59,10 @@ class QuizTools(object):
         :param answer_key:
         :return:
         """
+
+        if not answer_key:
+            raise ValueError("QuizTools :: Invalid argument passed.")
+
         # Converting from immutable dict to mutable
         answer_key = dict(answer_key)
 
@@ -67,16 +71,15 @@ class QuizTools(object):
             del answer_key['csrfmiddlewaretoken']
 
         if not quiz_complete_model or not answer_key:
-            raise ValueError("QuizMaker:create_quiz_content:Parameter missing quiz, quiz_data, quiz_form or answer_key")
+            raise ValueError("Quiz content or answer key cannot be empty.")
         if not quiz_complete_model.quiz_model.quiz_id or not quiz_complete_model.quiz_model.quiz_name:
-            raise ValueError("QuizMaker:create_quiz_content:Invalid Quiz model passed")
+            raise ValueError("QuizMaker:create_quiz_content:Invalid Quiz model")
 
         quiz_complete_model.answer_key = answer_key
 
         try:
             content = serialize(quiz_complete_model)
-        except Exception as err:
-            # print (err)
+        except Exception:
             raise
         return content
 
@@ -92,7 +95,7 @@ class QuizTools(object):
         # Checking if less html tags then something is wrong or empty form has been submitted
         if len(form_tags) < 10:
             raise ValueError(
-                "QuizTools:quiz_form_data_parser:Empty quizzes cannot be submitted. Form_data cannot be empty.")
+                "Empty quizzes cannot be submitted. Form cannot be empty.")
 
         # One more check to make sure that the form submitted has relevant tags.
         # Need to avoid script attacks
@@ -100,7 +103,7 @@ class QuizTools(object):
             pass
         else:
             raise ValueError(
-                "QuizTools:quiz_form_data_parser:Quiz form is not properly generated. Something wrong with data")
+                "Quiz form is not properly generated. Something wrong with data")
 
         # Removing redundant lines
         # <div rendered-form></div>
@@ -118,10 +121,9 @@ class QuizTools(object):
         """
         try:
             return_code = self.dbx.upload_file(content=content, filename=filename)
-        except Exception as err:
+        except Exception:
             # TODO: Handle this properly
-            # print (err)
-            return None
+            raise
         return return_code
 
     @staticmethod
@@ -224,7 +226,7 @@ class QuizTools(object):
         filename = QuizTools.create_filename(quiz)
         try:
             self.dbx.delete_file(filename)
-        except ApiError as err:
+        except ApiError:
             raise ValueError("Quiz file not found in storage.")
 
     @staticmethod

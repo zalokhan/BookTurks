@@ -356,7 +356,8 @@
             <div class="col-lg-12" style="text-align:center;">
                 <form action="{% url 'service:register' %}" method="post" class="form-signin">
                     {% csrf_token %}
-                    <button class="btn btn-xl" type="submit" style="background-color: lightblue">Register
+                    <button id="register_button" class="btn btn-xl" type="submit" style="background-color: lightblue">
+                        Register
                     </button>
                 </form>
             </div>

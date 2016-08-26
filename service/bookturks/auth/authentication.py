@@ -98,4 +98,4 @@ def logout_view(request):
     :return: renders a page with context
     """
     logout(request)
-    return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME, ))
+    return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))

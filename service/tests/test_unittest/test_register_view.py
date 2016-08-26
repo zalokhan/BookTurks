@@ -1,13 +1,12 @@
-from django.test import TestCase, Client
+from django.contrib.auth import authenticate
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import authenticate
-
-from service.tests.create_user import create_user
-from service.tests.constants_models import context
+from django.test import TestCase, Client
 
 from service.models import User
+from service.tests.constants_models import context
+from service.tests.create_user import create_user
 
 
 class RegisterViewTest(TestCase):
@@ -99,28 +98,6 @@ class RegisterViewTest(TestCase):
         user.delete()
         user = authenticate(username=context.get('username'), password=context.get('password'))
         self.assertEqual(user.is_active, True)
-
-    def test_register_check_with_wrong_username_format(self):
-        """
-        Checking register check
-        :return:
-        """
-        client = Client()
-        params = dict(context)
-        params['username'] = 'test'
-        response = client.post(reverse('service:register_check'), params, follow=True)
-        self.assertEqual(response.status_code, 200)
-        # Testing redirection
-        redirect_chain = list()
-        redirect_chain.append(("/register/", 302))
-        self.assertEqual(response.redirect_chain, redirect_chain)
-
-        # Test if exception raised
-        with self.assertRaisesMessage(Http404, ''):
-            get_object_or_404(User, username=params.get('username'))
-
-        user = authenticate(username=params.get('username'), password=params.get('password'))
-        self.assertEqual(user, None)
 
     def test_register_check_with_missing_inputs(self):
         """

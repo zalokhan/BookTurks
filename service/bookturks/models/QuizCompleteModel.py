@@ -4,7 +4,7 @@ class QuizCompleteModel(object):
     """
 
     def __init__(self, quiz_model, quiz_data=None, quiz_form=None, answer_key=None, attempts=-1,
-                 pass_percentage=None, event_model=None, tags=list()):
+                 pass_percentage=None, event_model=None, tags=None):
         # Quiz Model from the database
         self.quiz_model = quiz_model
         # Raw quiz data (editable)
