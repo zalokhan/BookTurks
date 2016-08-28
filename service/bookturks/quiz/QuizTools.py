@@ -31,7 +31,7 @@ class QuizTools(object):
         """
         if not quiz_name.rstrip():
             raise ValueError("Quiz Name cannot be blank")
-        quiz_id = "_".join([username, quiz_name])
+        quiz_id = "_".join([username, quiz_name.lower()])
         if re.match("^[A-Za-z0-9_ -]*$", quiz_name):
             quiz_id = ''.join(character for character in quiz_id if character.isalnum())
             if quiz_id.rstrip():
