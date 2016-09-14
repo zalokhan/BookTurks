@@ -8,7 +8,6 @@
 [![Issue Count](https://codeclimate.com/github/zalokhan/BookTurks/badges/issue_count.svg)](https://codeclimate.com/github/zalokhan/BookTurks)
 
 
-
 Link to deployed web service is [here](https://bookturks.herokuapp.com/)
 
 Travis build history [https://travis-ci.org/zalokhan/BookTurks](hhttps://travis-ci.org/zalokhan/BookTurks)
