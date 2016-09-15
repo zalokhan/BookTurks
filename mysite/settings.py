@@ -31,19 +31,16 @@ def get_env_variable(var_name, default=False):
         return os.environ[var_name]
     except KeyError:
         # try and catch to support both python 2 and python 3
-        try:
-            from StringIO import StringIO
-        except ImportError:
-            from io import StringIO
-        import ConfigParser
+        from io import StringIO
+        import configparser
         env_file = os.environ.get('PROJECT_ENV_FILE', PROJECT_ROOT + "/.env")
         try:
             config = StringIO()
             config.write("[DATA]\n")
             config.write(open(env_file).read())
             config.seek(0, os.SEEK_SET)
-            cp = ConfigParser.ConfigParser()
-            cp.readfp(config)
+            cp = configparser.ConfigParser()
+            cp.read_file(config)
             value = dict(cp.items('DATA'))[var_name.lower()]
             if value.startswith('"') and value.endswith('"'):
                 value = value[1:-1]
@@ -61,7 +58,6 @@ def get_env_variable(var_name, default=False):
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 """
 Environment Variables and keys.
