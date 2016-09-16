@@ -1,4 +1,2 @@
 mysite/.env
 *.pyc
-
-service/tests/chromedrivers

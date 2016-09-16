@@ -31,7 +31,11 @@ def get_local_driver():
     """
     if 'TRAVIS' in os.environ:
         return WebDriver()
-    return webdriver.Chrome(settings.BASE_DIR + '/service/tests/chromedrivers/chromedriver_mac64')
+    chromedriver_path = settings.BASE_DIR + '/service/tests/chromedrivers/chromedriver'
+    if os.path.isfile(chromedriver_path):
+        return webdriver.Chrome(chromedriver_path)
+    else:
+        raise FileNotFoundError("Chromedriver not found. Place file or link in {0}".format(chromedriver_path))
 
 
 class SeleniumTests(StaticLiveServerTestCase):
