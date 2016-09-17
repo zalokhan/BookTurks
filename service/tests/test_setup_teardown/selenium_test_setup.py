@@ -1,8 +1,8 @@
 import os
 
-import selenium.webdriver
 from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from selenium import webdriver
 from selenium.webdriver.firefox.webdriver import WebDriver
 
 
@@ -20,8 +20,8 @@ def get_sauce_driver(capabilities):
     capabilities['tags'] = [os.environ['TRAVIS_PYTHON_VERSION'], 'CI']
     capabilities['browserName'] = 'firefox'
 
-    return selenium.webdriver.Remote(desired_capabilities=capabilities,
-                                     command_executor="http://{0}/wd/hub".format(hub_url))
+    return webdriver.Remote(desired_capabilities=capabilities,
+                            command_executor="http://{0}/wd/hub".format(hub_url))
 
 
 def get_local_driver():
@@ -29,7 +29,13 @@ def get_local_driver():
     Returns local web driver
     :return:
     """
-    return WebDriver()
+    if 'TRAVIS' in os.environ:
+        return WebDriver()
+    chromedriver_path = settings.BASE_DIR + '/service/tests/chromedrivers/chromedriver'
+    if os.path.isfile(chromedriver_path):
+        return webdriver.Chrome(chromedriver_path)
+    else:
+        raise FileNotFoundError("Chromedriver not found. Place file or link in {0}".format(chromedriver_path))
 
 
 class SeleniumTests(StaticLiveServerTestCase):
@@ -37,6 +43,7 @@ class SeleniumTests(StaticLiveServerTestCase):
     Base setup and tear down for integration tests.
     Distribute into different files if integration tests grow.
     """
+
     @classmethod
     def setUpClass(cls):
         super(SeleniumTests, cls).setUpClass()
