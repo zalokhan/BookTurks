@@ -52,9 +52,13 @@ def user_quizarena_solve_view(request, quiz_id):
     if not quiz:
         set_alert_session(session=request.session, message="No such quiz present", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
-    content = quiz_tools.download_quiz_content(quiz_model=quiz)
-    if not content:
+    quiz_complete_model = quiz_tools.download_quiz_content(quiz_model=quiz)
+    if not quiz_complete_model:
         set_alert_session(session=request.session, message="This quiz is unavailable", alert_type=DANGER)
+        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
+
+    if quiz_tools.check_attempt_eligibility(request, quiz_complete_model, quiz_id):
+        set_alert_session(session=request.session, message="Attempts exceeded", alert_type=DANGER)
         return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
 
     context = {
@@ -62,9 +66,9 @@ def user_quizarena_solve_view(request, quiz_id):
         USER: request.user,
         ALERT_MESSAGE: alert_message,
         ALERT_TYPE: alert_type,
-        'quiz_form': content.quiz_form
+        'quiz_form': quiz_complete_model.quiz_form
     }
-    request.session['quiz'] = content.quiz_model
+    request.session['quiz'] = quiz_complete_model.quiz_model
 
     return render(request, USER_QUIZARENA_SOLVE_PAGE, context)
 

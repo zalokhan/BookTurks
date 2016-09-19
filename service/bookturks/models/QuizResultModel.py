@@ -34,4 +34,4 @@ class QuizResultModel(object):
                         "CORRECT SCORE : ", str(self.correct_score), "\n",
                         "WRONG SCORE : ", str(self.wrong_score), "\n",
                         "MAX SCORE : ", str(self.max_score), "\n",
-                        "ATTEMPTS : ", str(self.max_score)])
+                        "ATTEMPTS : ", str(self.attempts)])
