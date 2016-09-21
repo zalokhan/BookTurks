@@ -32,7 +32,7 @@ class QuizCreateTests(SeleniumTests):
 
         self.driver.find_element_by_id("sidebar_parent_quiz").click()
         # Wait for drop down to populate
-        WebDriverWait(driver=self.driver, timeout=3).until(
+        WebDriverWait(driver=self.driver, timeout=5).until(
             expected_conditions.visibility_of_element_located((By.ID, "sidebar_quiz_init"))
         )
 
@@ -51,12 +51,15 @@ class QuizCreateTests(SeleniumTests):
 
         # Edit properties of the element
         # Wait for javascript to animate movement of box
-        # WebDriverWait(driver=self.driver, timeout=3).until(
-        #     expected_conditions.visibility_of_element_located((By.ID, "frmb-0-fld-1-edit"))
-        # )
-        time.sleep(0.3)
+        WebDriverWait(driver=self.driver, timeout=10).until(
+            expected_conditions.visibility_of_element_located((By.ID, "frmb-0-fld-1-edit"))
+        )
+        # time.sleep(0.3)
         self.driver.find_element_by_id("frmb-0-fld-1-edit").click()
-        time.sleep(0.3)  # Wait for edit button to open dropdown
+        # Wait for edit button to open dropdown
+        WebDriverWait(driver=self.driver, timeout=10).until(
+            expected_conditions.visibility_of_element_located((By.CLASS_NAME, "close-field"))
+        )
         self.driver.find_element_by_class_name("close-field").click()
         # Submit quiz
         self.driver.find_element_by_id("frmb-0-submit").click()
@@ -72,24 +75,24 @@ class QuizCreateTests(SeleniumTests):
         self.driver.find_element_by_css_selector("button[data-id=testemailcommockquiz]").click()
         # Dismiss deletion
         # Wait for javascript to animate modal
-        # WebDriverWait(driver=self.driver, timeout=5).until(
-        #     expected_conditions.visibility_of_element_located(
-        #         (By.CSS_SELECTOR, "button[type=button][data-dismiss=modal]")
-        #     )
-        # )
-        time.sleep(0.3)
+        WebDriverWait(driver=self.driver, timeout=10).until(
+            expected_conditions.visibility_of_element_located(
+                (By.CSS_SELECTOR, "button[type=button][data-dismiss=modal]")
+            )
+        )
+        # time.sleep(0.3)
         self.driver.find_element_by_css_selector("button[type=button][data-dismiss=modal]").click()
 
         time.sleep(0.3)  # Wait for modal to fade away.
         # Delete quiz
         self.driver.find_element_by_css_selector("button[data-id=testemailcommockquiz]").click()
         # Wait for javascript to animate modal
-        # WebDriverWait(driver=self.driver, timeout=3).until(
-        #     expected_conditions.visibility_of_element_located(
-        #         (By.CSS_SELECTOR, "button[type=submit]")
-        #     )
-        # )
-        time.sleep(0.3)
+        WebDriverWait(driver=self.driver, timeout=10).until(
+            expected_conditions.visibility_of_element_located(
+                (By.CSS_SELECTOR, "button[type=submit]")
+            )
+        )
+        # time.sleep(0.3)
         self.driver.find_element_by_css_selector("button[type=submit]").click()
 
         user_profile_tools = UserProfileTools()
