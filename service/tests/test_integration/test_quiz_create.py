@@ -39,14 +39,16 @@ class QuizCreateTests(SeleniumTests):
         self.driver.find_element_by_id("sidebar_quiz_init").click()
         self.driver.find_element_by_name("quiz_name").send_keys("mock_quiz")
         self.driver.find_element_by_name("quiz_description").send_keys("mock_description")
-
         self.driver.find_element_by_id("quiz_init_form").submit()
+
+        # Drag and Drop
         action = ActionChains(self.driver)
-        x = self.driver.find_element_by_class_name("icon-radio-group")
-        y = self.driver.find_element_by_class_name("ui-sortable")
-        action.drag_and_drop(x, y)
+        draggable_radio_group = self.driver.find_element_by_class_name("icon-radio-group")
+        dragging_destination_box = self.driver.find_element_by_class_name("ui-sortable")
+        action.drag_and_drop(draggable_radio_group, dragging_destination_box)
         action.move_to_element(self.driver.find_element_by_id("frmb-0-stage-wrap"))
         action.perform()
+
         # Edit properties of the element
         # Wait for javascript to animate movement of box
         WebDriverWait(driver=self.driver, timeout=3).until(
@@ -57,12 +59,14 @@ class QuizCreateTests(SeleniumTests):
         # Submit quiz
         self.driver.find_element_by_id("frmb-0-submit").click()
 
+        # Mark answer for answer key
         self.driver.find_elements_by_css_selector("input[type=radio][value=option-1]")[0].click()
         self.driver.find_element_by_css_selector("button[type=submit]").click()
 
-        # Check myquiz and delete quiz
+        # Check myquiz
         self.driver.find_element_by_id("sidebar_parent_quiz").click()
         self.driver.find_element_by_id("sidebar_myquiz").click()
+        # Try deleting
         self.driver.find_element_by_css_selector("button[data-id=testemailcommockquiz]").click()
         # Dismiss deletion
         # Wait for javascript to animate modal
@@ -72,9 +76,10 @@ class QuizCreateTests(SeleniumTests):
             )
         )
         self.driver.find_element_by_css_selector("button[type=button][data-dismiss=modal]").click()
-        # Delete
+
         # Wait for modal to fade away.
         time.sleep(0.3)
+        # Delete quiz
         self.driver.find_element_by_css_selector("button[data-id=testemailcommockquiz]").click()
         # Wait for javascript to animate modal
         WebDriverWait(driver=self.driver, timeout=3).until(
