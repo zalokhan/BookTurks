@@ -18,7 +18,7 @@ def get_sauce_driver(capabilities):
     capabilities['tunnel-identifier'] = os.environ["TRAVIS_JOB_NUMBER"]
     capabilities['build'] = os.environ['TRAVIS_BUILD_NUMBER']
     capabilities['tags'] = [os.environ['TRAVIS_PYTHON_VERSION'], 'CI']
-    capabilities['browserName'] = 'firefox'
+    capabilities['browserName'] = 'chrome'
 
     return webdriver.Remote(desired_capabilities=capabilities,
                             command_executor="http://{0}/wd/hub".format(hub_url))
