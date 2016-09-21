@@ -241,4 +241,4 @@ STATICFILES_DIRS = [
 DROPBOX_CLIENT = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
 
 # Sauce Labs integration
-SAUCE_TEST = False
+SAUCE_TEST = True

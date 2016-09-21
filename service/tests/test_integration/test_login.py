@@ -19,28 +19,25 @@ class LoginTests(SeleniumTests):
         User.objects.create_user(username='test@email.com', email='test@email.com', password='password')
         mock_user_model.save()
 
-        self.selenium.get('{0}{1}'.format(self.live_server_url, '/'))
-        username_input = self.selenium.find_element_by_name("username")
-        username_input.send_keys('test@email.com')
-        password_input = self.selenium.find_element_by_name("password")
-        password_input.send_keys('password')
-        self.selenium.find_element_by_id('login_form').submit()
+        self.driver.get('{0}{1}'.format(self.live_server_url, '/'))
+        self.driver.find_element_by_name("username").send_keys('test@email.com')
+        self.driver.find_element_by_name("password").send_keys('password')
+        self.driver.find_element_by_id('login_form').submit()
 
-        assert self.selenium.current_url, '{0}{1}'.format(self.live_server_url, '/home/')
+        assert self.driver.current_url, '{0}{1}'.format(self.live_server_url, '/home/')
 
-        self.selenium.find_element_by_id('navbar_dropdown').click()
-        self.selenium.find_element_by_id('user_logout').click()
-        assert self.selenium.current_url, '{0}{1}'.format(self.live_server_url, '/')
+        self.driver.find_element_by_id('navbar_dropdown').click()
+        self.driver.find_element_by_id('user_logout').click()
+        assert self.driver.current_url, '{0}{1}'.format(self.live_server_url, '/')
 
         # Repeat to cover branch when user profile is created and present and has to be fetched.
-        self.selenium.get('{0}{1}'.format(self.live_server_url, '/'))
-        username_input = self.selenium.find_element_by_name("username")
-        username_input.send_keys('test@email.com')
-        password_input = self.selenium.find_element_by_name("password")
-        password_input.send_keys('password')
-        self.selenium.find_element_by_id('login_form').submit()
-        self.selenium.find_element_by_id('navbar_dropdown').click()
-        self.selenium.find_element_by_id('user_logout').click()
+        self.driver.get('{0}{1}'.format(self.live_server_url, '/'))
+        self.driver.find_element_by_name("username").send_keys('test@email.com')
+        self.driver.find_element_by_name("password").send_keys('password')
+        self.driver.find_element_by_id('login_form').submit()
+        # Clicking the logout button
+        self.driver.find_element_by_id('navbar_dropdown').click()
+        self.driver.find_element_by_id('user_logout').click()
 
         user_profile_tools = UserProfileTools()
         user_profile_tools.delete_profile_from_storage('test@email.com')
