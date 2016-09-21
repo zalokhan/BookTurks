@@ -4,6 +4,7 @@ import re
 from django.conf import settings
 from dropbox.exceptions import ApiError
 
+from service.bookturks.Constants import USER_PROFILE_MODEL
 from service.bookturks.adapters.QuizTagAdapter import QuizTagAdapter
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
 from service.bookturks.models.QuizResultModel import QuizResultModel
@@ -238,3 +239,21 @@ class QuizTools(object):
         """
         for tag in quiz.quiztag_set.all():
             QuizTagAdapter.unlink_quiz(tag_name=tag.tag_name, quiz_id=quiz.quiz_id)
+
+    @staticmethod
+    def check_attempt_eligibility(self, request, quiz_complete_model, quiz_id):
+        """
+        Checks if the user still has number of attempts left for this quiz
+        :return:
+        """
+        attempted = 0
+        user_profile_model = request.session.get(USER_PROFILE_MODEL)
+        attempted_quiz = user_profile_model.attempted_quiz
+        for quiz_result in attempted_quiz:
+            if quiz_result.quiz_model.quiz_id == quiz_id:
+                attempted = quiz_result.attempts
+                break
+
+        valid_attempts = int(quiz_complete_model.attempts)
+        if attempted >= valid_attempts:
+            return 1
