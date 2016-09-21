@@ -50,11 +50,11 @@ class SeleniumTests(StaticLiveServerTestCase):
         cls.capabilities = dict()
 
         if settings.SAUCE_TEST and 'TRAVIS' in os.environ:
-            cls.selenium = get_sauce_driver(cls.capabilities)
+            cls.driver = get_sauce_driver(cls.capabilities)
         else:
-            cls.selenium = get_local_driver()
+            cls.driver = get_local_driver()
 
     @classmethod
     def tearDownClass(cls):
-        cls.selenium.quit()
+        cls.driver.quit()
         super(SeleniumTests, cls).tearDownClass()
