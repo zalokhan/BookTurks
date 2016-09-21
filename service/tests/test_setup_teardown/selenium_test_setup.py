@@ -3,7 +3,6 @@ import os
 from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
-from selenium.webdriver.firefox.webdriver import WebDriver
 
 
 def get_sauce_driver(capabilities):
@@ -29,8 +28,6 @@ def get_local_driver():
     Returns local web driver
     :return:
     """
-    if 'TRAVIS' in os.environ:
-        return WebDriver()
     chromedriver_path = settings.BASE_DIR + '/service/tests/chromedrivers/chromedriver'
     if os.path.isfile(chromedriver_path):
         return webdriver.Chrome(chromedriver_path)
