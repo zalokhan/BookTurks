@@ -246,6 +246,10 @@ class QuizTools(object):
         Checks if the user still has number of attempts left for this quiz
         :return:
         """
+        # Infinite number of attempts.
+        if int(quiz_complete_model.attempts) is -1:
+            return
+
         attempted = 0
         for quiz_result in user_profile_model.attempted_quiz:
             if quiz_result.quiz_model.quiz_id == quiz_id:
