@@ -3,8 +3,9 @@ from django.core.urlresolvers import reverse
 from django.test import Client
 
 from service.bookturks.serializer import serialize
+from service.bookturks.Constants import USER_PROFILE_MODEL
 from service.tests.create_user import create_user, prepare_client
-from service.tests.constants_models import context, mock_quiz_complete_model
+from service.tests.constants_models import context, mock_quiz_complete_model, mock_user_profile_model
 from service.tests.test_setup_teardown.quiz_test_setup import QuizTest
 
 
@@ -71,6 +72,11 @@ class UserQuizArenaViewTest(QuizTest):
                                                        quiz_owner=self.mock_user)
         quiz_complete_model = mock_quiz_complete_model
         quiz_complete_model.quiz_model = quiz
+
+        # Preparing session for attempts check while solving quizzes. Needs user_profile_model
+        session = client.session
+        session[USER_PROFILE_MODEL] = mock_user_profile_model
+        session.save()
 
         # Preparing mock file for test
         with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
