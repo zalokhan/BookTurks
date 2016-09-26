@@ -39,7 +39,7 @@ def get_env_variable(var_name, default=False):
             config.write("[DATA]\n")
             config.write(open(env_file).read())
             config.seek(0, os.SEEK_SET)
-            cp = configparser.ConfigParser()
+            cp = configparser.RawConfigParser()
             cp.read_file(config)
             value = dict(cp.items('DATA'))[var_name.lower()]
             if value.startswith('"') and value.endswith('"'):
@@ -164,11 +164,11 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'MasterServiceDB',
-        'USER': 'MasterService',
-        'PASSWORD': 'MasterServiceDB',
-        'HOST': '',
-        'PORT': '',
+        'NAME': 'test1',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 

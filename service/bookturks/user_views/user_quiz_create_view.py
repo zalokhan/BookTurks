@@ -5,7 +5,7 @@ User Quiz Views
 from dateutil.parser import parse
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
@@ -68,7 +68,6 @@ def user_quiz_maker_view(request):
     user_adapter = UserAdapter()
     quiz_adapter = QuizAdapter()
     quiz_tag_adapter = QuizTagAdapter()
-    quiz_tools = QuizTools()
 
     context = {
         REQUEST: request,
@@ -88,15 +87,13 @@ def user_quiz_maker_view(request):
         # quiz_name could be None if there were errors in creating the model
         # Check if quiz_id is not set after creating the id. (This will mostly be true as we already have this check in
         # the javascript)
-        quiz_id = quiz_tools.get_quiz_id(username=user.username, quiz_name=quiz_name)
-
-        # Quiz ID is duplicate
-        if quiz_adapter.exists(quiz_id):
-            raise ValueError("Quiz ID already present")
+        quiz = quiz_adapter.get_quiz_for_owner(user, quiz_name)
+        if quiz:
+            raise ValueError("Quiz already present")
 
         # Create the quiz model
-        quiz = quiz_adapter.create_model(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description,
-                                         quiz_owner=user)
+        quiz = quiz_adapter.create_model(quiz_name=quiz_name, quiz_description=quiz_description,
+                                         quiz_owner=user, start_time=event_start_date_time, end_time=event_end_date_time)
 
         quiz_complete_model = QuizCompleteModel(quiz_model=quiz,
                                                 attempts=attempts,

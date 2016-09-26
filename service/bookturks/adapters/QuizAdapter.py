@@ -16,7 +16,7 @@ class QuizAdapter(object):
         pass
 
     @staticmethod
-    def create_and_save_model(quiz_id, quiz_name, quiz_description, quiz_owner):
+    def create_and_save_model(quiz_name, quiz_description, quiz_owner):
         """
         Creates and saves quiz object
         :param quiz_id:
@@ -25,21 +25,20 @@ class QuizAdapter(object):
         :param quiz_owner:
         :return:
         """
-        if not quiz_id or not quiz_id.strip() or \
-                not quiz_name or not quiz_name.strip() or \
+        if not quiz_name or not quiz_name.strip() or \
                 not quiz_description or not quiz_description.strip() or \
                 not quiz_owner:
             raise ValueError("Quiz model cannot be created. Parameter missing.")
 
-        if QuizAdapter.exists(quiz_id=quiz_id):
-            raise ValueError("Model already present")
-        else:
-            quiz = Quiz(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description, quiz_owner=quiz_owner)
-            quiz.save()
+        quiz = QuizAdapter.get_quiz_for_owner(quiz_owner, quiz_name)
+        if quiz:
+            raise ValueError("Quiz already present")
+        quiz = Quiz(quiz_name=quiz_name, quiz_description=quiz_description, quiz_owner=quiz_owner)
+        quiz.save()
         return quiz
 
     @staticmethod
-    def create_model(quiz_id, quiz_name, quiz_description, quiz_owner):
+    def create_model(quiz_name, quiz_description, quiz_owner, start_time, end_time):
         """
         Creates model
         :param quiz_id:
@@ -48,15 +47,17 @@ class QuizAdapter(object):
         :param quiz_owner:
         :return:
         """
-        if not quiz_id or not quiz_id.strip() or \
-                not quiz_name or not quiz_name.strip() or \
+        if not quiz_name or not quiz_name.strip() or \
                 not quiz_description or not quiz_description.strip() or \
                 not quiz_owner:
             raise ValueError("Quiz model cannot be created. Parameter missing.")
-        if QuizAdapter.exists(quiz_id=quiz_id):
-            raise ValueError("Model already present")
-        else:
-            quiz = Quiz(quiz_id=quiz_id, quiz_name=quiz_name, quiz_description=quiz_description, quiz_owner=quiz_owner)
+
+        quiz = QuizAdapter.get_quiz_for_owner(quiz_owner, quiz_name)
+        if quiz:
+            raise ValueError("Quiz already present")
+
+        quiz = Quiz(quiz_name=quiz_name, quiz_description=quiz_description, quiz_owner=quiz_owner,
+                    event_start=start_time, event_end=end_time)
         return quiz
 
     @staticmethod
@@ -90,6 +91,17 @@ class QuizAdapter(object):
         :return:
         """
         return Quiz.objects.filter(quiz_owner=user_model)
+
+    @staticmethod
+    def get_quiz_for_owner(user, quiz_name):
+        """
+        Returns the quiz owned by the user passed in the argument
+        :param user:
+        :param quiz_name:
+        :return:
+        """
+        # iexact is for making the quiz name case insensitive
+        return Quiz.objects.filter(quiz_name__iexact=quiz_name, quiz_owner=user)
 
     @staticmethod
     def get_all_models():
