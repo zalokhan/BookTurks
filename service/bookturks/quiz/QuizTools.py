@@ -23,24 +23,6 @@ class QuizTools(object):
         self.dbx = DropboxClient(settings.DROPBOX_CLIENT)
 
     @staticmethod
-    def get_quiz_id(username, quiz_name):
-        """
-        Concatenate to form the quiz_id
-        :param username:
-        :param quiz_name:
-        :return:
-        """
-        if not quiz_name.rstrip():
-            raise ValueError("Quiz Name cannot be blank")
-        quiz_id = "_".join([username, quiz_name.lower()])
-        if re.match("^[A-Za-z0-9_ -]*$", quiz_name):
-            quiz_id = ''.join(character for character in quiz_id if character.isalnum())
-            if quiz_id.rstrip():
-                return quiz_id
-        else:
-            raise ValueError("The quiz Name can contain ony alphanumeric characters, spaces, '-', '?' and '_'")
-
-    @staticmethod
     def create_filename(quiz):
         """
         Create filename for dropbox upload
