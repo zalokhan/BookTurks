@@ -1,11 +1,12 @@
 """
 User Quiz Views
 """
+import re
 
 from dateutil.parser import parse
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.utils import timezone
 
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
@@ -83,6 +84,12 @@ def user_quiz_maker_view(request):
 
         if not user:
             raise ValueError("User not recognized")
+
+        if not quiz_name.rstrip():
+            raise ValueError("Quiz Name cannot be blank")
+
+        if not re.match("^[A-Za-z0-9_ -]*$", quiz_name):
+            raise ValueError("The quiz Name can contain ony alphanumeric characters, spaces, '-', '?' and '_'")
 
         # quiz_name could be None if there were errors in creating the model
         # Check if quiz_id is not set after creating the id. (This will mostly be true as we already have this check in
