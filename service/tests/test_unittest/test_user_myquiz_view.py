@@ -1,11 +1,13 @@
+import uuid
+
 from django.conf import settings
 from django.contrib.auth.models import User as AuthUser
 from django.core.urlresolvers import reverse
 from django.test import Client
 
 from service.bookturks.serializer import serialize
-from service.tests.create_user import create_user, prepare_client
 from service.tests.constants_models import context, mock_quiz_complete_model
+from service.tests.create_user import create_user, prepare_client
 from service.tests.test_setup_teardown.quiz_test_setup import QuizTest
 
 
@@ -59,8 +61,7 @@ class UserMyquizViewTest(QuizTest):
         self.assertEqual(user.is_active, True)
         client.login(username=context.get('username'), password=context.get('password'))
         # Preparing quiz model to be displayed
-        self.quiz_adapter.create_and_save_model(quiz_id="test_id",
-                                                quiz_name="mock_name",
+        self.quiz_adapter.create_and_save_model(quiz_name="mock_name",
                                                 quiz_description="mock_description",
                                                 quiz_owner=self.mock_user)
 
@@ -80,8 +81,7 @@ class UserMyquizViewTest(QuizTest):
         self.assertEqual(user.is_active, True)
         client.login(username=context.get('username'), password=context.get('password'))
         # Preparing quiz model to be displayed
-        quiz = self.quiz_adapter.create_and_save_model(quiz_id="test_id",
-                                                       quiz_name="mock_name",
+        quiz = self.quiz_adapter.create_and_save_model(quiz_name="mock_name",
                                                        quiz_description="mock_description",
                                                        quiz_owner=self.mock_user)
         quiz_complete_model = mock_quiz_complete_model
@@ -93,7 +93,8 @@ class UserMyquizViewTest(QuizTest):
             mock_file.write(serialize(quiz_complete_model))
             mock_file.close()
 
-        response = client.post(reverse('service:user_myquiz_info', kwargs={'quiz_id': 'test_id'}), context, follow=True)
+        response = client.post(reverse('service:user_myquiz_info', kwargs={'quiz_id': quiz.quiz_id}),
+                               context, follow=True)
         self.assertEqual(response.status_code, 200)
         # Testing redirection
         redirect_chain = list()
@@ -114,7 +115,8 @@ class UserMyquizViewTest(QuizTest):
         client = prepare_client(client)
 
         # Quiz not yet created
-        response = client.post(reverse('service:user_myquiz_info', kwargs={'quiz_id': 'test_id'}), context, follow=True)
+        response = client.post(reverse('service:user_myquiz_info', kwargs={'quiz_id': uuid.uuid4()}),
+                               context, follow=True)
         self.assertEqual(response.status_code, 200)
         # Testing redirection
         redirect_chain = list()
@@ -122,8 +124,7 @@ class UserMyquizViewTest(QuizTest):
         self.assertEqual(response.redirect_chain, redirect_chain)
 
         # Preparing quiz model to be displayed
-        quiz = self.quiz_adapter.create_and_save_model(quiz_id="test_id",
-                                                       quiz_name="mock_name",
+        quiz = self.quiz_adapter.create_and_save_model(quiz_name="mock_name",
                                                        quiz_description="mock_description",
                                                        quiz_owner=self.mock_user)
         quiz_complete_model = mock_quiz_complete_model
@@ -136,7 +137,8 @@ class UserMyquizViewTest(QuizTest):
             mock_file.close()
 
         # User not allowed to modify this
-        response = client.post(reverse('service:user_myquiz_info', kwargs={'quiz_id': 'test_id'}), context, follow=True)
+        response = client.post(reverse('service:user_myquiz_info', kwargs={'quiz_id': quiz.quiz_id}),
+                               context, follow=True)
         self.assertEqual(response.status_code, 200)
         # Testing redirection
         redirect_chain = list()

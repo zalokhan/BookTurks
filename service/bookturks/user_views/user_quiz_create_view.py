@@ -58,6 +58,8 @@ def user_quiz_maker_view(request):
     local = timezone.get_current_timezone()
     event_model = None
     # TODO: Remove this from here and put it in a function.
+    event_start_date_time = None
+    event_end_date_time = None
     if start_date_time and end_date_time:
         event_start_date_time = (local.localize(parse(start_date_time), is_dst=None)).astimezone(timezone.utc)
         event_end_date_time = (local.localize(parse(end_date_time), is_dst=None)).astimezone(timezone.utc)
@@ -99,8 +101,11 @@ def user_quiz_maker_view(request):
             raise ValueError("Quiz already present")
 
         # Create the quiz model
-        quiz = quiz_adapter.create_model(quiz_name=quiz_name, quiz_description=quiz_description,
-                                         quiz_owner=user, start_time=event_start_date_time, end_time=event_end_date_time)
+        quiz = quiz_adapter.create_model(quiz_name=quiz_name,
+                                         quiz_description=quiz_description,
+                                         quiz_owner=user,
+                                         start_time=event_start_date_time,
+                                         end_time=event_end_date_time)
 
         quiz_complete_model = QuizCompleteModel(quiz_model=quiz,
                                                 attempts=attempts,
