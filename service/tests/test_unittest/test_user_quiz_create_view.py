@@ -81,10 +81,9 @@ class UserQuizCreateViewTest(QuizTest):
         user = create_user()
         quiz_parameters = dict(context)
 
-        quiz_parameters['quiz_name'] = 'test_quiz_name'
+        quiz_parameters['quiz_name'] = 'mock_name'
         quiz_parameters['quiz_description'] = 'test_quiz_description'
         quiz = self.quiz_adapter.create_and_save_model(
-            quiz_id=self.quiz_tools.get_quiz_id(user.username, quiz_parameters['quiz_name']),
             quiz_name="mock_name",
             quiz_description="mock_description",
             quiz_owner=self.mock_user)
@@ -226,7 +225,6 @@ class UserQuizCreateViewTest(QuizTest):
 
         # Preparing the context
         quiz_model = self.quiz_adapter.create_and_save_model(
-            quiz_id=self.quiz_tools.get_quiz_id(user.username, 'test_quiz_name'),
             quiz_name="mock_name",
             quiz_description="mock_description",
             quiz_owner=self.mock_user)
@@ -385,8 +383,7 @@ class UserQuizCreateViewTest(QuizTest):
         client.login(username=context.get('username'), password=context.get('password'))
         client = prepare_client(client)
         # Preparing quiz model to be deleted
-        quiz = self.quiz_adapter.create_and_save_model(quiz_id="test_id",
-                                                       quiz_name="mock_name",
+        quiz = self.quiz_adapter.create_and_save_model(quiz_name="mock_name",
                                                        quiz_description="mock_description",
                                                        quiz_owner=self.mock_user)
         quiz_parameters = dict(context)
@@ -420,8 +417,7 @@ class UserQuizCreateViewTest(QuizTest):
         client.login(username="mock2@mock.com", password=context.get('password'))
 
         # Preparing quiz model to be deleted
-        quiz = self.quiz_adapter.create_and_save_model(quiz_id="test_id",
-                                                       quiz_name="mock_name",
+        quiz = self.quiz_adapter.create_and_save_model(quiz_name="mock_name",
                                                        quiz_description="mock_description",
                                                        quiz_owner=self.mock_user)
         quiz_parameters = dict(context)

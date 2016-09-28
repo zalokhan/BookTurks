@@ -60,7 +60,7 @@ def user_setup_view(request):
     # User does not exist but has email field in social authentication
     elif request.user.email and str(request.user.email).strip():
         # Creating username from email address
-        username = "".join([str(request.user.pk), request.user.email])
+        username = request.user.email
         # username exists
         if user_adapter.exists(username):
             return HttpResponseRedirect(reverse(SERVICE_USER_HOME))
@@ -78,7 +78,7 @@ def user_setup_view(request):
     # User not present and no email field (facebook) so creating username from username and pk
     else:
         # Creating username from pk and username in auth
-        username = "".join([str(request.user.pk), request.user.username, "@bookturks.com"])
+        username = "".join([request.user.username, "@bookturks.com"])
         if user_adapter.exists(username):
             return HttpResponseRedirect(reverse(SERVICE_USER_HOME))
         else:

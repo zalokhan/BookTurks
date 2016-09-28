@@ -62,6 +62,7 @@ class QuizCreateAndDeleteTests(SeleniumTests):
         )
         self.driver.find_element_by_id("frmb-0-fld-1-edit").click()
         # Wait for edit button to open dropdown
+        time.sleep(0.2)
         WebDriverWait(driver=self.driver, timeout=10).until(
             expected_conditions.visibility_of_element_located((By.CLASS_NAME, "close-field"))
         )
@@ -79,8 +80,10 @@ class QuizCreateAndDeleteTests(SeleniumTests):
         """
         # The quiz has been created.
         # Check if it exists in database
-        self.assertIsNotNone(UserAdapter.exists('test@email.com'))
-        quiz_model = QuizAdapter.exists('testemailcommockquiz')
+        user = UserAdapter.exists('test@email.com')
+        self.assertIsNotNone(user)
+        quiz_model = QuizAdapter.get_quiz_for_owner(quiz_name="mock_quiz", user=user).all()[0]
+        quiz_id = quiz_model.quiz_id
         self.assertIsNotNone(quiz_model)
         # Also check if it is there in the database.
         quiz_tools = QuizTools()
@@ -93,8 +96,12 @@ class QuizCreateAndDeleteTests(SeleniumTests):
         # Check myquiz
         self.driver.find_element_by_id("sidebar_parent_quiz").click()
         self.driver.find_element_by_id("sidebar_myquiz").click()
-        # Try deleting
-        self.driver.find_element_by_css_selector("button[data-id=testemailcommockquiz]").click()
+
+        # The href with the uuid takes time to load so deleting with data-toggle=modal.
+        delete_buttons = self.driver.find_elements_by_css_selector("button[data-toggle=modal]")
+        self.assertEqual(len(delete_buttons), 1)
+        self.driver.find_element_by_css_selector("button[data-toggle=modal]").click()
+
         # Dismiss deletion
         # Wait for javascript to animate modal
         WebDriverWait(driver=self.driver, timeout=10).until(
@@ -106,7 +113,7 @@ class QuizCreateAndDeleteTests(SeleniumTests):
 
         time.sleep(0.3)  # Wait for modal to fade away.
         # Delete quiz
-        self.driver.find_element_by_css_selector("button[data-id=testemailcommockquiz]").click()
+        self.driver.find_element_by_css_selector("button[data-toggle=modal]").click()
         # Wait for javascript to animate modal
         WebDriverWait(driver=self.driver, timeout=10).until(
             expected_conditions.visibility_of_element_located(
@@ -120,7 +127,7 @@ class QuizCreateAndDeleteTests(SeleniumTests):
         Check if quiz deleted
         """
         # Check again database if entry still present
-        self.assertIsNone(QuizAdapter.exists('testemailcommockquiz'))
+        self.assertIsNone(QuizAdapter.exists(quiz_id))
         # Should be erased from the storage too
         self.assertIsNone(quiz_tools.download_quiz_content(quiz_model=quiz_model))
 

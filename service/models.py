@@ -40,8 +40,8 @@ class Quiz(models.Model):
     quiz_description = models.TextField(verbose_name="Quiz description", null=False, blank=False)
     quiz_owner = models.ForeignKey(User)
     quiz_creation_datetime = models.DateTimeField('quiz datetime', default=timezone.now)
-    event_start = models.DateTimeField(default=timezone.now)
-    event_end = models.DateTimeField(default=timezone.now)
+    event_start = models.DateTimeField(default=timezone.now, null=True)
+    event_end = models.DateTimeField(default=timezone.now, null=True)
 
     def __str__(self):
         return self.quiz_name + "  by " + str(self.quiz_owner.username)
