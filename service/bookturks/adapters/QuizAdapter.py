@@ -16,13 +16,14 @@ class QuizAdapter(object):
         pass
 
     @staticmethod
-    def create_and_save_model(quiz_name, quiz_description, quiz_owner):
+    def create_and_save_model(quiz_name, quiz_description, quiz_owner, start_time=None, end_time=None):
         """
         Creates and saves quiz object
-        :param quiz_id:
         :param quiz_name:
         :param quiz_description:
         :param quiz_owner:
+        :param start_time:
+        :param end_time:
         :return:
         """
         if not quiz_name or not quiz_name.strip() or \
@@ -33,18 +34,20 @@ class QuizAdapter(object):
         quiz = QuizAdapter.get_quiz_for_owner(quiz_owner, quiz_name)
         if quiz:
             raise ValueError("Quiz already present")
-        quiz = Quiz(quiz_name=quiz_name, quiz_description=quiz_description, quiz_owner=quiz_owner)
+        quiz = Quiz(quiz_name=quiz_name, quiz_description=quiz_description, quiz_owner=quiz_owner,
+                    event_start=start_time, event_end=end_time)
         quiz.save()
         return quiz
 
     @staticmethod
-    def create_model(quiz_name, quiz_description, quiz_owner, start_time, end_time):
+    def create_model(quiz_name, quiz_description, quiz_owner, start_time=None, end_time=None):
         """
         Creates model
-        :param quiz_id:
         :param quiz_name:
         :param quiz_description:
         :param quiz_owner:
+        :param start_time:
+        :param end_time:
         :return:
         """
         if not quiz_name or not quiz_name.strip() or \

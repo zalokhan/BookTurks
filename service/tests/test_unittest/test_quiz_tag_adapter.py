@@ -36,8 +36,7 @@ class QuizTagAdapterTest(TestCase):
                                                        dob=context.get('user_dob'))
 
         # Create and save quiz with the above user as owner.
-        quiz_model = self.quiz_adapter.create_and_save_model(quiz_id="quiz_id",
-                                                             quiz_name="quiz_name",
+        quiz_model = self.quiz_adapter.create_and_save_model(quiz_name="quiz_name",
                                                              quiz_description="quiz_description",
                                                              quiz_owner=user)
 
