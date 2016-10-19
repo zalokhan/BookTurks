@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 
-from service.bookturks.user.UserProfileTools import UserProfileTools
+from service.bookturks.utils.UserProfileTools import UserProfileTools
 from service.tests.constants_models import mock_user_model
 from service.tests.test_setup_teardown.selenium_test_setup import SeleniumTests
 

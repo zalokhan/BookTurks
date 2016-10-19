@@ -88,7 +88,7 @@ class UserMyquizViewTest(QuizTest):
         quiz_complete_model.quiz_model = quiz
 
         # Preparing mock file for test
-        with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_tools.create_filename(quiz)]),
+        with open("".join([settings.BASE_DIR, "/service/tmp", self.quiz_storage_handler.create_filename(quiz)]),
                   'wb') as mock_file:
             mock_file.write(serialize(quiz_complete_model))
             mock_file.close()

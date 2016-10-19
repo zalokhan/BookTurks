@@ -1,5 +1,5 @@
 from service.bookturks.adapters.UserAdapter import UserAdapter
-from service.bookturks.user.UserProfileTools import UserProfileTools
+from service.bookturks.utils.UserProfileTools import UserProfileTools
 
 
 def get_avatar(backend, strategy, details, response, user=None, *args, **kwargs):

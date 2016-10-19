@@ -1,14 +1,13 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout
-
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
-from service.bookturks.alerts import set_alert_session
 from service.bookturks.Constants import USERNAME, PASSWORD, DANGER, SERVICE_MAIN_HOME, SERVICE_USER_HOME, \
     SERVICE_USER_SETUP
 from service.bookturks.adapters.UserAdapter import UserAdapter
+from service.bookturks.alerts import set_alert_session
 
 
 def login_check_view(request):
@@ -24,25 +23,28 @@ def login_check_view(request):
     # Authenticate the user with the provided username and password.
     # Django authentication is used here.
     user = authenticate(username=username, password=password)
-    if user is not None:
-        if user.is_active:
-            # Authentication successful
-            auth_login(request, user)
-            return HttpResponseRedirect(reverse(SERVICE_USER_SETUP))
+
+    try:
+        if user is not None:
+            if user.is_active:
+                # Authentication successful
+                auth_login(request, user)
+                return HttpResponseRedirect(reverse(SERVICE_USER_SETUP))
+
+            else:
+                # Authentication failure as user was disabled.
+                # Creating respective alerts.
+                raise ValueError("This account has been disabled. Contact the admin.")
 
         else:
-            # Authentication failure as user was disabled.
-            # Creating respective alerts.
-            set_alert_session(session=request.session, message="This account has been disabled. Contact the admin.",
-                              alert_type=DANGER)
-            return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))
-
-    else:
-        # Authentication failure
-        # the authentication system was unable to verify the username and password
-        set_alert_session(session=request.session, message="The username or password were incorrect.",
+            # Authentication failure
+            # the authentication system was unable to verify the username and password
+            raise ValueError("The username or password were incorrect.")
+    except ValueError as err:
+        set_alert_session(session=request.session,
+                          message=str(err),
                           alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))
+    return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))
 
 
 def user_setup_view(request):

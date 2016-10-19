@@ -3,8 +3,9 @@ from django.test import TestCase
 
 from service.bookturks.adapters.QuizAdapter import QuizAdapter
 from service.bookturks.adapters.UserAdapter import UserAdapter
-from service.bookturks.quiz.QuizTools import QuizTools
+from service.bookturks.utils.QuizTools import QuizTools
 from service.tests.dropbox_tools import mock_dropbox, restore_dropbox
+from service.bookturks.storage_handlers.QuizStorageHandler import QuizStorageHandler
 
 
 class QuizTest(TestCase):
@@ -23,6 +24,7 @@ class QuizTest(TestCase):
         self.user_adapter = UserAdapter()
         self.quiz_adapter = QuizAdapter()
         self.quiz_tools = QuizTools()
+        self.quiz_storage_handler = QuizStorageHandler()
         mock_dropbox(self, mock_dbx)
 
         # Creating test user in database

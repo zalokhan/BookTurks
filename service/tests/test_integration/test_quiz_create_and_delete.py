@@ -7,8 +7,8 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
 from service.bookturks.adapters import UserAdapter, QuizAdapter
-from service.bookturks.quiz.QuizTools import QuizTools
-from service.bookturks.user.UserProfileTools import UserProfileTools
+from service.bookturks.storage_handlers import QuizStorageHandler
+from service.bookturks.utils.UserProfileTools import UserProfileTools
 from service.tests.constants_models import mock_user_model
 from service.tests.test_setup_teardown.selenium_test_setup import SeleniumTests
 
@@ -85,9 +85,9 @@ class QuizCreateAndDeleteTests(SeleniumTests):
         quiz_model = QuizAdapter.get_quiz_for_owner(quiz_name="mock_quiz", user=user).all()[0]
         quiz_id = quiz_model.quiz_id
         self.assertIsNotNone(quiz_model)
-        # Also check if it is there in the database.
-        quiz_tools = QuizTools()
-        self.assertIsNotNone(quiz_tools.download_quiz_content(quiz_model=quiz_model))
+        # Also check if it is there in the storage.
+        quiz_storage_handler = QuizStorageHandler()
+        self.assertIsNotNone(quiz_storage_handler.download_quiz_content(quiz_model=quiz_model))
 
         """
         Part 3.
@@ -129,7 +129,7 @@ class QuizCreateAndDeleteTests(SeleniumTests):
         # Check again database if entry still present
         self.assertIsNone(QuizAdapter.exists(quiz_id))
         # Should be erased from the storage too
-        self.assertIsNone(quiz_tools.download_quiz_content(quiz_model=quiz_model))
+        self.assertIsNone(quiz_storage_handler.download_quiz_content(quiz_model=quiz_model))
 
         user_profile_tools = UserProfileTools()
         user_profile_tools.delete_profile_from_storage('test@email.com')

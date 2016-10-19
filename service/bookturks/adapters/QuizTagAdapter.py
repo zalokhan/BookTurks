@@ -25,13 +25,8 @@ class QuizTagAdapter(object):
         :param tag_name:
         :return:
         """
-        if not tag_name:
-            raise ValueError("tag_name cannot be empty or None")
-        if QuizTagAdapter.exists(tag_name):
-            raise ValueError("Cannot create new tag. Tag already exists")
-        else:
-            quiz_tag = QuizTag(tag_name=tag_name)
-            quiz_tag.save()
+        quiz_tag = QuizTagAdapter.create_model(tag_name)
+        quiz_tag.save()
         return quiz_tag
 
     @staticmethod
