@@ -9,7 +9,7 @@ from service.bookturks.adapters import QuizAdapter, UserAdapter
 from service.bookturks.alerts import set_alert_session
 from service.bookturks.decorators.Controller import controller
 from service.bookturks.models import ControllerModel
-from service.bookturks.storage_handlers import QuizStorageHandler
+from service.bookturks.storage_handlers import QuizStorageHandler, UserProfileStorageHandler
 from service.bookturks.utils import QuizChecker, QuizTools, UserProfileTools
 
 
@@ -74,6 +74,7 @@ def user_quizarena_result_view(request):
 
     user_adapter = UserAdapter()
     quiz_storage_handler = QuizStorageHandler()
+    user_profile_storage_handler = UserProfileStorageHandler()
     quiz_checker = QuizChecker()
     # Get the user model from the request.
     user = user_adapter.get_user_instance_from_django_user(request.user)
@@ -101,8 +102,7 @@ def user_quizarena_result_view(request):
     # Save result in model
     UserProfileTools.save_attempted_quiz_profile(session=request.session, quiz_result_model=quiz_result_model)
     # Save the profile
-    user_profile_tools = UserProfileTools()
-    future = user_profile_tools.save_profile(request.session)
+    future = user_profile_storage_handler.save_profile(request.session)
 
     context = {'result': quiz_result_model}
 

@@ -7,8 +7,7 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
 from service.bookturks.adapters import UserAdapter, QuizAdapter
-from service.bookturks.storage_handlers import QuizStorageHandler
-from service.bookturks.utils.UserProfileTools import UserProfileTools
+from service.bookturks.storage_handlers import QuizStorageHandler, UserProfileStorageHandler
 from service.tests.constants_models import mock_user_model
 from service.tests.test_setup_teardown.selenium_test_setup import SeleniumTests
 
@@ -131,5 +130,5 @@ class QuizCreateAndDeleteTests(SeleniumTests):
         # Should be erased from the storage too
         self.assertIsNone(quiz_storage_handler.download_quiz_content(quiz_model=quiz_model))
 
-        user_profile_tools = UserProfileTools()
-        user_profile_tools.delete_profile_from_storage('test@email.com')
+        user_profile_storage_handler = UserProfileStorageHandler()
+        user_profile_storage_handler.delete_profile_from_storage('test@email.com')

@@ -18,13 +18,12 @@ def user_home_main_view(request):
     :return: Renders user_home page (dashboard)
     """
     user_adapter = UserAdapter()
-    user_profile_tools = UserProfileTools()
 
     if USER_PROFILE_MODEL not in request.session:
         user_model = user_adapter.get_user_instance_from_django_user(request.user)
         if not user_model:
             return ControllerModel(view=SERVICE_USER_SETUP, redirect=True)
-        request.session[USER_PROFILE_MODEL] = user_profile_tools.get_profile(user_model)
+        request.session[USER_PROFILE_MODEL] = UserProfileTools.get_profile(user_model)
 
     context = {
         USER_PROFILE_MODEL: request.session.get(USER_PROFILE_MODEL)

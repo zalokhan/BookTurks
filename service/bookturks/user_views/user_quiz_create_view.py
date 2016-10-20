@@ -15,7 +15,7 @@ from service.bookturks.models import ControllerModel
 from service.bookturks.models.QuizCompleteModel import QuizCompleteModel
 from service.bookturks.parser.QuizParser import QuizParser
 from service.bookturks.session_handler import session_insert_keys, session_remove_keys
-from service.bookturks.storage_handlers import QuizStorageHandler
+from service.bookturks.storage_handlers import QuizStorageHandler, UserProfileStorageHandler
 from service.bookturks.utils import QuizTools, UserProfileTools
 
 
@@ -154,6 +154,7 @@ def user_quiz_create_view(request):
     quiz_adapter = QuizAdapter()
     quiz_tag_adapter = QuizTagAdapter()
     quiz_storage_handler = QuizStorageHandler()
+    user_profile_storage_handler = UserProfileStorageHandler()
 
     answer_key = request.POST
     quiz_complete_model = request.session.get('quiz_complete_model')
@@ -195,8 +196,7 @@ def user_quiz_create_view(request):
     UserProfileTools.save_my_quiz_profile(session=request.session, quiz_model=quiz_complete_model.quiz_model)
 
     # Save the profile
-    user_profile_tools = UserProfileTools()
-    future = user_profile_tools.save_profile(request.session)
+    future = user_profile_storage_handler.save_profile(request.session)
     # Wait for asynchronous callback
     future.result()
 
@@ -215,6 +215,8 @@ def user_quiz_delete_view(request):
     """
     quiz_tools = QuizTools()
     quiz_storage_handler = QuizStorageHandler()
+    user_profile_storage_handler = UserProfileStorageHandler()
+
     user_adapter = UserAdapter()
     quiz_adapter = QuizAdapter()
 
@@ -239,8 +241,7 @@ def user_quiz_delete_view(request):
         UserProfileTools.remove_my_quiz_profile(session=request.session, quiz_model=quiz)
 
         # Save the profile
-        user_profile_tools = UserProfileTools()
-        future = user_profile_tools.save_profile(request.session)
+        future = user_profile_storage_handler.save_profile(request.session)
         # Wait for asynchronous callback
         future.result()
 
