@@ -26,17 +26,8 @@ class UserAdapter(object):
         :param dob:
         :return: True if new user created or already present else false
         """
-        if not username or not username.strip():
-            raise ValueError("User model cannot be created. Parameter missing.")
-        if UserAdapter.exists(username=username):
-            raise ValueError("User Model already present")
-        else:
-            user = User(username=username,
-                        user_first_name=first_name,
-                        user_last_name=last_name,
-                        user_phone=phone,
-                        user_dob=dob)
-            user.save()
+        user = UserAdapter.create_model(username, first_name, last_name, phone, dob)
+        user.save()
         return user
 
     @staticmethod

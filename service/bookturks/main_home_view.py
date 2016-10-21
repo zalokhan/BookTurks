@@ -1,10 +1,9 @@
-from django.shortcuts import render
-
-from service.bookturks.alerts import init_alerts
-
-from service.bookturks.Constants import ALERT_MESSAGE, ALERT_TYPE, MAIN_HOME_PAGE, USER, REQUEST
+from service.bookturks.Constants import MAIN_HOME_PAGE
+from service.bookturks.decorators.Controller import controller
+from service.bookturks.models import ControllerModel
 
 
+@controller
 def main_home_view(request):
     """
     Main home page
@@ -12,15 +11,4 @@ def main_home_view(request):
     :param request: user request
     :return: renders a page with context
     """
-    # Clearing and displaying any alerts passed
-    request, alert_type, alert_message = init_alerts(request=request)
-
-    # Creating context
-    context = {
-        REQUEST: request,
-        USER: request.user,
-        ALERT_MESSAGE: alert_message,
-        ALERT_TYPE: alert_type
-    }
-
-    return render(request, MAIN_HOME_PAGE, context)
+    return ControllerModel(view=MAIN_HOME_PAGE, redirect=False)

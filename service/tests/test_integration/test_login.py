@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 
-from service.bookturks.user.UserProfileTools import UserProfileTools
+from service.bookturks.storage_handlers import UserProfileStorageHandler
 from service.tests.constants_models import mock_user_model
 from service.tests.test_setup_teardown.selenium_test_setup import SeleniumTests
 
@@ -39,5 +39,5 @@ class LoginTests(SeleniumTests):
         self.driver.find_element_by_id('navbar_dropdown').click()
         self.driver.find_element_by_id('user_logout').click()
 
-        user_profile_tools = UserProfileTools()
-        user_profile_tools.delete_profile_from_storage('test@email.com')
+        user_profile_storage_handler = UserProfileStorageHandler()
+        user_profile_storage_handler.delete_profile_from_storage('test@email.com')

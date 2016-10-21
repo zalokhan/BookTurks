@@ -1,0 +1,2 @@
+from service.bookturks.storage_handlers.QuizStorageHandler import QuizStorageHandler
+from service.bookturks.storage_handlers.UserProfileStorageHandler import UserProfileStorageHandler
