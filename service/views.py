@@ -14,6 +14,8 @@ from service.bookturks.user_views.user_quiz_create_view import user_quiz_init_vi
 from service.bookturks.user_views.user_quizarena_view import user_quizarena_home_view, user_quizarena_solve_view, \
     user_quizarena_result_view
 from service.bookturks.user_views.user_story_view import user_story_home_view
+from service.bookturks.user_views.user_resetPassword_view import get_username_password_reset_view, \
+    get_password_confirmation
 
 
 def main_home(request):
@@ -197,3 +199,16 @@ def user_story_home(request):
     :return:
     """
     return user_story_home_view(request)
+
+
+def reset_password(request):
+    """
+    Reset password view
+    :param request:
+    :return:
+    """
+    return get_username_password_reset_view(request)
+
+
+def reset_password_confirm(request, uidb64=None, token=None, *args, **kwargs):
+    return get_password_confirmation(request, uidb64, token, *args, **kwargs)

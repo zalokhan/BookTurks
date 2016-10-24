@@ -14,6 +14,12 @@ urlpatterns = [
     # Sets up the user profile and user models
     url(r'^usersetup/$', views.user_setup, name='user_setup'),
 
+    # Reset Password Confirmation
+    url(r'^reset_password_confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', views.reset_password_confirm,
+        name='reset_password_confirm'),
+    # Reset Password
+    url(r'^reset_password/$', views.reset_password, name='reset_password'),
+
     # Register new user
     url(r'^register/$', views.register, name='register'),
 

@@ -11,3 +11,4 @@ coveralls
 mock
 dropbox
 selenium
+sendgrid
