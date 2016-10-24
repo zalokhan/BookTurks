@@ -26,16 +26,7 @@ class QuizAdapter(object):
         :param end_time:
         :return:
         """
-        if not quiz_name or not quiz_name.strip() or \
-                not quiz_description or not quiz_description.strip() or \
-                not quiz_owner:
-            raise ValueError("Quiz model cannot be created. Parameter missing.")
-
-        quiz = QuizAdapter.get_quiz_for_owner(quiz_owner, quiz_name)
-        if quiz:
-            raise ValueError("Quiz already present")
-        quiz = Quiz(quiz_name=quiz_name, quiz_description=quiz_description, quiz_owner=quiz_owner,
-                    event_start=start_time, event_end=end_time)
+        quiz = QuizAdapter.create_model(quiz_name, quiz_description, quiz_owner, start_time, end_time)
         quiz.save()
         return quiz
 

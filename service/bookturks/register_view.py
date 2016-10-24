@@ -4,16 +4,16 @@ Registration handling
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 
 from service.bookturks.Constants import USERNAME, PASSWORD, REPASSWORD, USER_FIRST_NAME, USER_LAST_NAME, USER_PHONE, \
-    USER_DOB, \
-    ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS, \
-    SERVICE_REGISTER, SERVICE_MAIN_HOME, REGISTER_PAGE
+    USER_DOB, DANGER, SUCCESS, SERVICE_REGISTER, SERVICE_MAIN_HOME, REGISTER_PAGE
 from service.bookturks.adapters.UserAdapter import UserAdapter
-from service.bookturks.alerts import init_alerts, set_alert_session
+from service.bookturks.alerts import set_alert_session
+from service.bookturks.decorators.Controller import controller
+from service.bookturks.models import ControllerModel
 
 
+@controller
 def register_view(request):
     """
     Register
@@ -21,8 +21,7 @@ def register_view(request):
     :param request: User request
     :return: Renders page
     """
-    request, alert_type, alert_message = init_alerts(request=request)
-    return render(request, REGISTER_PAGE, {ALERT_MESSAGE: alert_message, ALERT_TYPE: alert_type})
+    return ControllerModel(view=REGISTER_PAGE, redirect=False)
 
 
 def register_check_view(request):

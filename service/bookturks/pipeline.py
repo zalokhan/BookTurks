@@ -1,5 +1,6 @@
 from service.bookturks.adapters.UserAdapter import UserAdapter
-from service.bookturks.user.UserProfileTools import UserProfileTools
+from service.bookturks.storage_handlers import UserProfileStorageHandler
+from service.bookturks.utils.UserProfileTools import UserProfileTools
 
 
 def get_avatar(backend, strategy, details, response, user=None, *args, **kwargs):
@@ -25,10 +26,12 @@ def get_avatar(backend, strategy, details, response, user=None, *args, **kwargs)
         ext = url.split('.')[-1]
     if url:
         user_adapter = UserAdapter()
-        user_profile_tools = UserProfileTools()
+        user_profile_storage_handler = UserProfileStorageHandler()
         user_model = user_adapter.get_user_instance_from_django_user(user)
+        
         if user_model:
-            user_profile_model = user_profile_tools.get_profile(user_model=user_model)
+            user_profile_model = UserProfileTools.get_profile(user_model=user_model)
             user_profile_model.display_picture = url
-            user_profile_tools.upload_profile(filename=user_profile_tools.create_filename(user_model.username),
-                                              content=user_profile_tools.create_content(user_profile_model))
+            user_profile_storage_handler.upload_profile(
+                filename=UserProfileStorageHandler.create_filename(user_model.username),
+                content=UserProfileStorageHandler.create_content(user_profile_model))

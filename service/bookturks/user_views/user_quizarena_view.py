@@ -1,41 +1,34 @@
 """
 Arena to attempt quizzes
 """
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
 
-from service.bookturks.adapters.UserAdapter import UserAdapter
-from service.bookturks.adapters.QuizAdapter import QuizAdapter
-from service.bookturks.quiz.QuizTools import QuizTools
-from service.bookturks.user.UserProfileTools import UserProfileTools
-
-from service.bookturks.alerts import init_alerts, set_alert_session
-from service.bookturks.Constants import REQUEST, USER, ALERT_MESSAGE, ALERT_TYPE, DANGER, \
-    USER_QUIZARENA_HOME_PAGE, SERVICE_USER_QUIZARENA_HOME, USER_QUIZARENA_SOLVE_PAGE, USER_QUIZARENA_RESULT_PAGE, USER_PROFILE_MODEL
+from service.bookturks.Constants import DANGER, \
+    USER_QUIZARENA_HOME_PAGE, SERVICE_USER_QUIZARENA_HOME, USER_QUIZARENA_SOLVE_PAGE, USER_QUIZARENA_RESULT_PAGE, \
+    USER_PROFILE_MODEL
+from service.bookturks.adapters import QuizAdapter, UserAdapter
+from service.bookturks.alerts import set_alert_session
+from service.bookturks.decorators.Controller import controller
+from service.bookturks.models import ControllerModel
+from service.bookturks.storage_handlers import QuizStorageHandler, UserProfileStorageHandler
+from service.bookturks.utils import QuizChecker, QuizTools, UserProfileTools
 
 
+@controller
 def user_quizarena_home_view(request):
     """
     Home page for the quiz arena
     :param request:
     :return:
     """
-    request, alert_type, alert_message = init_alerts(request=request)
     quiz_adapter = QuizAdapter()
 
     quiz_list = quiz_adapter.get_all_models()
-    context = {
-        REQUEST: request,
-        USER: request.user,
-        ALERT_MESSAGE: alert_message,
-        ALERT_TYPE: alert_type,
-        'quiz_list': quiz_list
-    }
+    context = {'quiz_list': quiz_list}
 
-    return render(request, USER_QUIZARENA_HOME_PAGE, context)
+    return ControllerModel(view=USER_QUIZARENA_HOME_PAGE, redirect=False, context=context)
 
 
+@controller
 def user_quizarena_solve_view(request, quiz_id):
     """
     Attempt the quiz here. Setup for the player to attempt.
@@ -44,15 +37,15 @@ def user_quizarena_solve_view(request, quiz_id):
     :param quiz_id:
     :return:
     """
-    request, alert_type, alert_message = init_alerts(request=request)
     quiz_adapter = QuizAdapter()
     quiz_tools = QuizTools()
+    quiz_storage_handler = QuizStorageHandler()
 
     quiz = quiz_adapter.exists(quiz_id)
     try:
         if not quiz:
             raise ValueError("No such quiz present")
-        quiz_complete_model = quiz_tools.download_quiz_content(quiz_model=quiz)
+        quiz_complete_model = quiz_storage_handler.download_quiz_content(quiz_model=quiz)
         if not quiz_complete_model:
             raise ValueError("This quiz is unavailable")
 
@@ -62,64 +55,60 @@ def user_quizarena_solve_view(request, quiz_id):
         set_alert_session(session=request.session,
                           message=str(err),
                           alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
-    context = {
-        REQUEST: request,
-        USER: request.user,
-        ALERT_MESSAGE: alert_message,
-        ALERT_TYPE: alert_type,
-        'quiz_form': quiz_complete_model.quiz_form
-    }
+        return ControllerModel(view=SERVICE_USER_QUIZARENA_HOME, redirect=True)
+    context = {'quiz_form': quiz_complete_model.quiz_form}
+
     request.session['quiz'] = quiz_complete_model.quiz_model
 
-    return render(request, USER_QUIZARENA_SOLVE_PAGE, context)
+    return ControllerModel(view=USER_QUIZARENA_SOLVE_PAGE, redirect=False, context=context)
 
 
+@controller
 def user_quizarena_result_view(request):
     """
     Result of the quiz attempt
     :param request:
     :return:
     """
-    request, alert_type, alert_message = init_alerts(request=request)
     quiz = request.session.get('quiz')
 
     user_adapter = UserAdapter()
-    quiz_tools = QuizTools()
+    quiz_storage_handler = QuizStorageHandler()
+    user_profile_storage_handler = UserProfileStorageHandler()
+    quiz_checker = QuizChecker()
     # Get the user model from the request.
     user = user_adapter.get_user_instance_from_django_user(request.user)
 
-    if not quiz or not user:
-        set_alert_session(session=request.session, message="Invalid quiz attempt.", alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
+    try:
+        if not quiz or not user:
+            raise ValueError("Invalid quiz attempt.")
 
-    content = quiz_tools.download_quiz_content(quiz_model=quiz)
-    if not content:
-        set_alert_session(session=request.session, message="This quiz is unavailable", alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZARENA_HOME))
+        content = quiz_storage_handler.download_quiz_content(quiz_model=quiz)
 
-    answer_key = content.answer_key
-    user_answer_key = dict(request.POST)
+        if not content:
+            raise ValueError("This quiz is unavailable")
 
-    quiz_result_model = quiz_tools.get_quiz_result(quiz_model=quiz, answer_key=answer_key,
-                                                   user_answer_key=user_answer_key)
+        answer_key = content.answer_key
+        user_answer_key = dict(request.POST)
+
+        quiz_result_model = quiz_checker.get_quiz_result(quiz_model=quiz, answer_key=answer_key,
+                                                         user_answer_key=user_answer_key)
+    except ValueError as err:
+        set_alert_session(session=request.session,
+                          message=str(err),
+                          alert_type=DANGER)
+        return ControllerModel(view=SERVICE_USER_QUIZARENA_HOME, redirect=True)
+
     # Save result in model
     UserProfileTools.save_attempted_quiz_profile(session=request.session, quiz_result_model=quiz_result_model)
     # Save the profile
-    user_profile_tools = UserProfileTools()
-    future = user_profile_tools.save_profile(request.session)
+    future = user_profile_storage_handler.save_profile(request.session)
 
-    context = {
-        REQUEST: request,
-        USER: request.user,
-        ALERT_MESSAGE: alert_message,
-        ALERT_TYPE: alert_type,
-        'result': quiz_result_model
-    }
+    context = {'result': quiz_result_model}
 
     # Clearing the session
     del request.session['quiz']
 
     # Wait for asynchronous callback
     future.result()
-    return render(request, USER_QUIZARENA_RESULT_PAGE, context)
+    return ControllerModel(view=USER_QUIZARENA_RESULT_PAGE, redirect=False, context=context)

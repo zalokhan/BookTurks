@@ -3,43 +3,35 @@ User Quiz Views
 """
 import re
 
-from dateutil.parser import parse
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
-from django.utils import timezone
 
 from service.bookturks.Constants import SERVICE_USER_QUIZ_INIT, SERVICE_USER_HOME, USER_QUIZ_INIT_PAGE, \
-    USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, SERVICE_USER_MYQUIZ_HOME, REQUEST, USER, \
-    ALERT_MESSAGE, ALERT_TYPE, DANGER, SUCCESS
+    USER_QUIZ_MAKER_PAGE, USER_QUIZ_VERIFIER_PAGE, SERVICE_USER_MYQUIZ_HOME, DANGER, SUCCESS
 from service.bookturks.adapters import UserAdapter, QuizAdapter, QuizTagAdapter
-from service.bookturks.alerts import init_alerts, set_alert_session
-from service.bookturks.models.EventModel import EventModel
+from service.bookturks.alerts import set_alert_session
+from service.bookturks.decorators.Controller import controller
+from service.bookturks.models import ControllerModel
 from service.bookturks.models.QuizCompleteModel import QuizCompleteModel
-from service.bookturks.quiz.QuizTools import QuizTools
+from service.bookturks.parser.QuizParser import QuizParser
 from service.bookturks.session_handler import session_insert_keys, session_remove_keys
-from service.bookturks.user.UserProfileTools import UserProfileTools
+from service.bookturks.storage_handlers import QuizStorageHandler, UserProfileStorageHandler
+from service.bookturks.utils import QuizTools, UserProfileTools
 
 
+@controller
 def user_quiz_init_view(request):
     """
     Landing quiz page and verifier and name checker
     :param request: User request
     :return: renders quiz name form
     """
-
-    request, alert_type, alert_message = init_alerts(request=request)
-    context = {
-        REQUEST: request,
-        USER: request.user,
-        ALERT_MESSAGE: alert_message,
-        ALERT_TYPE: alert_type,
-        # "quiz_tag_names": json.dumps(quiz_tag_names, ensure_ascii=False)
-    }
-
-    return render(request, USER_QUIZ_INIT_PAGE, context)
+    # Add this for typeahead
+    # "quiz_tag_names": json.dumps(quiz_tag_names, ensure_ascii=False)
+    return ControllerModel(view=USER_QUIZ_INIT_PAGE, redirect=False)
 
 
+@controller
 def user_quiz_maker_view(request):
     """
     Quiz creation page for user
@@ -55,29 +47,10 @@ def user_quiz_maker_view(request):
     pass_percentage = request.POST.get('pass_percentage')
     tag_names = request.POST.get('quiz_tags')
 
-    local = timezone.get_current_timezone()
-    event_model = None
-    # TODO: Remove this from here and put it in a function.
-    event_start_date_time = None
-    event_end_date_time = None
-    if start_date_time and end_date_time:
-        event_start_date_time = (local.localize(parse(start_date_time), is_dst=None)).astimezone(timezone.utc)
-        event_end_date_time = (local.localize(parse(end_date_time), is_dst=None)).astimezone(timezone.utc)
-        event_model = EventModel(start_time=event_start_date_time, end_time=event_end_date_time)
-
-    request, alert_type, alert_message = init_alerts(request=request)
-
     # Initialize the adapters.
     user_adapter = UserAdapter()
     quiz_adapter = QuizAdapter()
     quiz_tag_adapter = QuizTagAdapter()
-
-    context = {
-        REQUEST: request,
-        USER: request.user,
-        ALERT_MESSAGE: alert_message,
-        ALERT_TYPE: alert_type
-    }
 
     try:
 
@@ -104,13 +77,13 @@ def user_quiz_maker_view(request):
         quiz = quiz_adapter.create_model(quiz_name=quiz_name,
                                          quiz_description=quiz_description,
                                          quiz_owner=user,
-                                         start_time=event_start_date_time,
-                                         end_time=event_end_date_time)
+                                         start_time=QuizParser.get_timezone_aware_datetime(start_date_time),
+                                         end_time=QuizParser.get_timezone_aware_datetime(end_date_time))
 
         quiz_complete_model = QuizCompleteModel(quiz_model=quiz,
                                                 attempts=attempts,
                                                 pass_percentage=pass_percentage,
-                                                event_model=event_model,
+                                                event_model=QuizParser.get_event_model(start_date_time, end_date_time),
                                                 tags=list())
 
         # Create the tag names and put them into the quiz_complete_model
@@ -123,13 +96,14 @@ def user_quiz_maker_view(request):
         set_alert_session(session=request.session,
                           message=str(err),
                           alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
+        return ControllerModel(view=SERVICE_USER_QUIZ_INIT, redirect=True)
 
     session_insert_keys(session=request.session, quiz_complete_model=quiz_complete_model)
 
-    return render(request, USER_QUIZ_MAKER_PAGE, context)
+    return ControllerModel(view=USER_QUIZ_MAKER_PAGE, redirect=False)
 
 
+@controller
 def user_quiz_verifier_view(request):
     """
     Verifies the form for errors
@@ -137,8 +111,6 @@ def user_quiz_verifier_view(request):
     :param request: User request
     :return: Message depending on success or failure of quiz creation.
     """
-    request, alert_type, alert_message = init_alerts(request=request)
-    quiz_tools = QuizTools()
 
     # Quiz form is the HTML form which can be displayed and submitted by a user
     quiz_form = request.POST.get('quiz_form')
@@ -152,13 +124,13 @@ def user_quiz_verifier_view(request):
 
         # Parse the form to remove irrelevant data.
         # It will be better and cleaner to change the javascript so this will not be required
-        quiz_form = quiz_tools.parse_form(quiz_form=quiz_form)
+        quiz_form = QuizParser.parse_quiz_form(quiz_form=quiz_form)
 
     except ValueError as err:
         set_alert_session(session=request.session,
                           message=str(err),
                           alert_type=DANGER)
-        return HttpResponseRedirect(reverse(SERVICE_USER_QUIZ_INIT))
+        return ControllerModel(view=SERVICE_USER_QUIZ_INIT, redirect=True)
 
     # Add this form so that it can be displayed in the next page
     context = {
@@ -170,7 +142,7 @@ def user_quiz_verifier_view(request):
     quiz_complete_model.quiz_data = quiz_data
     session_insert_keys(request.session, quiz_complete_model=quiz_complete_model)
 
-    return render(request, USER_QUIZ_VERIFIER_PAGE, context)
+    return ControllerModel(view=USER_QUIZ_VERIFIER_PAGE, redirect=False, context=context)
 
 
 def user_quiz_create_view(request):
@@ -179,22 +151,23 @@ def user_quiz_create_view(request):
     :param request: User request
     :return: Redirects to dashboard on successful quiz creation.
     """
-    quiz_tools = QuizTools()
     quiz_adapter = QuizAdapter()
     quiz_tag_adapter = QuizTagAdapter()
+    quiz_storage_handler = QuizStorageHandler()
+    user_profile_storage_handler = UserProfileStorageHandler()
 
     answer_key = request.POST
     quiz_complete_model = request.session.get('quiz_complete_model')
 
     try:
         # Create serialized content to be uploaded to storage
-        content = quiz_tools.create_content(quiz_complete_model=quiz_complete_model, answer_key=answer_key)
+        content = quiz_storage_handler.create_content(quiz_complete_model=quiz_complete_model, answer_key=answer_key)
 
         # Create filename for file in storage
-        filename = quiz_tools.create_filename(quiz=quiz_complete_model.quiz_model)
+        filename = quiz_storage_handler.create_filename(quiz=quiz_complete_model.quiz_model)
 
         # Upload file to storage and get the return code (file id)
-        quiz_tools.upload_quiz(content=content, filename=filename)
+        quiz_storage_handler.upload_quiz(content=content, filename=filename)
 
     except ValueError as err:
         set_alert_session(session=request.session,
@@ -223,8 +196,7 @@ def user_quiz_create_view(request):
     UserProfileTools.save_my_quiz_profile(session=request.session, quiz_model=quiz_complete_model.quiz_model)
 
     # Save the profile
-    user_profile_tools = UserProfileTools()
-    future = user_profile_tools.save_profile(request.session)
+    future = user_profile_storage_handler.save_profile(request.session)
     # Wait for asynchronous callback
     future.result()
 
@@ -242,6 +214,9 @@ def user_quiz_delete_view(request):
     :return:
     """
     quiz_tools = QuizTools()
+    quiz_storage_handler = QuizStorageHandler()
+    user_profile_storage_handler = UserProfileStorageHandler()
+
     user_adapter = UserAdapter()
     quiz_adapter = QuizAdapter()
 
@@ -259,15 +234,14 @@ def user_quiz_delete_view(request):
         # Unlink all tags from the quiz
         quiz_tools.unlink_all_tags_of_quiz(quiz)
         # Deletes from storage
-        quiz_tools.delete_quiz_from_storage(quiz)
+        quiz_storage_handler.delete_quiz_from_storage(quiz)
         # Deletes from database
         quiz_adapter.delete_model(quiz)
         # Deletes from the user profile
         UserProfileTools.remove_my_quiz_profile(session=request.session, quiz_model=quiz)
 
         # Save the profile
-        user_profile_tools = UserProfileTools()
-        future = user_profile_tools.save_profile(request.session)
+        future = user_profile_storage_handler.save_profile(request.session)
         # Wait for asynchronous callback
         future.result()
 
