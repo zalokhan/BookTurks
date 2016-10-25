@@ -18,25 +18,23 @@ import sendgrid
 
 
 def get_username_password_reset_view(request):
-    request, alert_type, alert_message = init_alerts(request=request)
-
     username = request.POST.get('username')
 
     user_adapter = UserAdapter()
     if validate_email_address(username) is True:
-        user = user_adapter.get_user_from_django(username)
-        if user is None:
+        try:
+            user = user_adapter.get_user_from_django(username)
+        except Http404:
             set_alert_session(session=request.session,
                               message=str("The username does not exist."),
                               alert_type=DANGER)
-        else:
-            content = craft_email(request, user)
-            send_email(content, user.email)
-            success_alert = "An email has been sent to " + user.email +\
-                            ". Please check the inbox to reset the password."
-            set_alert_session(session=request.session,
-                              message=success_alert,
-                              alert_type=SUCCESS)
+        content = craft_email(request, user)
+        send_email(content, user.email)
+        success_alert = "An email has been sent to " + user.email +\
+                        ". Please check the inbox to reset the password."
+        set_alert_session(session=request.session,
+                          message=success_alert,
+                          alert_type=SUCCESS)
 
         return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))
 
@@ -46,13 +44,12 @@ def get_password_confirmation(request, uidb64=None, token=None, *args, **kwargs)
         return render(request, RESET_PASSWORD_CONFIRM, {'uidb64': uidb64, 'token': token})
 
     # uidb64, token is for verification purpose
-    request, alert_type, alert_message = init_alerts(request=request)
     new_password = request.POST.get('password')
     uidb64 = request.POST.get('uidb64')
     token = request.POST.get('token')
     user_adapter = UserAdapter()
-    assert uidb64 is not None and token is not None
     try:
+        assert uidb64 is not None and token is not None
         uid = urlsafe_base64_decode(uidb64)
         user = user_adapter.get_user_from_django_pk(uid)
     except (TypeError, ValueError, OverflowError, Http404):

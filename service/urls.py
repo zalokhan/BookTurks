@@ -19,6 +19,7 @@ urlpatterns = [
         name='reset_password_confirm'),
     # Reset Password
     url(r'^reset_password/$', views.reset_password, name='reset_password'),
+    url(r'^reset_password_confirm_put/$', views.reset_password_confirm, name='reset_password_confirm_put'),
 
     # Register new user
     url(r'^register/$', views.register, name='register'),

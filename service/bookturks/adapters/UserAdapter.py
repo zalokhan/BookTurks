@@ -101,7 +101,7 @@ class UserAdapter(object):
         :return:
         """
         if not email or not email.strip():
-            raise ValueError("User model cannot be created. Parameter missing.")
+            raise ValueError("User Email not valid.")
         try:
             user = models.User.objects.get(email=email)
         except Http404:
@@ -116,11 +116,11 @@ class UserAdapter(object):
         :return:
         """
         if not pk or not pk.strip():
-            raise ValueError("User model cannot be created. Parameter missing.")
+            raise ValueError("User id not valid.")
         try:
             user = models.User.objects.get(pk=pk)
         except Http404:
-            raise(Http404, "User not found.")
+            return None
         return user
 
     @staticmethod
