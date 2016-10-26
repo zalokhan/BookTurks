@@ -104,8 +104,8 @@ class UserAdapter(object):
             raise ValueError("User Email not valid.")
         try:
             user = models.User.objects.get(email=email)
-        except Http404:
-            raise(Http404, "User not found.")
+        except Exception:
+            raise
         return user
 
     @staticmethod
@@ -119,8 +119,8 @@ class UserAdapter(object):
             raise ValueError("User id not valid.")
         try:
             user = models.User.objects.get(pk=pk)
-        except Http404:
-            return None
+        except Exception:
+            return
         return user
 
     @staticmethod
