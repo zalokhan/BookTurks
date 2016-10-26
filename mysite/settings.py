@@ -166,11 +166,11 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'test1',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': 'MasterServiceDB',
+        'USER': 'MasterService',
+        'PASSWORD': 'MasterServiceDB',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
