@@ -45,6 +45,8 @@ SERVICE_USER_QUIZARENA_RESULT = "service:user_quizarena_result"
 # Write a story pages
 SERVICE_USER_STORY_HOME = "service:user_story_home"
 
+# Reset Password
+SERVICE_USER_RESET_PASSWORD = "service: reset_password"
 # HTML pages
 # Main pages
 MAIN_HOME_PAGE = "service/main_home_page.html"
@@ -64,6 +66,9 @@ USER_QUIZARENA_RESULT_PAGE = "service/user_quizarena_result.html"
 # Write a story pages
 USER_STORY_HOME_PAGE = "service/user_story_home.html"
 
+# Reset Password
+RESET_PASSWORD_CONFIRM = "service/reset_password_confirm.html"
+RESET_PASSWORD = "service/password_reset_email.html"
 """
 Quiz
 """

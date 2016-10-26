@@ -1,5 +1,6 @@
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import models
 
 from service.models import User
 
@@ -91,3 +92,48 @@ class UserAdapter(object):
                 return UserAdapter.exists(username)
             else:
                 return None
+
+    @staticmethod
+    def get_user_from_django(email):
+        """
+        Fetches User model from django user using email
+        :param email:
+        :return:
+        """
+        if not email or not email.strip():
+            raise ValueError("User Email not valid.")
+        try:
+            user = models.User.objects.get(email=email)
+        except Http404:
+            raise(Http404, "User not found.")
+        return user
+
+    @staticmethod
+    def get_user_from_django_pk(pk):
+        """
+        Fetches User model from django user using pk
+        :param pk:
+        :return:
+        """
+        if not pk or not pk.strip():
+            raise ValueError("User id not valid.")
+        try:
+            user = models.User.objects.get(pk=pk)
+        except Http404:
+            return None
+        return user
+
+    @staticmethod
+    def user_change_password(user, password):
+        """
+            Changes the Django user password
+            :param user:
+            :param password:
+            :return:
+            """
+        if not password:
+            raise ValueError("Value for password must be provided")
+        user.set_password(password)
+        user.save()
+        return user
+
