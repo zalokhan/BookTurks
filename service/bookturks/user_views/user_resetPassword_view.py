@@ -24,10 +24,11 @@ def get_username_password_reset_view(request):
     if validate_email_address(username) is True:
         try:
             user = user_adapter.get_user_from_django(username)
-        except Http404:
+        except Exception:
             set_alert_session(session=request.session,
-                              message=str("The username does not exist."),
+                              message=str("The user does not exist."),
                               alert_type=DANGER)
+            return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))
         content = craft_email(request, user)
         send_email(content, user.email)
         success_alert = "An email has been sent to " + user.email +\
@@ -35,8 +36,11 @@ def get_username_password_reset_view(request):
         set_alert_session(session=request.session,
                           message=success_alert,
                           alert_type=SUCCESS)
-
-        return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))
+    else:
+        set_alert_session(session=request.session,
+                          message=str("The email address is not valid."),
+                          alert_type=DANGER)
+    return HttpResponseRedirect(reverse(SERVICE_MAIN_HOME))
 
 
 def get_password_confirmation(request, uidb64=None, token=None, *args, **kwargs):
@@ -52,7 +56,7 @@ def get_password_confirmation(request, uidb64=None, token=None, *args, **kwargs)
         assert uidb64 is not None and token is not None
         uid = urlsafe_base64_decode(uidb64)
         user = user_adapter.get_user_from_django_pk(uid)
-    except (TypeError, ValueError, OverflowError, Http404):
+    except Exception:
         user = None
 
     if user is not None and default_token_generator.check_token(user, token):
