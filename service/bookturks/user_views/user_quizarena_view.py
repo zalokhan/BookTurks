@@ -22,7 +22,8 @@ def user_quizarena_home_view(request):
     """
     quiz_adapter = QuizAdapter()
 
-    quiz_list = quiz_adapter.get_all_models()
+    # Gets only the quizzes which have valid event windows.
+    quiz_list = quiz_adapter.get_valid_quizzes()
     context = {'quiz_list': quiz_list}
 
     return ControllerModel(view=USER_QUIZARENA_HOME_PAGE, redirect=False, context=context)
@@ -49,7 +50,7 @@ def user_quizarena_solve_view(request, quiz_id):
         if not quiz_complete_model:
             raise ValueError("This quiz is unavailable")
 
-        quiz_tools.check_attempt_eligibility((request.session.get(USER_PROFILE_MODEL)), quiz_complete_model, quiz_id)
+        quiz_tools.check_quiz_eligibility((request.session.get(USER_PROFILE_MODEL)), quiz_complete_model, quiz_id)
 
     except ValueError as err:
         set_alert_session(session=request.session,
