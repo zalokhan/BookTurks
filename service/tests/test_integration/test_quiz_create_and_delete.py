@@ -72,6 +72,9 @@ class QuizCreateAndDeleteTests(SeleniumTests):
         # Mark answer for answer key
         self.driver.find_elements_by_css_selector("input[type=radio][value=option-1]")[0].click()
         self.driver.find_element_by_css_selector("button[type=submit]").click()
+        # BUG FIX. Did not wait after submission for page to load. So adding this explicit wait.
+        while self.driver.current_url is '{0}{1}'.format(self.live_server_url, '/home/'):
+            time.sleep(0.1)
 
         """
         Part 2.

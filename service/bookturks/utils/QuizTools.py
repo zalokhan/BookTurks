@@ -1,4 +1,6 @@
-from service.bookturks.adapters.QuizTagAdapter import QuizTagAdapter
+from django.utils import timezone
+
+from service.bookturks.adapters import QuizTagAdapter
 
 
 class QuizTools(object):
@@ -17,11 +19,26 @@ class QuizTools(object):
             QuizTagAdapter.unlink_quiz(tag_name=tag.tag_name, quiz_id=quiz.quiz_id)
 
     @staticmethod
-    def check_attempt_eligibility(user_profile_model, quiz_complete_model, quiz_id):
+    def check_quiz_eligibility(user_profile_model, quiz_complete_model, quiz_id):
         """
-        Checks if the user still has number of attempts left for this quiz
+        Checks the following :
+        If the user still has number of attempts left for this quiz
+        If the quiz falls in the valid event window
         :return:
         """
+
+        # We can shift this check before downloading the file.
+        quiz_model = quiz_complete_model.quiz_model
+
+        # These can be null since null=true in the models.Quiz
+        if quiz_model.event_start and quiz_model.event_end:
+            current_time = timezone.now()
+            if quiz_model.event_start > current_time:
+                time_left = str(quiz_model.event_start - current_time)
+                raise ValueError("Quiz Event not yet started. {0} left".format(time_left))
+            if quiz_model.event_end < current_time:
+                raise ValueError("Quiz Expired")
+
         # Infinite number of attempts.
         if int(quiz_complete_model.attempts) is -1:
             return

@@ -1,5 +1,6 @@
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from service.models import Quiz
 
@@ -104,3 +105,14 @@ class QuizAdapter(object):
         :return:
         """
         return Quiz.objects.all()
+
+    @staticmethod
+    def get_valid_quizzes():
+        """
+        Returns list of valid quizzes
+        Falls within the event window
+        :return:
+        """
+        current_time = timezone.now()
+        # Excluding so that we do not omit null event quizzes.
+        return Quiz.objects.all().exclude(event_start__gt=current_time).exclude(event_end__lt=current_time)
