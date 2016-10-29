@@ -5,6 +5,7 @@ from django.test import TestCase
 
 from service.bookturks.Constants import QUIZ_HOME
 from service.bookturks.dropbox_adapter.DropboxClient import DropboxClient
+from service.bookturks.serializer import serialize, deserialize
 
 
 class DropboxClientTest(TestCase):
@@ -27,7 +28,7 @@ class DropboxClientTest(TestCase):
         mock_filename = "".join([QUIZ_HOME, "/mock_user_quiz_name"])
 
         # Checking uploads
-        upload_result = self.dbx.upload_file(content="mock_content", filename=mock_filename)
+        upload_result = self.dbx.upload_file(content=serialize("mock_content"), filename=mock_filename)
         self.assertIsNotNone(upload_result)
         self.assertEqual(mock_filename, upload_result.path_display)
 
@@ -39,11 +40,11 @@ class DropboxClientTest(TestCase):
 
         # Checking downloads
         path, download_result = self.dbx.get_file(mock_filename)
-        with open(path) as quiz_file:
+        with open(path, 'rb') as quiz_file:
             content = quiz_file.read()
             quiz_file.close()
         os.remove(path)
-        self.assertEqual(content, "mock_content")
+        self.assertEqual(deserialize(content), "mock_content")
 
         # Checking deletions
         delete_result = self.dbx.delete_file(mock_filename)
