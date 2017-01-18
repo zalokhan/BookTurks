@@ -411,10 +411,6 @@
     </div>
     <!-- End of Modal -->
 
-    {% if user and not user.is_anonymous %}
-        {{ user.get_full_name|default:user.username }}
-    {% else %}
-    {% endif %}
 </section>
 
 <section id="contact">
